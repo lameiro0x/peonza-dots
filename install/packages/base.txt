@@ -1,0 +1,33 @@
+# System base, on top of what archinstall 4.5 already installs (base, linux, linux-lts,
+# linux-firmware, intel-ucode, btrfs-progs, grub, efibootmgr, snapper, grub-btrfs,
+# inotify-tools, zram-generator, networkmanager, pipewire stack).
+# Official repos only (core/extra). install/check-packages.py verifies every line.
+base-devel
+git
+openssh
+man-db
+man-pages
+pacman-contrib
+reflector
+rsync
+snap-pac
+sof-firmware
+linux-firmware-intel
+intel-media-driver
+vulkan-intel
+libva-utils
+vulkan-tools
+intel-gpu-tools
+intel-npu-driver
+pciutils
+usbutils
+lm_sensors
+smartmontools
+nvme-cli
+bubblewrap
+socat
+greetd
+greetd-tuigreet
+xdg-user-dirs
+xdg-utils
+nftables

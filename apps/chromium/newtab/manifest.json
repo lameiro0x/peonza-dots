@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Ryce · Nueva pestaña",
+  "description": "Reloj, buscador y la barra de marcadores sobre el fondo del tema de ryce. Sin red y sin seguimiento.",
+  "version": "1.0",
+  "minimum_chrome_version": "120",
+  "chrome_url_overrides": { "newtab": "newtab.html" },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["bookmarks", "favicon", "search", "tabs"]
+}

@@ -1,0 +1,133 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+    // The peonza spinning: the brand's `think` state as a looping WebP (theme/fetch/fetch.py),
+    // sent with the kitty protocol and played by kitty itself (animationFrame 0). fastfetch
+    // decodes it with ImageMagick 7 once per box size (~/.cache/fastfetch/images keeps the
+    // result). apps/fish/functions/fastfetch.fish falls back to the still PNG
+    // (kitty-direct) without ImageMagick, to the half-block peonza (peonza.txt, `$1` below)
+    // in the TTY, over ssh and in tmux, and puts a smaller logo above the text when the
+    // terminal is narrower than 88 columns.
+    // 31 x 12 cells is a square at kitty's cell (10 x 26 px at 13 pt with cell_height
+    // 112 %: 310 x 312 px); the WebP is drawn larger, so it is only ever scaled down.
+    "logo": {
+        "type": "kitty",
+        "source": "~/.local/state/ryce/theme/current/fastfetch/peonza.webp",
+        "animationFrame": 0,
+        "width": 31,
+        "height": 12,
+        "padding": {
+            "top": 3,
+            "left": 2,
+            "right": 2
+        },
+        "color": {
+            "1": "{{fg0}}"
+        }
+    },
+
+    // Three groups, each in one of the theme's hues (the bar's module colours): gruvbox and
+    // kanagawa in Origen and Ola, greys in Grafito and Tinta, so those stay monochrome.
+    // Icons are keyIcon, not part of the key: the fish wrapper turns them off in the TTY.
+    // The key width counts the icon and its two spaces: 15 fits «intérprete» and a gap.
+    // Beside the logo every line fits 88 columns, half a 1920 px kitty: logo 35, key 15 and
+    // a value of at most 37 («1920x1080 @ 144 Hz, 1920x1080 @ 72 Hz»), so the bars are
+    // 8 wide and the processor and the graphics card are their names only. A longer one is cut
+    // at the window's edge (disableLinewrap; fastfetch 2.71 leaves it off) instead of
+    // wrapping to column 0 under the peonza, which is where its tail («· 48%») showed.
+    "display": {
+        "separator": "  ",
+        "disableLinewrap": true,
+        "key": {
+            "type": "both-2",
+            "width": 15
+        },
+        "color": {
+            "keys": "{{fg1}}",
+            "title": "{{fg0}}",
+            "output": "{{fg0}}",
+            "separator": "{{fg2}}"
+        },
+        "percent": {
+            "type": ["num", "bar"],
+            "color": {
+                "green": "{{ok}}",
+                "yellow": "{{warn}}",
+                "red": "{{err}}"
+            }
+        },
+        "bar": {
+            "char": {
+                "elapsed": "━",
+                "total": "─"
+            },
+            "border": null,
+            "color": {
+                "total": "{{fg2}}"
+            },
+            "width": 8
+        },
+        // One unit across the rice: the desk and the bar say «11,8 de 31 GB», counting
+        // 1024-based units and calling them GB (desk/Sampler.qml, SystemLine.qml). JEDEC is
+        // exactly that, so the numbers match too; SI would print 33.1 for the same 31.
+        // fastfetch has no decimal comma: it prints the point.
+        "size": {
+            "binaryPrefix": "jedec",
+            "ndigits": 1
+        }
+    },
+
+    "modules": [
+        // A blank first line: with the image logo above the text (the fish wrapper, narrow
+        // terminals) fastfetch 2.71 starts the first line where the image ended, to its right.
+        "break",
+        {
+            "type": "title",
+            "format": "{user-name}{#}{##{{fg2.hex}}}@{#}{host-name}",
+            "color": {
+                "user": "{{hue.cpu}}",
+                "host": "{{hue.mem}}"
+            }
+        },
+        {
+            "type": "separator",
+            "string": "─",
+            "outputColor": "{{fg2}}"
+        },
+
+        { "type": "custom", "format": "{##{{hue.cpu.hex}}}{#1}equipo" },
+        { "type": "os",       "key": "sistema",    "keyIcon": "{{glyph.arch}}",            "keyColor": "{{hue.cpu}}", "format": "{pretty-name} {arch}" },
+        { "type": "kernel",   "key": "núcleo",     "keyIcon": "{{glyph.linux}}",           "keyColor": "{{hue.cpu}}", "format": "{release}" },
+        { "type": "uptime",   "key": "encendido",  "keyIcon": "{{glyph.timer_outline}}",   "keyColor": "{{hue.cpu}}", "format": "{?days}{days} d {?}{hours} h {minutes} min" },
+        { "type": "packages", "key": "paquetes",   "keyIcon": "{{glyph.package_variant}}", "keyColor": "{{hue.cpu}}" },
+        "break",
+
+        { "type": "custom", "format": "{##{{hue.mem.hex}}}{#1}escritorio" },
+        { "type": "wm",       "key": "compositor", "keyIcon": "{{glyph.dock_window}}",     "keyColor": "{{hue.mem}}" },
+        { "type": "custom",   "key": "tema",       "keyIcon": "{{glyph.palette_outline}}", "keyColor": "{{hue.mem}}", "format": "{{theme.name}}" },
+        { "type": "shell",    "key": "intérprete", "keyIcon": "{{glyph.console_line}}",    "keyColor": "{{hue.mem}}" },
+        { "type": "display",  "key": "pantallas",  "keyIcon": "{{glyph.monitor}}",         "keyColor": "{{hue.mem}}", "compactType": "original-with-refresh-rate" },
+        // agentd's roster: hidden (no output) when agentd is not running or jq is missing.
+        {
+            "type": "command",
+            "key": "agentes",
+            "keyIcon": "{{glyph.uF06A9}}",
+            "keyColor": "{{hue.mem}}",
+            "shell": "/bin/sh",
+            "param": "-c",
+            "text": "f=\"${RYCE_AGENTD_DIR:-$XDG_RUNTIME_DIR/agentd}/roster.json\"; [ -r \"$f\" ] && jq -r '.sessions | length as $n | (map(select(.state == \"waiting\")) | length) as $w | (map(select(.state == \"busy\")) | length) as $b | if $n == 0 then \"ninguna sesión\" else \"\\($n) \\(if $n == 1 then \"sesión\" else \"sesiones\" end)\" + (if $w > 0 then \" · \\($w) \\(if $w == 1 then \"te espera\" else \"te esperan\" end)\" else \"\" end) + (if $b > 0 then \" · \\($b) \\(if $b == 1 then \"trabaja\" else \"trabajan\" end)\" else \"\" end) end' \"$f\" 2>/dev/null"
+        },
+        "break",
+
+        { "type": "custom", "format": "{##{{hue.vol.hex}}}{#1}máquina" },
+        { "type": "cpu",      "key": "procesador", "keyIcon": "{{glyph.cpu_64_bit}}",      "keyColor": "{{hue.vol}}", "format": "{name}" },
+        { "type": "gpu",      "key": "gráfica",    "keyIcon": "{{glyph.expansion_card}}",  "keyColor": "{{hue.vol}}", "format": "{name}" },
+        { "type": "memory",   "key": "memoria",    "keyIcon": "{{glyph.memory}}",          "keyColor": "{{hue.vol}}", "format": "{percentage-bar}  {used} de {total} · {percentage}" },
+        { "type": "disk",     "key": "disco",      "keyIcon": "{{glyph.harddisk}}",        "keyColor": "{{hue.vol}}", "folders": "/", "format": "{size-percentage-bar}  {size-used} de {size-total} · {size-percentage}" },
+        "break",
+        {
+            "type": "colors",
+            "symbol": "circle"
+        }
+    ]
+}

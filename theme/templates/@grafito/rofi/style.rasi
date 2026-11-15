@@ -1,0 +1,291 @@
+/* rofi 2.x (native Wayland), theme «{{theme.name}}». The instrument: on the left
+   the dot-matrix art with the clock in Doto at the top, read like a display, and
+   a readout of ruled rows at the foot (encendido, agentes), signed with the
+   peonza. On the right numbered tabs, the search line and the list; the selected
+   app is the white pill, square-cornered. Opaque, no blur, no colour.
+
+   bin/ryce-launcher fills the panel's text at each open (-theme-str) and turns
+   the face and the readout on. The clipboard picker (rofi -dmenu, same theme)
+   gets the art and the signature only. */
+
+* {
+    panel:   {{bg1@alpha.panel}};
+    still:   {{bg0}};
+    pick:    {{pill}};
+    on-pick: {{ink_on_pill}};
+    edge:    {{line}};
+    text:    {{fg0}};
+    muted:   {{fg1}};
+    mark:    {{fg2}};
+
+    background-color: transparent;
+    text-color:       @muted;
+    font:             "{{font.ui}} 13";
+}
+
+configuration {
+    show-icons:          true;
+    icon-theme:          "Papirus-Dark";
+    drun-display-format: "{name}";
+    window-format:       "{t}";
+    display-drun:        "01 APPS";
+    display-window:      "02 VENTANAS";
+    display-filebrowser: "03 ARCHIVOS";
+    display-run:         "04 EJECUTAR";
+    hover-select:        true;
+    filebrowser {
+        directories-first: true;
+        command:           "systemd-run --user --scope --slice=app.slice --collect xdg-open";
+    }
+}
+
+window {
+    location:         center;
+    anchor:           center;
+    width:            900px;
+    height:           540px;
+    padding:          0px;
+    background-color: @panel;
+    border:           {{geometry.border}}px;
+    border-color:     @edge;
+    border-radius:    {{geometry.rounding}}px;
+}
+
+mainbox {
+    orientation: horizontal;
+    spacing:     0px;
+    children:    [ still, column ];
+}
+
+/* ---- the panel ------------------------------------------------------------
+   panel.png is 360x600; the panel is 3:5 too, so `both` scales without
+   distortion. A hairline closes it against the list. */
+still {
+    orientation:      vertical;
+    expand:           false;
+    width:            324px;
+    padding:          22px 22px 16px 22px;
+    spacing:          0px;
+    background-color: @still;
+    background-image: url("~/.local/state/ryce/theme/current/wallpaper/panel.png", both);
+    border:           0px 1px 0px 0px;
+    border-color:     @edge;
+    children:         [ face, still-air, readout, signature ];
+}
+
+still-air {
+    expand: true;
+}
+
+/* bin/ryce-launcher turns the face and the readout on and the blank off, so the
+   face takes the panel's free space: rofi 2.0.0 lays out nothing in a box whose
+   children ask for more height than it got, and a box sized to its own estimate
+   can come out a few pixels short. */
+face {
+    enabled:     false;
+    orientation: vertical;
+    expand:      true;
+    spacing:     4px;
+    children:    [ textbox-greet, clock, textbox-date ];
+}
+
+textbox-greet {
+    expand:     false;
+    font:       "{{font.ui}} 11";
+    text-color: @muted;
+}
+
+textbox-date {
+    expand:     false;
+    font:       "{{font.ui}} 11";
+    text-color: @muted;
+}
+
+clock {
+    orientation: horizontal;
+    expand:      false;
+    spacing:     0px;
+    children:    [ textbox-hh, textbox-sep, textbox-mm, clock-air ];
+}
+
+/* Doto under 26 px loses its dots (contracts: display_min_px). */
+textbox-hh, textbox-sep, textbox-mm {
+    expand:     false;
+    font:       "{{font.display}} Black 64";
+    text-color: @text;
+}
+
+clock-air {
+    expand: true;
+}
+
+textbox-sep {
+    content:    "{{clock.sep}}";
+    text-color: @muted;
+}
+
+readout {
+    enabled:      false;
+    orientation:  vertical;
+    expand:       false;
+    spacing:      0px;
+    margin:       0px 0px 14px 0px;
+    border:       1px 0px 0px 0px;
+    border-color: @edge;
+    children:     [ uptime-row, agents-row ];
+}
+
+uptime-row, agents-row {
+    orientation:  horizontal;
+    expand:       false;
+    padding:      7px 0px;
+    border:       0px 0px 1px 0px;
+    border-color: @edge;
+}
+
+uptime-row { children: [ textbox-uptime-label, textbox-uptime ]; }
+agents-row { children: [ textbox-agents-label, textbox-agents ]; }
+
+textbox-uptime-label, textbox-agents-label {
+    expand:     false;
+    font:       "{{font.ui}} 9";
+    text-color: @muted;
+}
+
+textbox-uptime-label { content: "ENCENDIDO"; }
+textbox-agents-label { content: "AGENTES"; }
+
+textbox-uptime, textbox-agents {
+    expand:           true;
+    font:             "{{font.mono}} 10";
+    text-color:       @text;
+    horizontal-align: 1.0;
+}
+
+signature {
+    orientation: horizontal;
+    expand:      false;
+    spacing:     10px;
+    children:    [ textbox-peonza, textbox-theme ];
+}
+
+textbox-peonza {
+    expand:         false;
+    content:        "{{glyph.peonza}}";
+    font:           "Ryce Peonza 17";
+    text-color:     @text;
+    vertical-align: 0.5;
+}
+
+textbox-theme {
+    expand:         true;
+    content:        "GRAFITO";
+    font:           "{{font.ui}} 9";
+    text-color:     @muted;
+    vertical-align: 0.5;
+}
+
+/* ---- the list ------------------------------------------------------------- */
+
+column {
+    orientation: vertical;
+    expand:      true;
+    padding:     18px 24px 18px 24px;
+    spacing:     14px;
+    children:    [ mode-switcher, body ];
+}
+
+mode-switcher {
+    expand:       false;
+    spacing:      0px;
+    border:       0px 0px 1px 0px;
+    border-color: @edge;
+}
+
+button {
+    padding:          8px 0px;
+    font:             "{{font.ui}} 9";
+    text-color:       @muted;
+    horizontal-align: 0.0;
+    border:           0px 0px 2px 0px;
+    border-color:     transparent;
+}
+
+button selected {
+    text-color:   @text;
+    border-color: @text;
+}
+
+body {
+    orientation: vertical;
+    spacing:     10px;
+    children:    [ inputbar, message, listview ];
+}
+
+inputbar {
+    padding:  4px 4px 6px 4px;
+    spacing:  12px;
+    children: [ textbox-search, entry ];
+}
+
+textbox-search {
+    expand:         false;
+    content:        "{{glyph.magnify}}";
+    font:           "{{font.icon}} 14";
+    text-color:     @mark;
+    vertical-align: 0.5;
+}
+
+entry {
+    font:              "{{font.ui}} 14";
+    text-color:        @text;
+    placeholder:       "Buscar";
+    placeholder-color: @muted;
+    cursor:            text;
+    cursor-color:      @text;
+    vertical-align:    0.5;
+}
+
+message {
+    padding:      8px 12px;
+    border:       1px;
+    border-color: @edge;
+}
+
+textbox {
+    text-color: @text;
+}
+
+listview {
+    lines:        8;
+    columns:      1;
+    spacing:      2px;
+    scrollbar:    false;
+    fixed-height: true;
+    cycle:        true;
+    dynamic:      false;
+}
+
+element {
+    padding:       7px 12px;
+    spacing:       14px;
+    border-radius: {{geometry.pill_radius}}px;
+    text-color:    @muted;
+}
+
+element selected {
+    background-color: @pick;
+    text-color:       @on-pick;
+}
+
+element-icon {
+    size:           1.5em;
+    vertical-align: 0.5;
+    text-color:     inherit;
+}
+
+element-text {
+    text-color:     inherit;
+    vertical-align: 0.5;
+    highlight:      bold;
+}

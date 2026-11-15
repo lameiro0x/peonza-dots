@@ -1,0 +1,275 @@
+{
+  "schema": "ryce.theme/2",
+  "id": "origen",
+  "name": "Origen",
+  "temperature": "warm",
+  "tagline": "Gruvbox de taller: madera, crema y un naranja que solo avisa.",
+  "colors": {
+    "bg0": "#1d2021",
+    "bg1": "#282828",
+    "bg2": "#32302f",
+    "bg3": "#3c3836",
+    "line": "#504945",
+    "fg0": "#ebdbb2",
+    "fg1": "#bdae93",
+    "fg2": "#ae9f90",
+    "pill": "#ebdbb2",
+    "ink_on_pill": "#1d2021",
+    "dim_on_pill": "#665c54",
+    "busy": "#bdae93",
+    "signal": "#fe8019",
+    "signal_dim": "#3f2715",
+    "signal_on_pill": "#af3a03",
+    "tint": "#8ec07c",
+    "ok": "#b8bb26",
+    "warn": "#fabd2f",
+    "err": "#f25c54",
+    "claude": "#d97757"
+  },
+  "hues": {
+    "cpu": "#fabd2f",
+    "mem": "#8ec07c",
+    "net": "#83a598",
+    "vol": "#b8bb26",
+    "media": "#d3869b",
+    "clock": "#ebdbb2",
+    "disk": "#d5c4a1"
+  },
+  "alpha": {
+    "bar": 0.92,
+    "panel": 0.96,
+    "tooltip": 0.97,
+    "term": 0.78
+  },
+  "ansi": [
+    "#3c3836",
+    "#f77d75",
+    "#a7a628",
+    "#d79921",
+    "#7daea3",
+    "#d88ba0",
+    "#7bad7d",
+    "#cdbda1",
+    "#af9f90",
+    "#ff9e92",
+    "#b8bb26",
+    "#fabd2f",
+    "#a3c4b8",
+    "#e5a3b4",
+    "#8ec07c",
+    "#fbf1c7"
+  ],
+  "term": {
+    "cursor": "#fabd2f",
+    "selection_bg": "#504945",
+    "selection_fg": "#fbf1c7",
+    "url": "#83a598",
+    "claude": "#d79921",
+    "diff_add": "#2f3518",
+    "diff_del": "#3c1f1d",
+    "diff_add_word": "#4a5526",
+    "diff_del_word": "#5e2c28"
+  },
+  "fonts": {
+    "ui": "Martian Mono",
+    "display": "Martian Mono",
+    "mono": "JetBrainsMono Nerd Font",
+    "icon": "JetBrainsMono Nerd Font",
+    "display_min_px": 0
+  },
+  "geometry": {
+    "frame_top": 50,
+    "frame_rim": 0,
+    "frame_radius": 3,
+    "gaps_in": 4,
+    "gaps_out": 8,
+    "border": 2,
+    "rounding": 3,
+    "rounding_power": 2.0,
+    "pill_radius": 3
+  },
+  "blur": {
+    "enabled": true,
+    "size": 4,
+    "passes": 2,
+    "brightness": 0.45,
+    "desk": true
+  },
+  "motion": {
+    "preset": "cine",
+    "ms": 420,
+    "qml_curve": [
+      0.05,
+      0.7,
+      0.1,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "hypr": {
+      "curves": {
+        "decel": {
+          "type": "bezier",
+          "points": [
+            [
+              0.05,
+              0.7
+            ],
+            [
+              0.1,
+              1.0
+            ]
+          ]
+        },
+        "accel": {
+          "type": "bezier",
+          "points": [
+            [
+              0.3,
+              0.0
+            ],
+            [
+              0.8,
+              0.15
+            ]
+          ]
+        },
+        "std": {
+          "type": "bezier",
+          "points": [
+            [
+              0.2,
+              0.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "over": {
+          "type": "bezier",
+          "points": [
+            [
+              0.34,
+              1.3
+            ],
+            [
+              0.64,
+              1.0
+            ]
+          ]
+        }
+      },
+      "leaves": {
+        "windowsIn": {
+          "speed": 4.5,
+          "curve": "over",
+          "style": "popin 80%"
+        },
+        "windowsOut": {
+          "speed": 2.5,
+          "curve": "accel",
+          "style": "popin 85%"
+        },
+        "windowsMove": {
+          "speed": 4.0,
+          "curve": "std"
+        },
+        "fadeIn": {
+          "speed": 3.0,
+          "curve": "decel"
+        },
+        "fadeOut": {
+          "speed": 2.0,
+          "curve": "accel"
+        },
+        "fadeSwitch": {
+          "speed": 3.0,
+          "curve": "std"
+        },
+        "fadeDim": {
+          "speed": 4.0,
+          "curve": "std"
+        },
+        "layersIn": {
+          "speed": 3.5,
+          "curve": "decel",
+          "style": "popin 92%"
+        },
+        "layersOut": {
+          "speed": 2.0,
+          "curve": "accel",
+          "style": "fade"
+        },
+        "fadeLayersIn": {
+          "speed": 3.0,
+          "curve": "decel"
+        },
+        "fadeLayersOut": {
+          "speed": 2.0,
+          "curve": "accel"
+        },
+        "fadePopupsIn": {
+          "speed": 2.5,
+          "curve": "decel"
+        },
+        "fadePopupsOut": {
+          "speed": 1.5,
+          "curve": "accel"
+        },
+        "workspacesIn": {
+          "speed": 5.0,
+          "curve": "decel",
+          "style": "slidefade 20%"
+        },
+        "workspacesOut": {
+          "speed": 5.0,
+          "curve": "decel",
+          "style": "slidefade 20%"
+        },
+        "specialWorkspace": {
+          "speed": 4.0,
+          "curve": "decel",
+          "style": "slidefadevert 15%"
+        },
+        "border": {
+          "speed": 5.0,
+          "curve": "std"
+        },
+        "zoomFactor": {
+          "speed": 5.0,
+          "curve": "decel"
+        }
+      }
+    }
+  },
+  "wallpaper": {
+    "scene": "photo",
+    "source": "assets/wallpapers/origen-ocaso.jpg",
+    "focus": [
+      0.5,
+      0.62
+    ],
+    "grade": "none",
+    "lock_source": "assets/wallpapers/origen-hudson.jpg",
+    "alternates": [
+      "assets/wallpapers/origen-hudson.jpg"
+    ],
+    "transition": "grow",
+    "animated": false
+  },
+  "desktop": {
+    "gtk_theme": "adw-gtk3-dark",
+    "icon_theme": "ryce-origen",
+    "folder": "#d79921",
+    "folder_dark": "#a87a1a",
+    "cursor": "ryce-peonza",
+    "ambient": []
+  },
+  "contrast_floor": {
+    "text": 4.5,
+    "ui": 3.0
+  },
+  "scheme": "dark"
+}

@@ -1,0 +1,70 @@
+/* Zotero 10 in «{{theme.name}}» ({{theme.scheme}}). apps/zotero/plugin registers this file as a
+   user sheet and swaps it on every ryce-theme switch. Zotero styles its windows, its reader
+   and its note editor through one set of custom properties (zotero.css, reader.css,
+   editor.css); redefining them here, !important to beat the author sheets, recolours all
+   three without touching a selector that a release may rename. Both of Zotero's schemes
+   get the same values, so the result does not depend on the system's light/dark state.
+   Zotero's accent (selected rows, focused controls) is the theme's cool hue, the one GTK
+   tints its selection with, under bg0 text. Never the signal colour. */
+
+@-moz-document url-prefix("chrome://zotero/"), url-prefix("resource://zotero/reader/"),
+  url-prefix("resource://zotero/note-editor/") {
+  :root {
+    color-scheme: {{theme.scheme}} !important;
+
+    --fill-primary: {{fg0}} !important;
+    --fill-secondary: {{fg1}} !important;
+    --fill-tertiary: {{fg2}} !important;
+    --fill-quarternary: {{fg0@0.12}} !important;
+    --fill-quinary: {{fg0@0.06}} !important;
+    --fill-senary: {{fg0@0.03}} !important;
+
+    --color-background: {{bg0}} !important;
+    --color-background30: {{bg0@0.3}} !important;
+    --color-background50: {{bg0@0.5}} !important;
+    --color-background70: {{bg0@0.7}} !important;
+    --color-sidepane: {{bg1}} !important;
+    --color-toolbar: {{bg1}} !important;
+    --color-tabbar: {{bg1}} !important;
+    --color-menu: {{bg2}} !important;
+    --color-menu-opaque: {{bg2}} !important;
+    --color-button: {{bg2}} !important;
+    --color-button50: {{bg2@0.5}} !important;
+    --color-control: {{fg1}} !important;
+    --color-border: {{line}} !important;
+    --color-border50: {{line@0.5}} !important;
+    --color-panedivider: {{line}} !important;
+    --color-stripe: {{fg0@0.03}} !important;
+    --color-stripe-on-background: {{bg1}} !important;
+    --color-quinary-on-background: {{bg1}} !important;
+    --color-quarternary-on-background: {{bg2}} !important;
+    --color-quinary-on-sidepane: {{bg2}} !important;
+    --color-quarternary-on-sidepane: {{bg3}} !important;
+    --color-scrollbar: {{fg2}} !important;
+    --color-scrollbar-hover: {{fg1}} !important;
+    --color-scrollbar-background: transparent !important;
+
+    --color-accent: {{hue.net}} !important;
+    --color-accent-text: {{bg0}} !important;
+    --color-focus-border: {{fg1}} !important;
+    --color-focus-search: {{fg1}} !important;
+    --accent-blue: {{hue.net}} !important;
+    --accent-blue10: {{hue.net@0.1}} !important;
+    --accent-blue30: {{hue.net@0.3}} !important;
+    --accent-blue50: {{hue.net@0.5}} !important;
+    --accent-azure: {{hue.net}} !important;
+    --accent-red: {{err}} !important;
+    --accent-green: {{ok}} !important;
+    --accent-yellow: {{warn}} !important;
+    --accent-gold: {{warn}} !important;
+    --accent-white: {{bg0}} !important;
+    --color-invalid: {{err}} !important;
+    --color-invalid-background: {{err@0.14}} !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://zotero/") {
+  :root, window, dialog {
+    font-family: "{{font.ui}}", sans-serif !important;
+  }
+}

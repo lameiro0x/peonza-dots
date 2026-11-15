@@ -1,0 +1,378 @@
+{
+ "generated_by": "tools/atajos.py from keys/keymap.tsv; do not edit",
+ "groups": [
+  {
+   "title": "Ventanas",
+   "rows": [
+    {
+     "keys": [
+      "Mayús",
+      "Super",
+      "E"
+     ],
+     "what": "Salir de Hyprland"
+    },
+    {
+     "keys": [
+      "Super",
+      "F"
+     ],
+     "what": "Pantalla completa"
+    },
+    {
+     "keys": [
+      "Super",
+      "V"
+     ],
+     "what": "Ventana flotante / en mosaico"
+    },
+    {
+     "keys": [
+      "Super",
+      "P"
+     ],
+     "what": "Pseudo-mosaico"
+    },
+    {
+     "keys": [
+      "Super",
+      "J"
+     ],
+     "what": "Cambiar la división (horizontal / vertical)"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Q"
+     ],
+     "what": "Cerrar la ventana"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "H L K J"
+     ],
+     "what": "Mover el foco"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Super",
+      "H L K J"
+     ],
+     "what": "Mover la ventana"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Mayús",
+      "H L K J"
+     ],
+     "what": "Cambiar el tamaño de la ventana"
+    },
+    {
+     "keys": [
+      "Super",
+      "Clic izq."
+     ],
+     "what": "Mover la ventana con el ratón"
+    },
+    {
+     "keys": [
+      "Super",
+      "Clic der."
+     ],
+     "what": "Redimensionar con el ratón"
+    },
+    {
+     "keys": [
+      "Super",
+      "Esc"
+     ],
+     "what": "Bloquear la pantalla"
+    },
+    {
+     "keys": [
+      "Mayús",
+      "Super",
+      "Esc"
+     ],
+     "what": "Hibernar el PC (las sesiones siguen al volver)"
+    },
+    {
+     "keys": [
+      "Super",
+      "E"
+     ],
+     "what": "Despejar el escritorio"
+    }
+   ]
+  },
+  {
+   "title": "Workspaces",
+   "rows": [
+    {
+     "keys": [
+      "Ctrl",
+      "← →"
+     ],
+     "what": "Workspace anterior / siguiente; en el borde pasa a la otra pantalla"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "1 … 0"
+     ],
+     "what": "Ir a un workspace (1–10)"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Mayús",
+      "1 … 0"
+     ],
+     "what": "Mandar la ventana a un workspace"
+    }
+   ]
+  },
+  {
+   "title": "Pantallas",
+   "rows": [
+    {
+     "keys": [
+      "Ctrl",
+      "Tab"
+     ],
+     "what": "Foco a la otra pantalla"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Mayús",
+      "Tab"
+     ],
+     "what": "Mover la ventana a la otra pantalla"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Alt",
+      "← →"
+     ],
+     "what": "Foco a la pantalla de la izquierda / derecha"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Super",
+      "← →"
+     ],
+     "what": "Mover la ventana a la otra pantalla"
+    }
+   ]
+  },
+  {
+   "title": "Apps",
+   "rows": [
+    {
+     "keys": [
+      "Ctrl",
+      "Enter"
+     ],
+     "what": "Abrir una terminal"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Espacio"
+     ],
+     "what": "Lanzador de aplicaciones"
+    },
+    {
+     "keys": [
+      "Super",
+      "C"
+     ],
+     "what": "Historial del portapapeles"
+    }
+   ]
+  },
+  {
+   "title": "Capturas",
+   "rows": [
+    {
+     "keys": [
+      "ImprPant"
+     ],
+     "what": "Captura de toda la pantalla"
+    },
+    {
+     "keys": [
+      "Mayús",
+      "ImprPant"
+     ],
+     "what": "Captura de una zona"
+    },
+    {
+     "keys": [
+      "Ctrl",
+      "Mayús",
+      "S"
+     ],
+     "what": "Captura de una zona al portapapeles"
+    },
+    {
+     "keys": [
+      "Mayús",
+      "Super",
+      "S"
+     ],
+     "what": "Captura de una zona para anotarla (swappy)"
+    }
+   ]
+  },
+  {
+   "title": "Sonido",
+   "rows": [
+    {
+     "keys": [
+      "Vol +"
+     ],
+     "what": "Subir volumen"
+    },
+    {
+     "keys": [
+      "Vol −"
+     ],
+     "what": "Bajar volumen"
+    },
+    {
+     "keys": [
+      "Silencio"
+     ],
+     "what": "Silenciar"
+    },
+    {
+     "keys": [
+      "Alt",
+      "Super",
+      "→"
+     ],
+     "what": "Canción siguiente"
+    },
+    {
+     "keys": [
+      "Alt",
+      "Super",
+      "←"
+     ],
+     "what": "Canción anterior"
+    },
+    {
+     "keys": [
+      "Alt",
+      "Super",
+      "Espacio"
+     ],
+     "what": "Pausar o seguir la música"
+    },
+    {
+     "keys": [
+      "Play / Pausa"
+     ],
+     "what": "Pausar o seguir la música"
+    },
+    {
+     "keys": [
+      "Sig."
+     ],
+     "what": "Canción siguiente"
+    },
+    {
+     "keys": [
+      "Ant."
+     ],
+     "what": "Canción anterior"
+    }
+   ]
+  },
+  {
+   "title": "ryce",
+   "rows": [
+    {
+     "keys": [
+      "Super",
+      "A"
+     ],
+     "what": "Abrir o cerrar el panel lateral (agentes, música, controles)"
+    },
+    {
+     "keys": [
+      "Super",
+      "T"
+     ],
+     "what": "Elegir el tema (Origen, Grafito, Ola, Tinta o Papel)"
+    },
+    {
+     "keys": [
+      "Mayús",
+      "Super",
+      "T"
+     ],
+     "what": "Pasar al tema siguiente"
+    },
+    {
+     "keys": [
+      "Super",
+      "D"
+     ],
+     "what": "Mostrar u ocultar el reloj del escritorio"
+    },
+    {
+     "keys": [
+      "Mayús",
+      "Super",
+      "D"
+     ],
+     "what": "Mostrar u ocultar los datos del PC en el escritorio"
+    },
+    {
+     "keys": [
+      "Super",
+      "M"
+     ],
+     "what": "Abrir o cerrar Aria, tu música"
+    },
+    {
+     "keys": [
+      "Super",
+      "H"
+     ],
+     "what": "Abrir o cerrar tus tareas de Hito"
+    },
+    {
+     "keys": [
+      "Super",
+      "F1"
+     ],
+     "what": "Ver esta chuleta de atajos"
+    },
+    {
+     "keys": [
+      "Mayús",
+      "Super",
+      "W"
+     ],
+     "what": "Elegir fondo"
+    },
+    {
+     "keys": [
+      "Super",
+      "Espacio"
+     ],
+     "what": "Cambiar teclado inglés/español"
+    }
+   ]
+  }
+ ]
+}

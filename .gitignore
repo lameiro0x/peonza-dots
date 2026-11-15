@@ -1,0 +1,19 @@
+# runtime / local
+__pycache__/
+*.pyc
+.DS_Store
+hypr/local.lua
+.cache/
+out/
+
+# forge build worktrees (never part of the deployed tree)
+.worktrees/
+
+# never published: local agent config, editors, secrets, dependencies
+.claude/
+.mcp.json
+.env
+.env.*
+.idea/
+.vscode/
+node_modules/

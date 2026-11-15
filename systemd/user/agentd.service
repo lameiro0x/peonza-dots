@@ -1,0 +1,56 @@
+[Unit]
+Description=agentd: AI sessions for the bar, the sidebar and the window tags
+Documentation=file:%h/.local/lib/ryce/agentd
+# No PartOf=/After=graphical-session.target: greetd never activates it, so that
+# would be a stop rule that cannot fire dressed up as supervision (2026-08-11).
+#
+# Never give up. The default limit (5 starts / 10 s) turned a slow compositor
+# into a permanently failed daemon and a bar with no workspaces (2026-08-11).
+# It belongs in [Unit]; in [Service] systemd ignores it with one log line.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Environment=PYTHONPATH=%h/.local/lib/ryce
+# Seed the Waybar files before the bar's first read: waybar.service is ordered
+# After= this unit, and a start job is not "started" until ExecStartPre returns,
+# so After= means "the files exist", not "the process was forked". --wait 45
+# rides out a compositor that comes up after login (TimeoutStartSec is 90 s).
+# The leading `-`: seeding is an optimisation, never a reason to fail the unit;
+# the long-running daemon waits for Hyprland by itself.
+ExecStartPre=-/usr/bin/python3 -m agentd --once --wait 45
+ExecStart=/usr/bin/python3 -m agentd
+# A theme switch (ryce-theme) runs `systemctl --user reload agentd`: SIGHUP re-reads
+# the palette and rewrites every slot, whose markup carries the theme's greys.
+ExecReload=/usr/bin/kill -HUP $MAINPID
+# On any exit, crash and SIGKILL included, put the bar back to bare numerals, empty
+# the window line and the lock line, and untag the waiting windows: a dead agentd
+# must never leave a waiting ring or border claiming someone waits. ExecStopPost
+# runs after every stop, clean or not, with this unit's environment; the leading
+# `-` keeps a failed reset from masking why the daemon died.
+ExecStopPost=-/usr/bin/python3 -m agentd --reset
+Restart=always
+RestartSec=2
+
+# Reads /proc, ~/.claude and Hyprland's unix sockets; writes one directory under
+# $XDG_RUNTIME_DIR. Nothing here needs more than that.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+# ProtectSystem=strict makes everything read-only, $XDG_RUNTIME_DIR included,
+# and that is the one place this service writes.
+ReadWritePaths=%t
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+# Budget is < 40 MB RSS; 64M turns a leak into a restart instead of pressure.
+MemoryMax=64M
+
+[Install]
+# The one unit enabled at login: it waits for the compositor on its own, so it
+# can start before Hyprland and be ready when the bar asks.
+WantedBy=default.target

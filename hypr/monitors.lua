@@ -1,0 +1,24 @@
+-- One monitor, whatever its connector: the PC's AOC panel is 1920x1080@144,
+-- and "highrr" picks the highest refresh rate it advertises at its native size.
+hl.monitor({ output = "", mode = "highrr", position = "auto", scale = "1" })
+
+-- Workspaces 1-10 (CTRL + 1..9, 0) are not pinned here: a screen alone holds
+-- all ten. A second screen splits them in the gitignored ~/.config/hypr/local.lua,
+-- which hyprland.lua loads last. Pin with PERSISTENT rules, by description (it
+-- survives a change of port), e.g.:
+--
+--   hl.monitor({ output = "HDMI-A-1", mode = "1920x1080@60", position = "1920x0", scale = "1" })
+--   local MAIN, SECOND = "desc:AOC …", "desc:Samsung …"
+--   for ws = 1, 10 do
+--       hl.workspace_rule({ workspace = tostring(ws), monitor = ws <= 5 and MAIN or SECOND,
+--                           default = ws == 1 or ws == 6, persistent = true })
+--   end
+--
+-- Hyprland 0.57.2 keeps a persistent workspace alive on its rule's screen and
+-- moves it back there on every reload and every time that screen connects; a
+-- plain rule only places a workspace when it is created, so one that strayed (or
+-- that a new screen made up as its first free id) stayed on the wrong screen.
+-- `default` gives each screen its first workspace on connect. A rule naming a
+-- screen that is not plugged in claims nothing: its workspaces open on the
+-- focused screen and go home when it connects. The bar
+-- (quickshell/ryce/bar/Desks.qml) groups its slots by the same split.

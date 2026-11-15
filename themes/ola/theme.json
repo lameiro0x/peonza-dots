@@ -1,0 +1,262 @@
+{
+  "schema": "ryce.theme/2",
+  "id": "ola",
+  "name": "Ola",
+  "temperature": "cool",
+  "tagline": "La gran ola de Hokusai: tinta índigo, papel de arroz y un rosa sakura que solo avisa.",
+  "colors": {
+    "bg0": "#16161d",
+    "bg1": "#1f1f28",
+    "bg2": "#2a2a37",
+    "bg3": "#363646",
+    "line": "#3f3f55",
+    "fg0": "#dcd7ba",
+    "fg1": "#c8c093",
+    "fg2": "#a19f93",
+    "pill": "#dcd7ba",
+    "ink_on_pill": "#16161d",
+    "dim_on_pill": "#57534f",
+    "busy": "#c8c093",
+    "signal": "#d27e99",
+    "signal_dim": "#3a2230",
+    "signal_on_pill": "#9a3f62",
+    "tint": "#7e9cd8",
+    "ok": "#98bb6c",
+    "warn": "#e6c384",
+    "err": "#ff5d62",
+    "claude": "#d97757"
+  },
+  "hues": {
+    "cpu": "#e6c384",
+    "mem": "#98bb6c",
+    "net": "#7fb4ca",
+    "vol": "#7aa89f",
+    "media": "#a3d4d5",
+    "clock": "#dcd7ba",
+    "disk": "#c0a36e"
+  },
+  "alpha": {
+    "bar": 0.92,
+    "panel": 0.9,
+    "tooltip": 0.94,
+    "term": 0.72
+  },
+  "ansi": [
+    "#16161d",
+    "#f07e5c",
+    "#8aa77e",
+    "#c0a36e",
+    "#819fdb",
+    "#aa95ca",
+    "#7ea79c",
+    "#c8c093",
+    "#a09f96",
+    "#fe7271",
+    "#98bb6c",
+    "#e6c384",
+    "#7fb4ca",
+    "#a39ab9",
+    "#8fbeb4",
+    "#dcd7ba"
+  ],
+  "term": {
+    "cursor": "#c8c093",
+    "selection_bg": "#2d4f67",
+    "selection_fg": "#dcd7ba",
+    "url": "#7fb4ca",
+    "claude": "#e6c384",
+    "diff_add": "#1f2b1e",
+    "diff_del": "#2f1a1d",
+    "diff_add_word": "#2b3d28",
+    "diff_del_word": "#4a2329"
+  },
+  "fonts": {
+    "ui": "Inter",
+    "display": "Instrument Serif",
+    "mono": "JetBrainsMono Nerd Font",
+    "icon": "JetBrainsMono Nerd Font",
+    "display_min_px": 0
+  },
+  "geometry": {
+    "frame_top": 52,
+    "frame_rim": 0,
+    "frame_radius": 4,
+    "gaps_in": 5,
+    "gaps_out": 10,
+    "border": 1,
+    "rounding": 3,
+    "rounding_power": 3.0,
+    "pill_radius": 3
+  },
+  "blur": {
+    "enabled": true,
+    "size": 4,
+    "passes": 2,
+    "brightness": 0.45,
+    "desk": true
+  },
+  "motion": {
+    "preset": "fluida",
+    "ms": 520,
+    "qml_curve": [
+      0.38,
+      1.21,
+      0.22,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "hypr": {
+      "curves": {
+        "winIn": {
+          "type": "spring",
+          "mass": 1,
+          "stiffness": 260,
+          "damping": 26
+        },
+        "winMove": {
+          "type": "spring",
+          "mass": 1,
+          "stiffness": 300,
+          "damping": 30
+        },
+        "glide": {
+          "type": "bezier",
+          "points": [
+            [
+              0.16,
+              1.0
+            ],
+            [
+              0.3,
+              1.0
+            ]
+          ]
+        },
+        "accel": {
+          "type": "bezier",
+          "points": [
+            [
+              0.3,
+              0.0
+            ],
+            [
+              0.8,
+              0.15
+            ]
+          ]
+        }
+      },
+      "leaves": {
+        "windowsIn": {
+          "speed": 5.0,
+          "curve": "winIn",
+          "style": "popin 80%"
+        },
+        "windowsOut": {
+          "speed": 2.5,
+          "curve": "accel",
+          "style": "popin 85%"
+        },
+        "windowsMove": {
+          "speed": 4.0,
+          "curve": "winMove"
+        },
+        "fadeIn": {
+          "speed": 3.5,
+          "curve": "glide"
+        },
+        "fadeOut": {
+          "speed": 2.5,
+          "curve": "accel"
+        },
+        "fadeSwitch": {
+          "speed": 3.5,
+          "curve": "glide"
+        },
+        "fadeDim": {
+          "speed": 4.0,
+          "curve": "glide"
+        },
+        "layersIn": {
+          "speed": 4.0,
+          "curve": "glide",
+          "style": "slide top"
+        },
+        "layersOut": {
+          "speed": 2.5,
+          "curve": "accel",
+          "style": "fade"
+        },
+        "fadeLayersIn": {
+          "speed": 3.5,
+          "curve": "glide"
+        },
+        "fadeLayersOut": {
+          "speed": 2.5,
+          "curve": "accel"
+        },
+        "fadePopupsIn": {
+          "speed": 3.0,
+          "curve": "glide"
+        },
+        "fadePopupsOut": {
+          "speed": 2.0,
+          "curve": "accel"
+        },
+        "workspacesIn": {
+          "speed": 5.5,
+          "curve": "glide",
+          "style": "slidefadevert 20%"
+        },
+        "workspacesOut": {
+          "speed": 5.5,
+          "curve": "glide",
+          "style": "slidefadevert 20%"
+        },
+        "specialWorkspace": {
+          "speed": 5.0,
+          "curve": "glide",
+          "style": "slidefadevert 20%"
+        },
+        "border": {
+          "speed": 5.0,
+          "curve": "glide"
+        },
+        "zoomFactor": {
+          "speed": 5.0,
+          "curve": "glide"
+        }
+      }
+    }
+  },
+  "wallpaper": {
+    "scene": "photo",
+    "source": "assets/wallpapers/ola.jpg",
+    "focus": [
+      0.42,
+      0.5
+    ],
+    "grade": "none",
+    "lock_source": "assets/wallpapers/ola-lock.jpg",
+    "alternates": [
+      "assets/wallpapers/ola-kajikazawa.jpg",
+      "assets/wallpapers/ola-naruto.jpg"
+    ],
+    "transition": "wave",
+    "animated": false
+  },
+  "desktop": {
+    "gtk_theme": "adw-gtk3-dark",
+    "icon_theme": "ryce-ola",
+    "folder": "#7e9cd8",
+    "folder_dark": "#4f6aa0",
+    "cursor": "ryce-peonza",
+    "ambient": []
+  },
+  "contrast_floor": {
+    "text": 4.5,
+    "ui": 3.0
+  },
+  "scheme": "dark"
+}

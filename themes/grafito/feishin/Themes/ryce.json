@@ -1,0 +1,35 @@
+{
+  "mode": "dark",
+  "colors": {
+    "background": "#0a0a0a",
+    "background-alternate": "#000000",
+    "surface": "#141414",
+    "surface-foreground": "#f2f2f2",
+    "foreground": "#f2f2f2",
+    "foreground-muted": "#a8a8a8",
+    "primary": "#a8a8a8",
+    "state-error": "#c47a8a",
+    "state-info": "#9a9a9a",
+    "state-success": "#9bb59a",
+    "state-warning": "#d9c38a"
+  },
+  "app": {
+    "overlay-header": "linear-gradient(transparent 0%, rgba(0, 0, 0, 0.85) 100%)",
+    "overlay-subheader": "linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, var(--theme-colors-background) 100%)",
+    "scrollbar-size": "8px",
+    "scrollbar-handle-background": "rgba(132, 132, 132, 0.3)",
+    "scrollbar-handle-hover-background": "rgba(132, 132, 132, 0.55)",
+    "scrollbar-handle-active-background": "rgba(132, 132, 132, 0.75)",
+    "scrollbar-handle-border-radius": "1px"
+  },
+  "mantineOverride": {
+    "radius": {
+      "xs": "calc(1px / 3)",
+      "sm": "calc(1px / 2)",
+      "md": "calc(1px * 2 / 3)",
+      "lg": "1px",
+      "xl": "calc(1px * 4 / 3)"
+    }
+  },
+  "stylesheets": ["ryce.css"]
+}

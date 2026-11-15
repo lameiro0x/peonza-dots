@@ -1,0 +1,181 @@
+// ryce fallback bar — Waybar 0.16, Hyprland 0.57 (Lua). The primary bar is the
+// Quickshell frame; systemd starts this one only when Quickshell cannot stay up
+// (quickshell.service OnFailure=). Like it, no strip: three plates floating on the
+// wallpaper over a transparent window (style.css):
+//   left    the peonza + the focused window line (project › doing)
+//   centre  eleven workspace slots, each a ledger row written by agentd
+//   right   agents counter, volume, network, clock
+//
+// Every glyph below is a JSON \u escape, never a typed character: a typed private-use
+// glyph is invisible in review and an agent can silently drop it. Material Design
+// (nf-md-*, U+F0001..) from JetBrainsMono Nerd Font, and the peonza (U+100000) from
+// Ryce Peonza. waybar/tests checks all three rules.
+{
+    "layer": "top",
+    "position": "top",
+    // Inside the themes' frame_top range (46..52), so a fallback bar moves the
+    // windows by a few px at most against the zone they had.
+    "height": 48,
+    // palette.css is a theme link: a theme switch swaps it and this reloads the sheet.
+    "reload_style_on_change": true,
+
+    "modules-left": ["custom/peonza", "custom/window"],
+    "modules-center": ["group/workspaces"],
+    "modules-right": ["custom/agents", "wireplumber", "network", "clock"],
+
+    // The 20 px cut of the peonza (contracts/constants.json glyph.codepoints).
+    "custom/peonza": {
+        "format": "\udbc0\udc00",                       // Ryce Peonza U+100000
+        "tooltip": false
+    },
+
+    // ── FOCUSED WINDOW ───────────────────────────────────────────────────
+    // Written by agentd, not by Waybar's `rewrite`: that option runs std::regex over
+    // raw UTF-8 bytes and eats the first letter of accented titles. max-length keeps a
+    // long title from pushing into the centre at 1920 px.
+    "custom/window": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-window.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "max-length": 64
+    },
+
+    // ── WORKSPACES WITH CONTEXT ──────────────────────────────────────────
+    // One custom module per workspace, so each slot stays its own event box and knows
+    // which workspace it was clicked for. agentd writes one JSON per output and slot
+    // and wakes every bar with SIGRTMIN+9 when a slot changes; $WAYBAR_OUTPUT_NAME is
+    // set by Waybar per bar, so one config serves every monitor.
+    //
+    // The exec is a bare `cat`: no pipe, no redirect, no `;`. Waybar kills exec
+    // children by process group and a shell construct leaves an orphan per reload.
+    // A missing file (agentd not up yet) just leaves the slot empty for a beat.
+    //
+    // Clicks are Lua: Hyprland 0.57 evaluates whatever follows `dispatch` as Lua, and
+    // the old dispatcher word form silently does nothing (tools/lint.py enforces it).
+    "group/workspaces": {
+        "orientation": "horizontal",
+        "modules": [
+            "custom/ws1", "custom/ws2", "custom/ws3", "custom/ws4",
+            "custom/ws5", "custom/ws6", "custom/ws7", "custom/ws8",
+            "custom/ws9", "custom/ws10", "custom/ws11"
+        ]
+    },
+
+    "custom/ws1": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-1.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws2": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-2.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 2 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws3": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-3.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 3 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws4": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-4.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 4 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws5": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-5.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 5 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws6": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-6.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 6 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws7": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-7.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 7 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws8": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-8.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 8 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws9": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-9.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 9 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws10": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-10.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 10 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+    "custom/ws11": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/$WAYBAR_OUTPUT_NAME-11.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "hyprctl dispatch 'hl.dsp.focus({ workspace = 11 })'",
+        "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+        "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
+    },
+
+    // ── RIGHT ────────────────────────────────────────────────────────────
+    // How many sessions wait for you (or work, when nobody waits). Its class is
+    // `waiting | busy | calm`; only `waiting` takes the signal. Click opens the
+    // sidebar (a no-op while Quickshell is down, which is when this bar runs).
+    "custom/agents": {
+        "exec": "cat $XDG_RUNTIME_DIR/agentd/waybar/agents.json",
+        "return-type": "json", "interval": 60, "signal": 9,
+        "on-click": "qs -c ryce ipc call sidebar toggle"
+    },
+
+    "wireplumber": {
+        "format": "{icon} {volume}%",
+        "format-muted": "\udb81\udf5f",                 // nf-md-volume_mute
+        "format-icons": ["\udb81\udd7f", "\udb81\udd80", "\udb81\udd7e"],  // volume_low, _medium, _high
+        "tooltip-format": "{node_name}",
+        "scroll-step": 2,
+        "max-volume": 100,
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "pavucontrol"
+    },
+
+    // Ethernet is the link on this desk (the Wi-Fi card is 2.4 GHz only); the
+    // Wi-Fi format exists so a fallback link still reads as connected.
+    "network": {
+        "interval": 10,
+        "format-ethernet": "\udb80\ude00",              // nf-md-ethernet
+        "format-wifi": "\udb81\udda9",                  // nf-md-wifi
+        "format-linked": "\udb80\udf1a",                // nf-md-lan_pending
+        "format-disconnected": "\udb80\udf19",          // nf-md-lan_disconnect
+        "tooltip-format-ethernet": "{ifname} · {ipaddr}/{cidr}",
+        "tooltip-format-wifi": "{essid} · {ipaddr}/{cidr} · {signalStrength}%",
+        "tooltip-format-linked": "{ifname} · sin IP",
+        "tooltip-format-disconnected": "Sin red"
+    },
+
+    "clock": {
+        "format": "{:%H:%M}",
+        "tooltip-format": "{:%A, %d %B %Y}",
+        "interval": 60
+    }
+}

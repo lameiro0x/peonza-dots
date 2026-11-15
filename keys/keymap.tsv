@@ -1,0 +1,147 @@
+# Single source of truth for ryce-pc's keybindings. keys/gen.py turns it into
+# hypr/binds.lua; keys/test_gen.py holds it to dotsArch's hyprland.conf, one row
+# per bind there, plus the RYCE_EXTRAS allowlist written out in that test. Edit
+# here, run `python3 keys/gen.py`, keep the TSV and binds.lua together.
+#
+# Columns are TAB-separated (runs of tabs are fine, for alignment):
+#   mods    CTRL / SHIFT / ALT / SUPER separated by spaces, or - for none.
+#           Never ALT with SHIFT: Alt+Shift is the keyboard layout switch
+#           (grp:alt_shift_toggle in hypr/look.lua), so the bind would also
+#           flip the layout; gen.py rejects it.
+#   key     xkbcommon keysym name (Return, space, Left, Print...), or
+#           mouse:272 / mouse:273.
+#   action  exec close focus move resize workspace movetoworkspace focusmonitor
+#           movetomonitor fullscreen float pseudo togglesplit exit drag dragresize
+#           wsstep (-1 / +1: the previous / next workspace by number, empty ones
+#           included, stopping at 1 and 10; past a screen's last one it goes on
+#           to the other screen; Hyprland's e-1/e+1 skip empty ones)
+#           call (a ryce.<name> function from hypr/*.lua, run on each press)
+#   arg     the argument in Hyprland's own spelling, or - for none. The monitor
+#           actions (focusmonitor, movetomonitor) take +1 / -1 (next / previous)
+#           or l / r (the screen to the left / right; nothing happens at the edge)
+#   flags   optional, comma-separated:
+#             locked  also works on the lock screen (Hyprland's bindl)
+#             repeat  locked + repeats while held (Hyprland's bindel)
+
+# -- WM utilities (kept on SUPER)
+SUPER SHIFT	e			exit			-
+SUPER		f			fullscreen		-
+SUPER		v			float			-
+SUPER		p			pseudo			-
+SUPER		j			togglesplit		-
+
+# -- Terminal (ryce-term = kitty in the capped ryce-agents.slice; plain kitty
+#    until bin/ryce-term is deployed), close, launcher (bin/ryce-launcher: rofi
+#    with the panel filled; plain rofi until it is deployed). rofi starts every
+#    app (and Terminal=true ones in kitty) as its own scope in the user manager's
+#    app.slice, where systemd-oomd can see and pick it; launched bare they would
+#    share greetd's session scope with everything else.
+CTRL		Return			exec			test -x ~/.local/bin/ryce-term && exec ~/.local/bin/ryce-term || exec kitty
+CTRL		q			close			-
+CTRL		space			exec			test -x ~/.local/bin/ryce-launcher && exec ~/.local/bin/ryce-launcher || exec rofi -show drun -theme ~/.config/rofi/style.rasi -run-command "systemd-run --user --scope --slice=app.slice --collect {cmd}" -run-shell-command "systemd-run --user --scope --slice=app.slice --collect kitty -e {cmd}"
+
+# -- Focus (CTRL + hjkl)
+CTRL		h			focus			l
+CTRL		l			focus			r
+CTRL		k			focus			u
+CTRL		j			focus			d
+
+# -- Monitors: Tab cycles; the arrows go by side (the AOC left, the Samsung
+#    right, ~/.config/hypr/local.lua). ALT reads "screen": CTRL+ALT focuses
+#    one. CTRL+SUPER carries the window, as CTRL+SUPER+h/l do (those also cross
+#    at the screen's edge); the focus and the cursor follow it. Workspaces never
+#    change screen: each screen keeps its own (1-5 and 6-10 on this PC).
+CTRL		Tab			focusmonitor		+1
+CTRL SHIFT	Tab			movetomonitor		+1
+CTRL ALT	Left			focusmonitor		l
+CTRL ALT	Right			focusmonitor		r
+CTRL SUPER	Left			movetomonitor		l
+CTRL SUPER	Right			movetomonitor		r
+
+# -- Move/swap windows (CTRL + SUPER + hjkl)
+CTRL SUPER	h			move			l
+CTRL SUPER	l			move			r
+CTRL SUPER	k			move			u
+CTRL SUPER	j			move			d
+
+# -- Resize (CTRL + SHIFT + hjkl), Hyprland resizeactive deltas in px
+CTRL SHIFT	h			resize			-40 0
+CTRL SHIFT	l			resize			40 0
+CTRL SHIFT	k			resize			0 -40
+CTRL SHIFT	j			resize			0 40
+
+# -- Previous/next workspace, empty ones included, stopping at 1 and 10; 5 -> 6
+#    and 6 -> 5 cross to the other screen with the focus (dotsArch had e-1/e+1,
+#    which skip empty ones: see RYCE_DEVIATIONS in keys/test_gen.py)
+CTRL		Left			wsstep			-1
+CTRL		Right			wsstep			+1
+
+# -- Go to workspace: CTRL + 1-9, CTRL + 0 for 10. The focus goes to the screen
+#    that keeps it. dotsArch's CTRL + ' (11) is gone: RYCE_DROPPED in keys/test_gen.py
+CTRL		1			workspace		1
+CTRL		2			workspace		2
+CTRL		3			workspace		3
+CTRL		4			workspace		4
+CTRL		5			workspace		5
+CTRL		6			workspace		6
+CTRL		7			workspace		7
+CTRL		8			workspace		8
+CTRL		9			workspace		9
+CTRL		0			workspace		10
+
+# -- Move window to workspace and follow it
+CTRL SHIFT	1			movetoworkspace		1
+CTRL SHIFT	2			movetoworkspace		2
+CTRL SHIFT	3			movetoworkspace		3
+CTRL SHIFT	4			movetoworkspace		4
+CTRL SHIFT	5			movetoworkspace		5
+CTRL SHIFT	6			movetoworkspace		6
+CTRL SHIFT	7			movetoworkspace		7
+CTRL SHIFT	8			movetoworkspace		8
+CTRL SHIFT	9			movetoworkspace		9
+CTRL SHIFT	0			movetoworkspace		10
+
+# -- Screenshots into ~/Pictures/Screenshots (area-copy also to the clipboard,
+#    edit opens the selection in swappy)
+-		Print			exec			~/.config/hypr/scripts/screenshot.sh full
+SHIFT		Print			exec			~/.config/hypr/scripts/screenshot.sh area
+CTRL SHIFT	s			exec			~/.config/hypr/scripts/screenshot.sh area-copy
+SUPER SHIFT	s			exec			~/.config/hypr/scripts/screenshot.sh edit
+
+# -- Mouse: SUPER + left drag moves, SUPER + right drag resizes
+SUPER		mouse:272		drag			-
+SUPER		mouse:273		dragresize		-
+
+# -- Volume
+-		XF86AudioRaiseVolume	exec			wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+	repeat
+-		XF86AudioLowerVolume	exec			wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-	repeat
+-		XF86AudioMute		exec			wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle	repeat
+
+# -- Music: playerctl talks to playerctld, so it drives the player used last
+#    (Aria's mpv, Feishin, a browser). SUPER+ALT + arrows for keyboards without
+#    media keys: right the next song, left the previous one, space plays or
+#    pauses. Locked, like the media keys, so they work over the lock screen.
+#    All of them ryce extras (keys/test_gen.py RYCE_EXTRAS).
+SUPER ALT	Right			exec			playerctl next		locked
+SUPER ALT	Left			exec			playerctl previous	locked
+SUPER ALT	space			exec			playerctl play-pause	locked
+-		XF86AudioPlay		exec			playerctl play-pause	locked
+-		XF86AudioPause		exec			playerctl play-pause	locked
+-		XF86AudioNext		exec			playerctl next		locked
+-		XF86AudioPrev		exec			playerctl previous	locked
+
+# -- ryce extras (each one is listed in keys/test_gen.py RYCE_EXTRAS)
+SUPER		a			exec			qs -c ryce ipc call sidebar toggle
+SUPER		t			exec			qs -c ryce ipc call selector toggle
+SUPER SHIFT	t			exec			~/.local/bin/ryce-theme next
+SUPER		d			exec			qs -c ryce ipc call desk toggle clock
+SUPER SHIFT	d			exec			qs -c ryce ipc call desk toggle stats
+SUPER		Escape			exec			pidof hyprlock || hyprlock
+SUPER SHIFT	Escape			exec			systemctl hibernate
+SUPER		c			exec			~/.config/hypr/scripts/clipboard.sh
+SUPER		m			exec			qs -c ryce ipc call aria toggle
+SUPER		h			exec			qs -c ryce ipc call hito toggle
+SUPER		F1			exec			qs -c ryce ipc call keys toggle
+SUPER SHIFT	w			exec			qs -c ryce ipc call wallpick toggle
+SUPER		e			call			ryce.despejar
+SUPER		space			exec			hyprctl switchxkblayout all next

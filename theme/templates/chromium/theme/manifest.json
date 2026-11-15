@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Ryce · {{theme.name}}",
+  "description": "Colores del tema «{{theme.name}}» de ryce. Lo genera theme/render.py; bin/ryce-chromium-theme lo copia a ~/.local/share/ryce/chromium/theme.",
+  "version": "1.0",
+  "theme": {
+    "colors": {
+      "frame": [{{bg0.rgb}}],
+      "frame_inactive": [{{bg0.rgb}}],
+      "frame_incognito": [{{bg1.rgb}}],
+      "frame_incognito_inactive": [{{bg1.rgb}}],
+      "background_tab": [{{bg0.rgb}}],
+      "background_tab_inactive": [{{bg0.rgb}}],
+      "toolbar": [{{bg2.rgb}}],
+      "toolbar_text": [{{fg0.rgb}}],
+      "toolbar_button_icon": [{{fg1.rgb}}],
+      "tab_text": [{{fg0.rgb}}],
+      "tab_background_text": [{{fg1.rgb}}],
+      "tab_background_text_inactive": [{{fg2.rgb}}],
+      "tab_background_text_incognito": [{{fg1.rgb}}],
+      "bookmark_text": [{{fg1.rgb}}],
+      "omnibox_background": [{{bg0.rgb}}],
+      "omnibox_text": [{{fg0.rgb}}],
+      "ntp_background": [{{bg0.rgb}}],
+      "ntp_text": [{{fg0.rgb}}],
+      "ntp_link": [{{tint.rgb}}],
+      "ntp_header": [{{line.rgb}}],
+      "button_background": [0, 0, 0, 0]
+    }
+  }
+}

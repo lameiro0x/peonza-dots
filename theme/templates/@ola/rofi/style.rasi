@@ -1,0 +1,302 @@
+/* rofi 2.x (native Wayland), theme «{{theme.name}}». The print: on the left the
+   wave with an ink veil falling from the top, where the greeting is set in the
+   serif's italic and the clock in the serif itself; uptime and AI sessions sit
+   at the foot as capsules, signed with the peonza. On the right capsule tabs, a
+   capsule search field and the list; the selected app is a crystal-blue capsule.
+
+   bin/ryce-launcher fills the panel's text at each open (-theme-str) and turns
+   the face and the readout on. The clipboard picker (rofi -dmenu, same theme)
+   gets the art and the signature only. Never the signal colour. */
+
+* {
+    panel:   {{bg1@alpha.panel}};
+    still:   {{bg2}};
+    capsule: {{bg0@0.82}};
+    field:   {{bg0}};
+    pick:    {{hue.net}};
+    on-pick: {{ink_on_pill}};
+    gold:    {{hue.cpu}};
+    sea:     {{hue.media}};
+    reed:    {{hue.vol}};
+    chip:    {{bg3}};
+    edge:    {{line}};
+    text:    {{fg0}};
+    muted:   {{fg1}};
+    mark:    {{fg2}};
+
+    background-color: transparent;
+    text-color:       @muted;
+    font:             "{{font.ui}} 13";
+}
+
+configuration {
+    show-icons:          true;
+    icon-theme:          "Papirus-Dark";
+    drun-display-format: "{name}";
+    window-format:       "{t}";
+    display-drun:        "{{glyph.uF003B}}  Apps";
+    display-window:      "{{glyph.uF10AC}}  Ventanas";
+    display-filebrowser: "{{glyph.uF024B}}  Archivos";
+    display-run:         "{{glyph.uF07B7}}  Ejecutar";
+    hover-select:        true;
+    filebrowser {
+        directories-first: true;
+        command:           "systemd-run --user --scope --slice=app.slice --collect xdg-open";
+    }
+}
+
+window {
+    location:         center;
+    anchor:           center;
+    width:            900px;
+    height:           540px;
+    padding:          0px;
+    background-color: @panel;
+    border:           {{geometry.border}}px;
+    border-color:     @edge;
+    border-radius:    {{geometry.rounding}}px;
+}
+
+mainbox {
+    orientation: horizontal;
+    spacing:     0px;
+    children:    [ still, column ];
+}
+
+/* ---- the panel ------------------------------------------------------------
+   panel.png is 360x600; the panel is 3:5 too, so `both` scales without
+   distortion. */
+still {
+    orientation:      vertical;
+    expand:           false;
+    width:            324px;
+    padding:          0px 0px 14px 0px;
+    spacing:          8px;
+    background-color: @still;
+    background-image: url("~/.local/state/ryce/theme/current/wallpaper/panel.png", both);
+    border-radius:    {{geometry.rounding}}px 0px 0px {{geometry.rounding}}px;
+    children:         [ face, still-air, readout, signature ];
+}
+
+still-air {
+    expand: true;
+}
+
+/* bin/ryce-launcher turns the face and the readout on and the blank off, so the
+   face takes the panel's free space: rofi 2.0.0 lays out nothing in a box whose
+   children ask for more height than it got, and a box sized to its own estimate
+   can come out a few pixels short.
+   The veil is ink at the top and gone by the face's foot, long and soft. */
+face {
+    enabled:          false;
+    orientation:      vertical;
+    expand:           true;
+    padding:          22px 24px;
+    spacing:          0px;
+    background-image: linear-gradient(to bottom, {{bg0@0.9}}, {{bg0@0.9}}, {{bg0@0.0}});
+    border-radius:    {{geometry.rounding}}px 0px 0px 0px;
+    children:         [ textbox-greet, clock, textbox-date ];
+}
+
+textbox-greet {
+    expand:     false;
+    font:       "{{font.display}} Italic 22";
+    text-color: @gold;
+}
+
+clock {
+    orientation: horizontal;
+    expand:      false;
+    spacing:     0px;
+    children:    [ textbox-hh, textbox-sep, textbox-mm, clock-air ];
+}
+
+textbox-hh, textbox-sep, textbox-mm {
+    expand:     false;
+    font:       "{{font.display}} 76";
+    text-color: @text;
+}
+
+textbox-sep {
+    content:    "{{clock.sep}}";
+    text-color: @gold;
+}
+
+clock-air {
+    expand: true;
+}
+
+textbox-date {
+    expand:     false;
+    font:       "{{font.ui}} 11";
+    text-color: @muted;
+}
+
+readout {
+    enabled:     false;
+    orientation: vertical;
+    expand:      false;
+    margin:      0px 14px;
+    spacing:     6px;
+    children:    [ uptime-row, agents-row ];
+}
+
+uptime-row, agents-row {
+    orientation:      horizontal;
+    expand:           false;
+    padding:          6px 14px;
+    spacing:          10px;
+    background-color: @capsule;
+    border-radius:    {{geometry.pill_radius}}px;
+}
+
+uptime-row { children: [ textbox-uptime-label, textbox-uptime ]; }
+agents-row { children: [ textbox-agents-label, textbox-agents ]; }
+
+textbox-uptime-label, textbox-agents-label {
+    expand: false;
+    font:   "{{font.ui}} 10";
+}
+
+textbox-uptime-label { content: "{{glyph.uF051B}}  encendido"; text-color: @sea; }
+textbox-agents-label { content: "{{glyph.uF06A9}}"; text-color: @reed; }
+
+textbox-uptime, textbox-agents {
+    expand:     true;
+    font:       "{{font.ui}} 10";
+    text-color: @text;
+}
+
+signature {
+    orientation:      horizontal;
+    expand:           false;
+    margin:           0px 14px;
+    padding:          6px 14px;
+    spacing:          10px;
+    background-color: @capsule;
+    border-radius:    {{geometry.pill_radius}}px;
+    children:         [ textbox-peonza, textbox-theme ];
+}
+
+textbox-peonza {
+    expand:         false;
+    content:        "{{glyph.peonza}}";
+    font:           "Ryce Peonza 17";
+    text-color:     @text;
+    vertical-align: 0.5;
+}
+
+textbox-theme {
+    expand:         true;
+    content:        "{{theme.name}}";
+    font:           "{{font.display}} Italic 15";
+    text-color:     @muted;
+    vertical-align: 0.5;
+}
+
+/* ---- the list ------------------------------------------------------------- */
+
+column {
+    orientation: vertical;
+    expand:      true;
+    padding:     18px 22px 18px 22px;
+    spacing:     14px;
+    children:    [ mode-switcher, body ];
+}
+
+mode-switcher {
+    expand:  false;
+    spacing: 6px;
+}
+
+button {
+    padding:          6px 12px;
+    border-radius:    {{geometry.pill_radius}}px;
+    font:             "{{font.icon}} 11";
+    text-color:       @muted;
+    horizontal-align: 0.5;
+}
+
+button selected {
+    background-color: @chip;
+    text-color:       @text;
+}
+
+body {
+    orientation: vertical;
+    spacing:     12px;
+    children:    [ inputbar, message, listview ];
+}
+
+/* Search: a capsule of ink. */
+inputbar {
+    padding:          10px 18px;
+    spacing:          12px;
+    background-color: @field;
+    border:           1px;
+    border-color:     @edge;
+    border-radius:    {{geometry.pill_radius}}px;
+    children:         [ textbox-search, entry ];
+}
+
+textbox-search {
+    expand:         false;
+    content:        "{{glyph.magnify}}";
+    font:           "{{font.icon}} 14";
+    text-color:     @sea;
+    vertical-align: 0.5;
+}
+
+entry {
+    font:              "{{font.ui}} 14";
+    text-color:        @text;
+    placeholder:       "Buscar";
+    placeholder-color: @muted;
+    cursor:            text;
+    cursor-color:      @text;
+    vertical-align:    0.5;
+}
+
+message {
+    padding:          8px 16px;
+    border-radius:    {{geometry.pill_radius}}px;
+    background-color: @chip;
+}
+
+textbox {
+    text-color: @text;
+}
+
+listview {
+    lines:        8;
+    columns:      1;
+    spacing:      2px;
+    scrollbar:    false;
+    fixed-height: true;
+    cycle:        true;
+    dynamic:      false;
+}
+
+element {
+    padding:       6px 16px;
+    spacing:       14px;
+    border-radius: {{geometry.pill_radius}}px;
+    text-color:    @muted;
+}
+
+element selected {
+    background-color: @pick;
+    text-color:       @on-pick;
+}
+
+element-icon {
+    size:           1.5em;
+    vertical-align: 0.5;
+    text-color:     inherit;
+}
+
+element-text {
+    text-color:     inherit;
+    vertical-align: 0.5;
+    highlight:      bold;
+}

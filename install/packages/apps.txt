@@ -1,0 +1,45 @@
+# Daily-driver apps and virtualisation (Kali VMs). Official repos only.
+firefox
+keepassxc
+obsidian
+spotify-launcher
+feishin
+cmatrix
+qemu-full
+libvirt
+virt-manager
+dnsmasq
+edk2-ovmf
+swtpm
+bluez
+bluez-utils
+blueman
+# Not listed on purpose (AUR; check-packages.py only accepts core/extra), installed by hand:
+#   visual-studio-code-bin: read its PKGBUILD first, then
+#     git clone https://aur.archlinux.org/visual-studio-code-bin.git ~/.cache/aur/visual-studio-code-bin
+#     cd ~/.cache/aur/visual-studio-code-bin && makepkg -d
+#     pkexec pacman -U --needed visual-studio-code-bin-*.pkg.tar.zst   # pulls its deps from extra
+#   zapzap (WhatsApp, Qt WebEngine; 2026-11-14): same steps, built from the AUR commit read on
+#     2026-11-14 — `git checkout c8e09491f2323fcf5cab47f6efae72aed230cffe` before makepkg
+#     (pkgver 7.5.1, source = upstream tag 7.5.1; no install hook). Its deps are all in extra
+#     (python-pyqt6-webengine, dbus-python, python-pydantic…): pkexec pacman -S --needed
+#     --asdeps <the PKGBUILD's depends and makedepends> first, then makepkg.
+#   dripfetch (curses dashboard, a-shygun/dripfetch; 2026-11-14): same steps, AUR commit
+#     `dcfa767934185661f1ce61f86cc5c805ddd0e157` (pkgver 0.5.0, sha256-pinned tarball; no install
+#     hook); deps python-psutil, python-ruamel-yaml from extra. The rice renders its per-theme
+#     config (theme/fetch/fetch.py) and apps/fish/functions/dripfetch.fish runs it.
+#   neofetch (7.1.0, dylanaraps/neofetch, archived upstream 2024 and dropped from extra;
+#     2026-11-14): same steps, AUR commit `f6044ebf112b4ebd433764e6510f8fec68e75e5e` (pkgrel 2,
+#     maintainer Muflone). Its source is the signed git commit 60d07dee6b76…: first
+#     `gpg --recv-keys 7C20ADCD35D9797789B6BCC046D62DD9F1DE636E` (Dylan Araps, validpgpkeys),
+#     never --skippgpcheck. depends bash, makedepends git; no install hook. The rice renders
+#     its per-theme config (theme/templates/neofetch/) and apps/fish/functions/neofetch.fish
+#     runs it. hyfetch in extra is no substitute: 2.x is Rust and ships no neowofetch.
+#   zotero-bin (10.0.8, Zotero's own tarball; 2026-11-14): same steps, AUR commit
+#     `cca51a217fa5f4adb7b3281d7eb56771dc2356ce` (pkgrel 2; source
+#     Zotero-10.0.8_linux-x86_64.tar.xz, sha256 a704cfd4…c1032b as the PKGBUILD pins it);
+#     deps alsa-lib gtk3 nss from extra; no install hook. Then, with Zotero closed,
+#     `python3 apps/zotero/setup.py` (Better BibTeX 9.0.77 pinned by sha256 in
+#     apps/zotero/better-bibtex.json, and the Ryce plugin that themes Zotero live).
+#   A newer AUR commit is read again before building: a PKGBUILD runs as you, its package as root.
+#   extensions: ~/mac-archive/vscode/vscode-extensions.txt (skip vscode-vibrancy-continued: macOS only)

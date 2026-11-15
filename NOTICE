@@ -1,0 +1,80 @@
+peonza-dots
+===========
+
+The code and configuration in this repository are under the MIT licence (LICENSE).
+Three kinds of material are not, and are listed here.
+
+
+1. The peonza mark: all rights reserved
+---------------------------------------
+
+© 2026 lameiro0x. All rights reserved.
+
+The peonza (the spinning top that marks this desktop) is lameiro0x's brand mark. It and
+everything drawn from it are included only so that this desktop works as published.
+No licence is granted for them: copying, modifying, redistributing or publicly showing
+them outside this desktop, or making derivative works of them, requires prior written
+permission from lameiro0x. Using the mark, or anything confusingly similar to it, is
+not permitted. The MIT licence of the code does not extend to them.
+
+That covers, wherever they appear in the tree:
+
+- the `RycePeonza.otf` font and its glyphs (assets/fonts/);
+- the peonza sprites, logos and boot animation frames (themes/*/peonza/);
+- the terminal, fetch and greeting pictures of the peonza (themes/*/fastfetch/,
+  themes/*/neofetch/, themes/*/greet/);
+- the generated wallpapers and their masters: Grafito's dot plates, Tinta's drawing
+  sheets and lock picture, Papel's Tractatus covers, every theme's launcher panel
+  (assets/wallpapers/grafito-*, tinta-*, papel*; the matching files in themes/*/wallpaper/);
+- the boot, login and new tab art (theme/boot/grub/, theme/boot/greeter/,
+  themes/*/boot/, themes/*/chromium/newtab/);
+- the cursors (assets/cursors/).
+- the README's pictures and animations (.github/readme/), which show the mark and the
+  desktop drawn around it.
+
+The programs that draw them (theme/) are code, under the MIT licence; what they draw
+from the mark is not.
+
+Text and data mining of this material, including training AI models, is expressly
+reserved under Article 4(3) of Directive (EU) 2019/790 (art. 67.3 RDL 24/2021).
+Requests: https://art.lameiro0x.com
+
+
+2. Third-party pictures: public domain
+---------------------------------------
+
+Every photographed or scanned picture is a public-domain work. Sources, crops and
+grading: assets/wallpapers/README.md.
+
+- Katsushika Hokusai, *The Great Wave off Kanagawa* (c. 1831). Wikimedia Commons,
+  `Great_Wave_off_Kanagawa2.jpg`. Public domain. (ola.jpg)
+- Katsushika Hokusai, *Fine Wind, Clear Morning* (c. 1830-32). Wikimedia Commons,
+  `Red_Fuji_southern_wind_clear_morning.jpg`. Public domain. (ola-lock.jpg)
+- Katsushika Hokusai, *Kajikazawa in Kai Province* (c. 1830-32). The Metropolitan
+  Museum of Art, Open Access (DP141013), via Wikimedia Commons. Public domain, CC0
+  scan. (ola-kajikazawa.jpg)
+- Utagawa Hiroshige, *The Whirlpools of Awa* (1857). The Metropolitan Museum of Art,
+  Open Access (DP146864), via Wikimedia Commons. Public domain, CC0 scan.
+  (ola-naruto.jpg)
+- Frederic Edwin Church, *Twilight in the Wilderness* (1860). Cleveland Museum of Art,
+  via Wikimedia Commons. Public domain. (origen-ocaso.jpg)
+- Jasper Francis Cropsey, *Autumn – On the Hudson River* (1860). National Gallery of
+  Art, via Wikimedia Commons. Public domain. (origen-hudson.jpg)
+
+Papel's covers measure Ludwig Wittgenstein's *Logisch-philosophische Abhandlung*
+(1921, German original; public domain): theme/wallpaper/tractatus.json keeps only each
+proposition's number, length and question marks, not the text.
+
+
+3. Fonts: SIL Open Font License 1.1
+-----------------------------------
+
+Vendored in assets/fonts/, each with its licence in assets/fonts/licenses/:
+
+- Martian Mono, Evil Martians
+- Space Grotesk, Florian Karsten
+- Doto, Óliver Lalan
+- Instrument Serif, Rodrigo Fuenzalida and Jordan Egstad
+- Space Mono, Colophon Foundry
+
+RycePeonza.otf is not one of them: it is the mark (section 1).

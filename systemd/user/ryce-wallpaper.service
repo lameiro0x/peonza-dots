@@ -1,0 +1,22 @@
+[Unit]
+Description=Wallpaper for the ryce session (awww)
+Documentation=man:awww-daemon(1) man:awww-img(1)
+PartOf=ryce-session.target
+
+[Service]
+Type=simple
+# awww 0.12: the daemon restores the last image it showed per output from its
+# cache, so a later boot paints the wallpaper even if the steps below miss.
+ExecStart=/usr/bin/awww-daemon --quiet
+# The daemon's socket appears a moment after the fork: wait up to ~3 s for it to
+# answer (`awww query` only lists the outputs).
+ExecStartPost=-/bin/sh -c 'n=0; while [ "$$n" -lt 10 ]; do /usr/bin/awww query >/dev/null 2>&1 && exit 0; n=$$((n + 1)); sleep 0.3; done; exit 1'
+# Then the current theme's wallpaper, chosen by the theme switcher itself, so a
+# boot and a switch paint the same image. Leading `-`: a missing image or an
+# undeployed ryce-theme must never stop the daemon. %h is the home directory.
+ExecStartPost=-%h/.local/bin/ryce-theme wallpaper --no-transition
+ExecStop=/usr/bin/awww kill
+Restart=on-failure
+RestartSec=2
+
+# No [Install]: ryce-session.target starts it once the compositor exists.

@@ -1,0 +1,267 @@
+{
+  "schema": "ryce.theme/2",
+  "id": "tinta",
+  "name": "Tinta",
+  "temperature": "neutral",
+  "tagline": "Manga en blanco y negro: cristal ahumado, texto de terminal y un ámbar que avisa.",
+  "colors": {
+    "bg0": "#0a0a0a",
+    "bg1": "#111111",
+    "bg2": "#1a1a1a",
+    "bg3": "#262626",
+    "line": "#3a3a3a",
+    "fg0": "#f0f0f0",
+    "fg1": "#b4b4b4",
+    "fg2": "#9a9a9a",
+    "pill": "#f0f0f0",
+    "ink_on_pill": "#0a0a0a",
+    "dim_on_pill": "#6a6a6a",
+    "busy": "#b4b4b4",
+    "signal": "#ffb000",
+    "signal_dim": "#3a2a05",
+    "signal_on_pill": "#8a5a00",
+    "tint": "#c8c8c8",
+    "ok": "#b8c8b8",
+    "warn": "#e0dac6",
+    "err": "#d4a9a9",
+    "claude": "#d97757"
+  },
+  "hues": {
+    "cpu": "#b4b4b4",
+    "mem": "#b4b4b4",
+    "net": "#b4b4b4",
+    "vol": "#b4b4b4",
+    "media": "#b4b4b4",
+    "clock": "#f0f0f0",
+    "disk": "#b4b4b4"
+  },
+  "alpha": {
+    "bar": 0.82,
+    "panel": 0.8,
+    "tooltip": 0.9,
+    "term": 0.62
+  },
+  "ansi": [
+    "#161616",
+    "#b99090",
+    "#9fb09f",
+    "#c8c1a8",
+    "#9ea6b0",
+    "#b0a0b0",
+    "#a0b0ae",
+    "#c8c8c8",
+    "#9a9a9a",
+    "#d4a9a9",
+    "#bccbbc",
+    "#e0dac6",
+    "#c0c6ce",
+    "#cbbccb",
+    "#bfcdcb",
+    "#ffffff"
+  ],
+  "term": {
+    "cursor": "#ffffff",
+    "selection_bg": "#3a3a3a",
+    "selection_fg": "#ffffff",
+    "url": "#e0e0e0",
+    "claude": "#ffffff",
+    "diff_add": "#1c241c",
+    "diff_del": "#2a1c1c",
+    "diff_add_word": "#2e3c2e",
+    "diff_del_word": "#462c2c"
+  },
+  "fonts": {
+    "ui": "JetBrainsMono Nerd Font",
+    "display": "JetBrainsMono Nerd Font",
+    "mono": "JetBrainsMono Nerd Font",
+    "icon": "JetBrainsMono Nerd Font",
+    "display_min_px": 0
+  },
+  "geometry": {
+    "frame_top": 46,
+    "frame_rim": 0,
+    "frame_radius": 0,
+    "gaps_in": 5,
+    "gaps_out": 12,
+    "border": 1,
+    "rounding": 2,
+    "rounding_power": 2.0,
+    "pill_radius": 2
+  },
+  "blur": {
+    "enabled": true,
+    "size": 4,
+    "passes": 2,
+    "brightness": 0.4,
+    "desk": false
+  },
+  "motion": {
+    "preset": "terminal",
+    "ms": 180,
+    "qml_curve": [
+      0.2,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "hypr": {
+      "curves": {
+        "crisp": {
+          "type": "bezier",
+          "points": [
+            [
+              0.2,
+              0.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "out": {
+          "type": "bezier",
+          "points": [
+            [
+              0.4,
+              0.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ]
+        },
+        "lin": {
+          "type": "bezier",
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ]
+        }
+      },
+      "leaves": {
+        "windowsIn": {
+          "speed": 2.5,
+          "curve": "crisp",
+          "style": "popin 97%"
+        },
+        "windowsOut": {
+          "speed": 1.5,
+          "curve": "out",
+          "style": "popin 97%"
+        },
+        "windowsMove": {
+          "speed": 2.5,
+          "curve": "crisp"
+        },
+        "fadeIn": {
+          "speed": 2.5,
+          "curve": "crisp"
+        },
+        "fadeOut": {
+          "speed": 1.5,
+          "curve": "out"
+        },
+        "fadeSwitch": {
+          "speed": 2.0,
+          "curve": "crisp"
+        },
+        "fadeDim": {
+          "speed": 2.0,
+          "curve": "crisp"
+        },
+        "layersIn": {
+          "speed": 2.0,
+          "curve": "crisp",
+          "style": "fade"
+        },
+        "layersOut": {
+          "speed": 1.5,
+          "curve": "out",
+          "style": "fade"
+        },
+        "fadeLayersIn": {
+          "speed": 2.0,
+          "curve": "crisp"
+        },
+        "fadeLayersOut": {
+          "speed": 1.5,
+          "curve": "out"
+        },
+        "fadePopupsIn": {
+          "speed": 1.5,
+          "curve": "crisp"
+        },
+        "fadePopupsOut": {
+          "speed": 1.0,
+          "curve": "out"
+        },
+        "workspacesIn": {
+          "speed": 3.0,
+          "curve": "crisp",
+          "style": "fade"
+        },
+        "workspacesOut": {
+          "speed": 3.0,
+          "curve": "crisp",
+          "style": "fade"
+        },
+        "specialWorkspace": {
+          "speed": 2.5,
+          "curve": "crisp",
+          "style": "fade"
+        },
+        "border": {
+          "speed": 2.0,
+          "curve": "crisp"
+        },
+        "zoomFactor": {
+          "speed": 3.0,
+          "curve": "crisp"
+        }
+      }
+    }
+  },
+  "wallpaper": {
+    "scene": "photo",
+    "source": "assets/wallpapers/tinta-despiece.jpg",
+    "focus": [
+      0.5,
+      0.45
+    ],
+    "grade": "mono",
+    "lock_source": "assets/wallpapers/tinta-lock.jpg",
+    "alternates": [
+      "assets/wallpapers/tinta-plano.jpg",
+      "assets/wallpapers/tinta-estela.jpg"
+    ],
+    "transition": "fade",
+    "animated": false
+  },
+  "desktop": {
+    "gtk_theme": "adw-gtk3-dark",
+    "icon_theme": "ryce-tinta",
+    "folder": "#9a9a9a",
+    "folder_dark": "#5c5c5c",
+    "cursor": "ryce-peonza",
+    "ambient": [
+      "hud",
+      "binclock",
+      "edgeviz"
+    ]
+  },
+  "contrast_floor": {
+    "text": 4.5,
+    "ui": 3.0
+  },
+  "scheme": "dark"
+}

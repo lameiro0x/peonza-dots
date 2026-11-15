@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# kitty in its own transient scope under ryce-agents.slice (memory-capped there: MemoryHigh /
+# MemoryMax, see systemd/user/ryce-agents.slice), so systemd-oomd can kill one runaway agent
+# terminal instead of the whole session. Without a user manager it is plain kitty.
+#
+#   ryce-term [kitty args…]
+set -euo pipefail
+
+command -v kitty >/dev/null || { echo "ryce-term: kitty no está instalado (sudo pacman -S kitty)" >&2; exit 1; }
+if command -v systemd-run >/dev/null && [ -S "${XDG_RUNTIME_DIR:-/nonexistent}/bus" ]; then
+  # The scope is named after this pid: systemd-run execs kitty in place, so it is unique while
+  # the terminal lives, and --collect removes it even if kitty exits with an error.
+  exec systemd-run --user --scope --quiet --collect --slice=ryce-agents.slice \
+    --unit="ryce-term-$$" -- kitty "$@"
+fi
+exec kitty "$@"

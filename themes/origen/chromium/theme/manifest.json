@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Ryce · Origen",
+  "description": "Colores del tema «Origen» de ryce. Lo genera theme/render.py; bin/ryce-chromium-theme lo copia a ~/.local/share/ryce/chromium/theme.",
+  "version": "1.0",
+  "theme": {
+    "colors": {
+      "frame": [29, 32, 33],
+      "frame_inactive": [29, 32, 33],
+      "frame_incognito": [40, 40, 40],
+      "frame_incognito_inactive": [40, 40, 40],
+      "background_tab": [29, 32, 33],
+      "background_tab_inactive": [29, 32, 33],
+      "toolbar": [50, 48, 47],
+      "toolbar_text": [235, 219, 178],
+      "toolbar_button_icon": [189, 174, 147],
+      "tab_text": [235, 219, 178],
+      "tab_background_text": [189, 174, 147],
+      "tab_background_text_inactive": [174, 159, 144],
+      "tab_background_text_incognito": [189, 174, 147],
+      "bookmark_text": [189, 174, 147],
+      "omnibox_background": [29, 32, 33],
+      "omnibox_text": [235, 219, 178],
+      "ntp_background": [29, 32, 33],
+      "ntp_text": [235, 219, 178],
+      "ntp_link": [142, 192, 124],
+      "ntp_header": [80, 73, 69],
+      "button_background": [0, 0, 0, 0]
+    }
+  }
+}

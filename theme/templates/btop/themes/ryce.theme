@@ -1,0 +1,59 @@
+# btop theme "ryce", theme «{{theme.name}}». Each meter rises through the theme's
+# hues (the bar's module colours: gruvbox and kanagawa in Origen and Ola, greys in
+# Grafito and Tinta) from a dark start to the theme's err at full load. The
+# selected row is the terminal's selection ground. bin/ryce-theme sends SIGUSR2,
+# which makes btop re-read this file.
+
+# Empty main_bg = terminal background (kitty's translucent bg1).
+theme[main_bg]=""
+theme[main_fg]="{{fg0}}"
+theme[title]="{{fg0}}"
+theme[hi_fg]="{{hue.cpu}}"
+theme[selected_bg]="{{term.selection_bg}}"
+theme[selected_fg]="{{term.selection_fg}}"
+theme[inactive_fg]="{{fg2}}"
+theme[graph_text]="{{fg1}}"
+theme[meter_bg]="{{bg3}}"
+theme[proc_misc]="{{hue.mem}}"
+
+theme[cpu_box]="{{line}}"
+theme[mem_box]="{{line}}"
+theme[net_box]="{{line}}"
+theme[proc_box]="{{line}}"
+theme[div_line]="{{line}}"
+
+theme[temp_start]="{{hue.mem}}"
+theme[temp_mid]="{{hue.cpu}}"
+theme[temp_end]="{{err}}"
+
+theme[cpu_start]="{{hue.mem}}"
+theme[cpu_mid]="{{hue.cpu}}"
+theme[cpu_end]="{{err}}"
+
+theme[free_start]="{{ansi.8}}"
+theme[free_mid]="{{hue.vol}}"
+theme[free_end]="{{hue.mem}}"
+
+theme[cached_start]="{{ansi.8}}"
+theme[cached_mid]="{{hue.disk}}"
+theme[cached_end]="{{hue.cpu}}"
+
+theme[available_start]="{{ansi.8}}"
+theme[available_mid]="{{hue.media}}"
+theme[available_end]="{{fg0}}"
+
+theme[used_start]="{{hue.mem}}"
+theme[used_mid]="{{hue.cpu}}"
+theme[used_end]="{{err}}"
+
+theme[download_start]="{{ansi.8}}"
+theme[download_mid]="{{hue.vol}}"
+theme[download_end]="{{hue.media}}"
+
+theme[upload_start]="{{ansi.8}}"
+theme[upload_mid]="{{hue.disk}}"
+theme[upload_end]="{{hue.cpu}}"
+
+theme[process_start]="{{hue.mem}}"
+theme[process_mid]="{{hue.cpu}}"
+theme[process_end]="{{err}}"

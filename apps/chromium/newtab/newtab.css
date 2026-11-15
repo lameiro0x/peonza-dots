@@ -1,0 +1,164 @@
+/* The new tab: the theme's own picture full bleed (theme/wallpaper/newtab.py, drawn
+   calm under the column) and one ruled column on the side it leaves empty. Colours,
+   letters, the side and where a narrower window crops the picture come from theme.css
+   and layout.css; fg2 only draws rules, never text. */
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg0);
+  color: var(--fg0);
+  font: 15px/1.45 var(--font-ui);
+  display: flex;
+  justify-content: var(--col-justify);
+  overflow: hidden;
+}
+
+.art {
+  position: fixed;
+  inset: 0;
+  background: var(--bg0) url("art-1920.jpg") var(--art-pos, center) / cover no-repeat;
+}
+@media (min-width: 2000px) { .art { background-image: url("art-2560.jpg"); } }
+.art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--scrim-dir),
+    color-mix(in srgb, var(--bg0) 94%, transparent) 0%,
+    color-mix(in srgb, var(--bg0) 86%, transparent) 34%,
+    color-mix(in srgb, var(--bg0) 0%, transparent) 62%);
+}
+
+.col {
+  position: relative;
+  width: min(54rem, 50vw);
+  height: 100%;
+  padding: 8vh 4vw 3vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+.now { display: flex; flex-direction: column; gap: .4rem; }
+.clock {
+  font: 400 clamp(5rem, 8.5vw, 8.75rem)/.9 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+.date {
+  margin: 0;
+  color: var(--fg1);
+  font-size: 1.15rem;
+}
+.date::first-letter { text-transform: uppercase; }
+
+.search { position: relative; }
+.search input {
+  width: 100%;
+  padding: .85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg1) 82%, transparent);
+  color: var(--fg0);
+  font: inherit;
+  font-size: 1.05rem;
+  outline: none;
+}
+.search input::placeholder { color: var(--fg1); opacity: 1; }
+.search input:focus-visible { border-color: var(--fg0); box-shadow: 0 0 0 1px var(--fg0); }
+.search input::-webkit-search-cancel-button { display: none; }
+
+/* Bookmarks: the bar's loose links as tiles, then each folder as a ruled section. */
+.marks {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  padding: 0 .75rem 1rem .5rem;
+  margin: 0 -.75rem 0 -.5rem;
+}
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr));
+  gap: .5rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  padding: .85rem .4rem .7rem;
+  border-radius: var(--radius);
+  color: var(--fg0);
+  text-decoration: none;
+  font-size: .82rem;
+}
+.tile img { width: 28px; height: 28px; }
+.tile span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.folders { columns: 3 12rem; column-gap: 2rem; }
+.folder { break-inside: avoid; margin: 0 0 1.6rem; }
+.folder h2, .folder h3 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 .35rem;
+  padding-bottom: .35rem;
+  border-bottom: 1px solid var(--fg2);
+  font: 600 .78rem var(--font-ui);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg0);
+}
+.folder h3 { margin-top: .6rem; border-bottom-color: var(--line); color: var(--fg1); }
+.folder h2 small, .folder h3 small { font-weight: 400; color: var(--fg1); }
+.folder ul { margin: 0; padding: 0; list-style: none; }
+.link {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .32rem .5rem;
+  margin: 0 -.5rem;
+  border-radius: calc(var(--radius) / 2);
+  color: var(--fg0);
+  text-decoration: none;
+}
+.link img { width: 16px; height: 16px; flex: none; }
+.link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tile:hover, .link:hover { background: color-mix(in srgb, var(--fg0) 9%, transparent); }
+.tile:focus-visible, .link:focus-visible {
+  outline: 2px solid var(--fg0);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--fg0) 9%, transparent);
+}
+
+.empty { color: var(--fg1); max-width: 34rem; }
+
+.sign {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--fg1);
+  font-size: .8rem;
+}
+.sign .name::before { content: "ryce · " var(--theme-name); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tile, .link { transition: background-color .12s ease-out; }
+}
+
+/* A narrow window: the column takes the width and the art stays behind a full scrim. */
+@media (max-width: 60rem) {
+  .col { width: 100%; padding: 6vh 6vw 2vh; }
+  .art::after { background: color-mix(in srgb, var(--bg0) 88%, transparent); }
+}

@@ -1,0 +1,5 @@
+{
+  "label": "Ryce · {{theme.name}}",
+  "background": "{{bg0}}",
+  "foreground": "{{fg0}}"
+}

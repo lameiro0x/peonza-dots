@@ -1,0 +1,73 @@
+# starship 1.27, theme «Origen»: gruvbox capsules on a ruled line. Each segment is
+# a rounded pill in one of the theme's hues with ink letters, the frame and its rule
+# in gruvbox's grey; below, the peonza in the theme's orange (the frame, the
+# peonza's three cells and the transient line: see theme/templates/starship.toml):
+#
+#   ╭─ ( ~/Repos/ryce-pc ) ( main ) ( ~1 +2 ) ( 12s ) ( x 1 ) ─────── <clock> 14:32
+#   ╰─ <peonza>  _
+
+format = """[╭─ ](rule)$hostname$directory$git_branch$git_status$cmd_duration$status $fill $time
+[╰─ ](rule)$character"""
+palette = "ryce"
+
+[palettes.ryce]
+rule = "{{fg2}}"
+ink = "{{ink_on_pill}}"
+muted = "{{fg1}}"
+dir = "{{hue.cpu}}"
+branch = "{{hue.mem}}"
+changes = "{{hue.media}}"
+took = "{{hue.disk}}"
+peonza = "{{hue.cpu}}"
+err = "{{err}}"
+
+[hostname]
+style = "muted"
+format = "[$hostname]($style) "  # ssh only
+
+[directory]
+read_only = " {{glyph.lock_outline}}"
+format = "[{{glyph.uE0B6}}](fg:dir)[{{glyph.folder}} $path$read_only](bold fg:ink bg:dir)[{{glyph.uE0B4}}](fg:dir)"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = "{{glyph.source_branch}} "
+format = " [{{glyph.uE0B6}}](fg:branch)[$symbol$branch](fg:ink bg:branch)[{{glyph.uE0B4}}](fg:branch)"
+
+[git_status]
+# Each count leads with its own space, so two never touch (~1 +2 ?3 ⇡4).
+format = "( [{{glyph.uE0B6}}](fg:changes)[$all_status$ahead_behind ](fg:ink bg:changes)[{{glyph.uE0B4}}](fg:changes))"
+ahead = " ⇡${count}"
+behind = " ⇣${count}"
+diverged = " ⇕"
+modified = " ~${count}"
+staged = " +${count}"
+untracked = " ?${count}"
+deleted = " -${count}"
+renamed = " »${count}"
+stashed = ""
+conflicted = " !${count}"
+
+[cmd_duration]
+min_time = 2000
+format = " [{{glyph.uE0B6}}](fg:took)[{{glyph.timer_outline}} $duration](fg:ink bg:took)[{{glyph.uE0B4}}](fg:took)"
+
+[status]
+disabled = false
+format = " [{{glyph.uE0B6}}](fg:err)[{{glyph.uF0156}} $status](bold fg:ink bg:err)[{{glyph.uE0B4}}](fg:err)"
+
+[fill]
+symbol = "─"
+style = "rule"
+
+[time]
+disabled = false
+time_format = "%H:%M"
+format = "[{{glyph.clock_outline}} $time](muted)"
+
+[character]
+success_symbol = "[{{glyph.u100003}}  ](peonza)"
+error_symbol = "[{{glyph.u100003}}  ](err)"
+vimcmd_symbol = "[{{glyph.u100003}}  ](branch)"

@@ -1,0 +1,141 @@
+{
+  "schema": "ryce.constants/1",
+  "tag": "agentwait",
+  "signal": 9,
+  "runtime": "agentd",
+  "roster_file": "roster.json",
+  "lock_file": "lock.txt",
+  "waybar_dir": "waybar",
+  "agents_file": "agents.json",
+  "qs_config": "ryce",
+  "sidebar_ipc": "sidebar",
+  "max_ws": 11,
+  "workspace_keys": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "0"
+  ],
+  "dispatch_focus_ws": "hl.dsp.focus({ workspace = %d })",
+  "dispatch_tag": "hl.dsp.window.tag({ tag = \"%s\", window = \"address:%s\" })",
+  "always_shown": 5,
+  "words_es": {
+    "note": "One vocabulary for the bar (agentd) and the sidebar (Quickshell, via the generated Words.qml). Plain Spanish, no English leaks: an unknown key falls back to waiting_fallback.",
+    "state": {
+      "waiting": "te espera",
+      "busy": "trabajando",
+      "shell": "comando en marcha",
+      "idle": "en reposo",
+      "unknown": "sin estado"
+    },
+    "waiting_for": {
+      "permission prompt": "pide permiso",
+      "input needed": "espera tu respuesta",
+      "dialog open": "tiene un diálogo abierto",
+      "sandbox request": "pide salir del sandbox",
+      "worker request": "un subagente pide permiso"
+    },
+    "waiting_fallback": "te espera",
+    "lock_one": "1 agente te espera",
+    "lock_many": "%d agentes te esperan"
+  },
+  "themes": [
+    "origen",
+    "grafito",
+    "ola",
+    "tinta",
+    "papel"
+  ],
+  "default_theme": "origen",
+  "theme_state": ".local/state/ryce/theme",
+  "theme_files": [
+    "theme.json",
+    "hypr/palette.lua",
+    "waybar/palette.css",
+    "wallpaper/1920x1080.jpg",
+    "wallpaper/2560x1440.jpg",
+    "wallpaper/thumb.png",
+    "wallpaper/lock.jpg",
+    "wallpaper/panel.png",
+    "peonza/still.png",
+    "peonza/spin.png",
+    "peonza/wobble.png",
+    "peonza/logo.png",
+    "peonza/plymouth-00.png",
+    "hypr/hyprlock.conf",
+    "kitty/kitty.conf",
+    "rofi/style.rasi",
+    "mako/config",
+    "starship.toml",
+    "fastfetch/config.jsonc",
+    "btop/themes/ryce.theme",
+    "cava/config",
+    "gtk-3.0/gtk.css",
+    "gtk-4.0/gtk.css",
+    "qt6ct/colors/ryce.conf",
+    "swayosd/style.css",
+    "yazi/theme.toml",
+    "claude/ryce.json"
+  ],
+  "ipc": {
+    "sidebar": [
+      "toggle",
+      "open",
+      "close"
+    ],
+    "selector": [
+      "toggle",
+      "open",
+      "close"
+    ],
+    "desk": [
+      "toggle(name)"
+    ],
+    "theme": [
+      "reload"
+    ],
+    "bar": [
+      "ping"
+    ],
+    "osd": [
+      "flash(kind)"
+    ]
+  },
+  "namespaces": [
+    "qs-frame",
+    "qs-bar",
+    "qs-edge",
+    "qs-sidebar",
+    "qs-selector",
+    "qs-osd",
+    "qs-desk",
+    "qs-wall"
+  ],
+  "peonza_assets": {
+    "still": "peonza/still.png",
+    "spin": "peonza/spin.png",
+    "spin_frames": 24,
+    "wobble": "peonza/wobble.png",
+    "wobble_frames": 16,
+    "sprite_px": 64,
+    "logo": "peonza/logo.png",
+    "plymouth": "peonza/plymouth-%02d.png",
+    "plymouth_frames": 72,
+    "plymouth_px": 160
+  },
+  "glyph": {
+    "font": "Ryce Peonza",
+    "codepoint": "U+100000",
+    "codepoints": {
+      "20": "U+100000",
+      "32": "U+100001",
+      "64": "U+100002"
+    }
+  }
+}

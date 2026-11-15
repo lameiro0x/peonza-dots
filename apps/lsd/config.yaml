@@ -1,0 +1,5 @@
+# lsd 1.2: the columns' colours live in colors.yaml beside this file (theme
+# "custom"); file names follow LS_COLORS, which fish sets per desktop theme.
+color:
+  when: auto
+  theme: custom

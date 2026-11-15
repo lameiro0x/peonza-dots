@@ -1,0 +1,47 @@
+# Shadows /usr/lib/systemd/user/waybar.service (same name, higher-priority
+# directory, so this file replaces it whole). The packaged unit has
+# Requisite=graphical-session.target, which greetd never activates: started from
+# ryce-session.target it would fail instantly.
+#
+# The FALLBACK bar. ryce-session.target does not start it: quickshell.service
+# starts it through OnFailure= when the Quickshell bar cannot stay up. By hand,
+# `systemctl --user start waybar` works too, and stops Quickshell (Conflicts=).
+[Unit]
+Description=Waybar, the ryce fallback bar
+Documentation=man:waybar(5)
+PartOf=ryce-session.target
+# One bar at a time: both reserve the top edge. Symmetric, so a Quickshell
+# started again (fixed, or the next session) takes the edge back.
+Conflicts=quickshell.service
+# The bar reads what agentd publishes under $XDG_RUNTIME_DIR. Wants=, not
+# Requires=: a bar with bare numerals still beats no bar.
+Wants=agentd.service
+After=agentd.service
+
+# No start-rate limit on purpose: the default gives up after 5 starts in 10 s, and
+# one burst of memory pressure would leave the bar dead until a manual restart
+# (2026-08-01). A broken config loops every 3 s instead, loud in the journal and
+# harmless, and waybar/tests gates the config before it lands. [Unit], not [Service].
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/waybar
+ExecReload=/usr/bin/kill -SIGUSR2 $MAINPID
+
+# The point of this unit: an unsupervised bar that dies once stays gone for hours
+# (2026-08-01: SIGBUS in fdopen() under zram exhaustion). Under systemd it is back
+# in three seconds.
+Restart=always
+RestartSec=3
+
+# systemd gives user services oom_score_adj=200. Asking for 0 lands on 100, not 0:
+# lowering it below the user manager's own 100 needs CAP_SYS_RESOURCE, so the
+# kernel clamps and systemd starts the unit anyway. 100 still beats 200, and the
+# OOM killer never picked the bar in 191 events (~90 MB against GB-sized browsers).
+OOMScoreAdjust=0
+# Keeps the bar's pages out of reclaim while zram thrashes: the 2026-08-01 crash
+# was a failed page fault under pressure, not an OOM kill.
+MemoryLow=128M
+
+# No [Install]: ryce-session.target starts it once the compositor exists.

@@ -1,0 +1,180 @@
+/* Managed by ryce-pc (install/boot-setup.sh, install/system-setup.sh): change it in the repo and re-run. */
+/* ReGreet 0.5 (GTK4) in the «Expediente» look: Tinta's greys, no card of its own (the sheet is
+   the background, as on the login page; one hairline at its left edge), fields underlined
+   instead of boxed, the login button a square of paper. Labels in Martian Mono, typed values
+   in Inter, the clock in Doto. Widget tree: ReGreet
+   src/gui/templates.rs (frame.background card and clock, combobox > button.combo, entry and
+   passwordentry, button.suggested-action "Login", button.destructive-action Reboot/Power Off,
+   infobar). No bare `label {}` colour: a rule that matches the button's own label beats the
+   colour it inherits, and it once painted the login text the button's colour (1.00:1). Labels
+   are coloured through their parent below. Contrast, against the brightest pixel the
+   background has behind the form (#414141, theme/boot/greeter/background.jpg): text outside a
+   field in fg1 #b4b4b4 (4.9:1; fg2 #7c7c7c would be 2.5:1), field rules #8e8e8e (3.1:1, and
+   5.8:1 on the field's #111111); fg2 only inside fields; #3a3a3a decorative only. */
+
+window.background {
+    background-color: #0a0a0a;
+    color: #f0f0f0;
+    font-family: "Martian Mono";
+}
+
+frame.background {
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid #3a3a3a;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 28px 32px;
+}
+
+/* The greeting and the "User:" / "Session:" captions. */
+grid > label {
+    color: #b4b4b4;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+entry,
+passwordentry,
+combobox button.combo,
+button.toggle {
+    background-color: #111111;
+    background-image: none;
+    color: #f0f0f0;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid #8e8e8e;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+    min-height: 36px;
+}
+
+/* What is typed: Inter, like the page's fields. */
+entry,
+passwordentry {
+    font-family: "Inter";
+    font-size: 15px;
+}
+
+entry:focus-within,
+passwordentry:focus-within,
+combobox button.combo:focus-visible,
+button.toggle:focus-visible {
+    border-bottom: 2px solid #f0f0f0;
+}
+
+entry image,
+passwordentry image {
+    color: #7c7c7c;
+}
+
+combobox button.combo label,
+combobox button.combo cellview,
+combobox button.combo arrow,
+button.toggle image {
+    color: #f0f0f0;
+}
+
+popover contents,
+popover.menu contents {
+    background-color: #111111;
+    color: #f0f0f0;
+    border: 1px solid #3a3a3a;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+popover contents label {
+    color: #f0f0f0;
+}
+
+popover.menu modelbutton:hover,
+popover treeview:selected {
+    background-color: #262626;
+}
+
+button {
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid #3a3a3a;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+button label {
+    color: #b4b4b4;
+}
+
+button:hover label,
+button:focus-visible label {
+    color: #f0f0f0;
+}
+
+button:focus-visible {
+    outline: 1px solid #f0f0f0;
+    outline-offset: 2px;
+}
+
+/* Login: paper and ink, 13.6:1. */
+button.suggested-action {
+    background-color: #d6d6d6;
+    border-color: #d6d6d6;
+    min-height: 28px;
+}
+
+button.suggested-action label,
+button.suggested-action:hover label,
+button.suggested-action:focus-visible label {
+    color: #0a0a0a;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+
+button.suggested-action:hover {
+    background-color: #f0f0f0;
+    border-color: #f0f0f0;
+}
+
+/* Reboot and Power Off: plain text on the ground. */
+button.destructive-action {
+    border-color: transparent;
+}
+
+button.destructive-action label {
+    color: #b4b4b4;
+}
+
+button.destructive-action:hover label,
+button.destructive-action:focus-visible label {
+    color: #f0f0f0;
+}
+
+infobar > revealer > box {
+    background-color: #111111;
+    border-left: 2px solid #7c7c7c;
+    border-radius: 0;
+}
+
+infobar.error > revealer > box {
+    border-left-color: #d4a9a9;
+}
+
+infobar label {
+    color: #f0f0f0;
+}
+
+infobar.error label {
+    color: #d4a9a9;
+}
+
+frame.widget-clock {
+    border-left: none;
+    padding: 6px 18px;
+}
+
+frame.widget-clock label {
+    color: #b4b4b4;
+    font-family: "Doto";
+    font-size: 20px;
+}

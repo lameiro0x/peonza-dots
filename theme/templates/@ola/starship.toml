@@ -1,0 +1,74 @@
+# starship 1.27, theme «Ola»: kanagawa swells on a ruled line. Each segment is a
+# slanted band in one of the theme's hues, leaning forward like the crest in
+# Hokusai's print, the directory signed with a wave; the frame and its rule in the
+# theme's grey, the peonza in foam (the frame, the peonza's three cells and the
+# transient line: see theme/templates/starship.toml):
+#
+#   ╭─ ◢ ~ ~/Repos/ryce-pc ◤ ◢ main ◤ ◢ ~1 +2 ◤ ◢ 12s ◤ ──────────────── 14:32
+#   ╰─ <peonza>  _
+
+format = """[╭─ ](rule)$hostname$directory$git_branch$git_status$cmd_duration$status $fill $time
+[╰─ ](rule)$character"""
+palette = "ryce"
+
+[palettes.ryce]
+rule = "{{fg2}}"
+ink = "{{ink_on_pill}}"
+muted = "{{fg1}}"
+foam = "{{hue.media}}"
+violet = "{{ansi.5}}"
+carp = "{{hue.cpu}}"
+sand = "{{hue.disk}}"
+peonza = "{{hue.media}}"
+err = "{{err}}"
+
+[hostname]
+style = "muted"
+format = "[$hostname]($style) "  # ssh only
+
+[directory]
+read_only = " {{glyph.lock_outline}}"
+format = "[{{glyph.uE0BA}}](fg:foam)[{{glyph.uF078D}} $path$read_only](bold fg:ink bg:foam)[{{glyph.uE0BC}}](fg:foam)"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = "{{glyph.source_branch}} "
+format = " [{{glyph.uE0BA}}](fg:violet)[$symbol$branch](fg:ink bg:violet)[{{glyph.uE0BC}}](fg:violet)"
+
+[git_status]
+# Each count leads with its own space, so two never touch (~1 +2 ?3 ⇡4).
+format = "( [{{glyph.uE0BA}}](fg:carp)[$all_status$ahead_behind ](fg:ink bg:carp)[{{glyph.uE0BC}}](fg:carp))"
+ahead = " ⇡${count}"
+behind = " ⇣${count}"
+diverged = " ⇕"
+modified = " ~${count}"
+staged = " +${count}"
+untracked = " ?${count}"
+deleted = " -${count}"
+renamed = " »${count}"
+stashed = ""
+conflicted = " !${count}"
+
+[cmd_duration]
+min_time = 2000
+format = " [{{glyph.uE0BA}}](fg:sand)[{{glyph.timer_outline}} $duration](fg:ink bg:sand)[{{glyph.uE0BC}}](fg:sand)"
+
+[status]
+disabled = false
+format = " [{{glyph.uE0BA}}](fg:err)[{{glyph.uF0156}} $status](bold fg:ink bg:err)[{{glyph.uE0BC}}](fg:err)"
+
+[fill]
+symbol = "─"
+style = "rule"
+
+[time]
+disabled = false
+time_format = "%H:%M"
+format = "[$time](muted)"
+
+[character]
+success_symbol = "[{{glyph.u100003}}  ](peonza)"
+error_symbol = "[{{glyph.u100003}}  ](err)"
+vimcmd_symbol = "[{{glyph.u100003}}  ](violet)"

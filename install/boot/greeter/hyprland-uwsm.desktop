@@ -1,0 +1,10 @@
+[Desktop Entry]
+# Managed by ryce-pc (install/boot-setup.sh, install/system-setup.sh): change it in the repo and re-run.
+# Masks the hyprland package's /usr/share/wayland-sessions/hyprland-uwsm.desktop: uwsm is not
+# installed (the rice starts its own units through ryce-session.target), and regreet 0.5 and
+# tuigreet 0.11 ignore TryExec, so the entry was listed and picking it ended the session in
+# 90 ms. Both read /usr/local/share first (ryce-greeter sets XDG_DATA_DIRS) and a Hidden copy
+# there hides the one in /usr/share, upgrades included.
+Name=Hyprland (uwsm-managed)
+Type=Application
+Hidden=true

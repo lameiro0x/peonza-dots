@@ -1,0 +1,41 @@
+# Development and AI-agent workstation. Official repos only.
+fish
+starship
+lsd
+bat
+zoxide
+fzf
+ripgrep
+fd
+jq
+go-yq
+zip
+shellcheck
+git-delta
+lazygit
+github-cli
+neovim
+python
+python-pip
+uv
+mise
+nodejs
+npm
+pnpm
+rustup
+cmake
+sqlite
+docker
+docker-compose
+docker-buildx
+chromium
+pyright
+typescript-language-server
+# ryce-pc build-time generators (theme/wallpaper/scenes.py, theme/peonza/*, the
+# Quickshell wallpaper shader): never needed at runtime, the outputs are committed.
+python-numpy
+python-pillow
+python-fonttools
+potrace
+qt6-shadertools
+librsvg

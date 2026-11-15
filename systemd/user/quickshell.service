@@ -1,0 +1,32 @@
+[Unit]
+Description=Quickshell ryce: the frame, the bar and its drawers
+Documentation=file:%h/.config/quickshell/ryce/shell.qml
+PartOf=ryce-session.target
+# It reads agentd's roster.json; it copes with the file not existing yet.
+After=agentd.service
+# The bar is mandatory and Quickshell is the fragile layer (a Qt upgrade can break
+# it), so a Quickshell that cannot stay up hands the bar to Waybar. OnFailure= fires
+# only once the start limit below is exhausted: a single crash just restarts.
+# Waybar Conflicts= this unit, so starting either one stops the other, and two bars
+# never reserve the top edge at once. Back to Quickshell after a fix:
+#   systemctl --user reset-failed quickshell && systemctl --user start quickshell
+OnFailure=waybar.service
+# Three failed starts inside the window, then give up. The window must hold three
+# of the slowest failures: a Quickshell that runs but never answers costs the
+# probe below (~10 s) plus RestartSec each, ~12 s, so three take ~36 s and a 30 s
+# window would reset before the fourth start and never give up. [Unit], not [Service].
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/quickshell -c ryce
+# Running is not working: a QML error after a Qt upgrade leaves the process alive
+# with no bar. The unit only counts as started once the bar answers its IPC ping
+# (20 tries, 0.5 s apart); a probe that fails fails the start, which restarts and
+# counts toward the limit above. `$$` is a literal `$` for systemd.
+ExecStartPost=/bin/sh -c 'n=0; while [ "$$n" -lt 20 ]; do [ "$$(/usr/bin/qs -c ryce ipc call bar ping 2>/dev/null)" = ok ] && exit 0; n=$$((n + 1)); sleep 0.5; done; echo "quickshell: the bar never answered ipc call bar ping" >&2; exit 1'
+Restart=on-failure
+RestartSec=2
+
+# No [Install]: ryce-session.target starts it once the compositor exists.

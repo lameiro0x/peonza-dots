@@ -1,0 +1,143 @@
+{
+  "generated_by": "theme/wallpaper/scenes.py (do not edit)",
+  "band_px": 60,
+  "themes": {
+    "origen": {
+      "1920x1080": {
+        "top": {
+          "y": 0,
+          "average": "#473533",
+          "luminance": 0.04125
+        },
+        "lightest": {
+          "y": 667,
+          "average": "#8c8155",
+          "luminance": 0.21932
+        }
+      },
+      "2560x1440": {
+        "top": {
+          "y": 0,
+          "average": "#473533",
+          "luminance": 0.04125
+        },
+        "lightest": {
+          "y": 900,
+          "average": "#8d8456",
+          "luminance": 0.22837
+        }
+      }
+    },
+    "grafito": {
+      "1920x1080": {
+        "top": {
+          "y": 0,
+          "average": "#010101",
+          "luminance": 0.0003
+        },
+        "lightest": {
+          "y": 686,
+          "average": "#131313",
+          "luminance": 0.00651
+        }
+      },
+      "2560x1440": {
+        "top": {
+          "y": 0,
+          "average": "#010101",
+          "luminance": 0.0003
+        },
+        "lightest": {
+          "y": 916,
+          "average": "#131313",
+          "luminance": 0.00651
+        }
+      }
+    },
+    "ola": {
+      "1920x1080": {
+        "top": {
+          "y": 0,
+          "average": "#c1bc9f",
+          "luminance": 0.49807
+        },
+        "lightest": {
+          "y": 18,
+          "average": "#c1bda0",
+          "luminance": 0.50271
+        }
+      },
+      "2560x1440": {
+        "top": {
+          "y": 0,
+          "average": "#c1bb9e",
+          "luminance": 0.49347
+        },
+        "lightest": {
+          "y": 38,
+          "average": "#c1bda0",
+          "luminance": 0.50271
+        }
+      }
+    },
+    "tinta": {
+      "1920x1080": {
+        "top": {
+          "y": 0,
+          "average": "#151515",
+          "luminance": 0.0075
+        },
+        "lightest": {
+          "y": 504,
+          "average": "#1c1c1c",
+          "luminance": 0.01161
+        }
+      },
+      "2560x1440": {
+        "top": {
+          "y": 0,
+          "average": "#151515",
+          "luminance": 0.0075
+        },
+        "lightest": {
+          "y": 667,
+          "average": "#1c1c1c",
+          "luminance": 0.01161
+        }
+      }
+    },
+    "papel": {
+      "1920x1080": {
+        "top": {
+          "y": 0,
+          "average": "#dbc7ae",
+          "luminance": 0.58963
+        },
+        "lightest": {
+          "y": 0,
+          "average": "#dbc7ae",
+          "luminance": 0.58963
+        }
+      },
+      "2560x1440": {
+        "top": {
+          "y": 0,
+          "average": "#dbc7ae",
+          "luminance": 0.58963
+        },
+        "lightest": {
+          "y": 0,
+          "average": "#dbc7ae",
+          "luminance": 0.58963
+        }
+      }
+    }
+  },
+  "floor": {
+    "theme": "papel",
+    "size": "1920x1080",
+    "y": 0,
+    "average": "#dbc7ae",
+    "luminance": 0.58963
+  }
+}

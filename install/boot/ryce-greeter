@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# greetd's greeter (default_session in /etc/greetd/config.toml): the login page after the LUKS
+# passphrase and after every logout. Three rungs, each tried only when the one above cannot
+# show, so there is always a way in:
+#   1. ryce's own page (quickshell/greeter, installed with its background to
+#      /usr/local/share/ryce/greeter) in cage;
+#   2. regreet in cage, dressed by install/boot/greeter/regreet.{toml,css};
+#   3. tuigreet on the console.
+# The login has one look whatever the desktop theme (like GRUB); an old theme spool in
+# /var/lib/ryce/greeter is no longer read and is left where it is.
+# The page writes "up" to a heartbeat file once it has loaded and reached greetd, and
+# "launch" just before the session starts. No beat within WAIT s (a QML error can leave
+# quickshell running with nothing on screen) and cage is stopped and regreet starts; any
+# other end of the page without "launch" falls to regreet too (a page that keeps dying
+# would otherwise be restarted by greetd forever). regreet dying within GRACE s falls to
+# tuigreet.
+# Installed to /usr/local/bin/ryce-greeter by install/system-setup.sh and install/boot-setup.sh.
+set -u
+
+GRACE=${RYCE_GREETER_GRACE:-15}
+WAIT=${RYCE_GREETER_WAIT:-12}
+# greetd SIGTERMs the greeter 5 s after it starts a session (greetd 0.10.3 context.rs:291),
+# and cage 0.3.1 segfaults on that teardown: a non-zero end of regreet may be a login that
+# worked. Waiting a little longer than greetd before falling to the next rung lets greetd end
+# us first; if nobody does, regreet really failed.
+SETTLE=${RYCE_GREETER_SETTLE:-7}
+QML=${RYCE_GREETER_QML:-/usr/local/share/ryce/greeter}
+# The desktop's keyboard (hypr/look.lua): the password is typed with the US map, Alt+Shift
+# switches to Spanish. cage reads these; the console (tuigreet) keeps its own keymap.
+export XKB_DEFAULT_LAYOUT=us,es XKB_DEFAULT_OPTIONS=ctrl:nocaps,grp:alt_shift_toggle
+# Sessions: /usr/local/share first, where install/boot/greeter/hyprland-uwsm.desktop hides
+# the package's uwsm entry (regreet 0.5 and tuigreet 0.11 ignore TryExec; uwsm is not
+# installed). Both read session dirs from here; greetd builds the user session's own env.
+export XDG_DATA_DIRS=/usr/local/share:/usr/share
+# The desktop's cursor (contracts desktop.cursor), put in /usr/share/icons by both installers:
+# the page (Qt) reads these, regreet takes regreet.toml's cursor_theme_name. cage 0.3 has no
+# cursor-shape protocol: until a client sets a cursor it shows its own default theme's.
+export XCURSOR_THEME=ryce-peonza XCURSOR_SIZE=32
+
+tui() {
+  # No tuigreet either: greetd restarts the greeter at once, so back off instead of
+  # spinning a tight loop on the console.
+  if ! command -v tuigreet >/dev/null; then sleep 5; exit 1; fi
+  exec tuigreet --time --remember --asterisks --cmd start-hyprland \
+    --theme 'border=darkgray;title=gray;greet=gray;text=gray;time=darkgray;container=black;prompt=gray;input=white;action=darkgray;button=gray'
+}
+
+# The Quickshell page. Returns (to fall back to regreet) unless it handed over a session.
+# It writes "launch" before asking greetd for the session, so its end needs no SETTLE wait.
+page() {
+  local dir beat pid rc state start=$SECONDS
+  if ! command -v cage >/dev/null || ! command -v qs >/dev/null || [ ! -f "$QML/shell.qml" ]; then
+    echo "ryce-greeter: falta cage, quickshell o $QML/shell.qml; uso regreet" >&2
+    return 1
+  fi
+  dir=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/ryce-greeter.XXXXXX") || return 1
+  beat=$dir/beat
+  RYCE_GREETER_HEARTBEAT=$beat RYCE_GREETER_LAYOUTS=$XKB_DEFAULT_LAYOUT \
+    cage -s -m last -d -- qs -p "$QML" &
+  pid=$!
+  while [ ! -s "$beat" ] && kill -0 "$pid" 2>/dev/null; do
+    if [ $((SECONDS - start)) -ge "$WAIT" ]; then
+      echo "ryce-greeter: la página de acceso no ha dado señales en $WAIT s; uso regreet" >&2
+      kill "$pid" 2>/dev/null
+      wait "$pid" 2>/dev/null
+      rm -rf "$dir"
+      return 1
+    fi
+    sleep 0.2
+  done
+  wait "$pid"
+  rc=$?
+  state=$(cat "$beat" 2>/dev/null)
+  rm -rf "$dir"
+  [ "$state" = launch ] && exit 0   # greetd starts the session
+  echo "ryce-greeter: la página de acceso salió con $rc a los $((SECONDS - start)) s sin abrir sesión; uso regreet" >&2
+  return 1
+}
+
+page
+
+if ! command -v cage >/dev/null || ! command -v regreet >/dev/null; then
+  echo "ryce-greeter: falta cage o regreet; uso tuigreet" >&2
+  tui
+fi
+
+# ReGreet README: dbus-run-session avoids a slow start, and so does skipping the portals.
+dbus=()
+if command -v dbus-run-session >/dev/null; then dbus=(dbus-run-session); fi
+start=$SECONDS
+env GTK_USE_PORTAL=0 GDK_DEBUG=no-portals "${dbus[@]}" cage -s -m last -d -- regreet
+rc=$?
+[ "$rc" = 0 ] && exit 0
+ran=$((SECONDS - start))
+sleep "$SETTLE"   # a session was started: greetd ends us here
+if [ "$ran" -lt "$GRACE" ]; then
+  echo "ryce-greeter: regreet salió con $rc a los $ran s; uso tuigreet" >&2
+  tui
+fi
+exit "$rc"   # it ran for a while: greetd starts it again

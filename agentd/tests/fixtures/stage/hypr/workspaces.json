@@ -1,0 +1,26 @@
+[
+ {
+  "id": 1,
+  "name": "1",
+  "monitor": "HEADLESS-1",
+  "windows": 1
+ },
+ {
+  "id": 2,
+  "name": "2",
+  "monitor": "HEADLESS-1",
+  "windows": 1
+ },
+ {
+  "id": 3,
+  "name": "3",
+  "monitor": "HEADLESS-1",
+  "windows": 1
+ },
+ {
+  "id": 4,
+  "name": "4",
+  "monitor": "HEADLESS-1",
+  "windows": 1
+ }
+]

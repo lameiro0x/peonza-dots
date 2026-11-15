@@ -1,0 +1,41 @@
+# lsd 1.2 column colours as ANSI slots (crossterm names: dark_* = 0-7, plain = 8-15),
+# so kitty's palette, i.e. the desktop theme, decides every shade. Replaces lsd's
+# default fixed 256-colour greens and creams. Never blue.
+user: grey
+group: dark_grey
+permission:
+  read: dark_green
+  write: dark_yellow
+  exec: dark_red
+  exec-sticky: dark_magenta
+  no-access: dark_grey
+  octal: dark_cyan
+  acl: dark_cyan
+  context: cyan
+date:
+  hour-old: green
+  day-old: dark_green
+  older: dark_cyan
+size:
+  none: dark_grey
+  small: grey
+  medium: yellow
+  large: dark_red
+inode:
+  valid: dark_magenta
+  invalid: dark_grey
+links:
+  valid: dark_magenta
+  invalid: dark_grey
+tree-edge: dark_grey
+git-status:
+  default: grey
+  unmodified: grey
+  ignored: dark_grey
+  new-in-index: dark_green
+  new-in-workdir: dark_green
+  typechange: dark_yellow
+  deleted: dark_red
+  renamed: dark_green
+  modified: dark_yellow
+  conflicted: dark_red

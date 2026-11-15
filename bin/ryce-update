@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+# The safe update ritual for this PC:
+#   1. Arch news published since the last full upgrade (read them: some ask for manual steps);
+#   2. sudo pacman -Syu with the hypr family pinned (IgnorePkg) and snap-pac taking a snapshot
+#      before and after, so a bad update is one GRUB entry away;
+#   3. if the pinned family has updates waiting, how to take them on purpose. Never automatic.
+#
+#   ryce-update [--dry-run]     --dry-run: news and pending updates only, changes nothing
+set -euo pipefail
+
+ROOT=${RYCE_ROOT:-}   # tests only: prefix for /var/log/pacman.log
+NEWS=https://archlinux.org/feeds/news/
+REPO=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd -P)   # through the ~/.local/bin link
+DRY=0
+
+die() { printf 'ryce-update: %s\n' "$*" >&2; exit 1; }
+
+case ${1:-} in
+  '') ;;
+  --dry-run) DRY=1 ;;
+  -h|--help) sed -n '2,8s/^# \{0,1\}//p' "${BASH_SOURCE[0]}"; exit 0 ;;
+  *) die "opción desconocida: $1 (usa --help)" ;;
+esac
+[ "$(id -u)" -ne 0 ] || die "ejecútalo como tu usuario, sin sudo: pedirá la contraseña cuando haga falta"
+for cmd in pacman pacman-conf curl python3; do
+  command -v "$cmd" >/dev/null || die "falta '$cmd'"
+done
+
+mapfile -t PINNED < <(pacman-conf IgnorePkg)
+case " ${PINNED[*]} " in
+  *" hyprland "*) ;;
+  *) die "la familia Hyprland no está fijada en /etc/pacman.conf: ejecuta antes 'sudo bash $REPO/install/system-setup.sh'" ;;
+esac
+
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/ryce-update.XXXXXX")
+trap 'rm -rf "$tmp"' EXIT
+
+# --- 1. news -----------------------------------------------------------------------------------
+last=$(grep -a 'starting full system upgrade' "$ROOT/var/log/pacman.log" 2>/dev/null | tail -n 1 \
+  | sed -n 's/^\[\([^]]*\)\].*/\1/p' || true)
+echo "==> Noticias de Arch desde tu última actualización${last:+ ($last)}"
+news=0
+if curl -fsSL --max-time 20 --retry 2 -o "$tmp/news.xml" "$NEWS"; then
+  news=$(python3 - "$tmp/news.xml" "$last" <<'PY'
+import sys
+import xml.etree.ElementTree as ET
+from datetime import datetime
+from email.utils import parsedate_to_datetime
+
+# Feed fetched over HTTPS from archlinux.org; expat ignores external entities and caps
+# entity expansion (Python >= 3.7.1 / expat >= 2.4), which is enough here.
+path, last = sys.argv[1], sys.argv[2]
+since = datetime.fromisoformat(last) if last else None
+items = []
+for item in ET.parse(path).getroot().iter("item"):
+    when = parsedate_to_datetime(item.findtext("pubDate", ""))
+    if since is None or when > since:
+        items.append((when, item.findtext("title", "").strip(), item.findtext("link", "").strip()))
+items.sort()
+for when, title, link in (items if since else items[-3:]):
+    print(f"    {when:%Y-%m-%d}  {title}\n                {link}", file=sys.stderr)
+print(len(items) if since else 0)
+PY
+  ) || die "no entiendo el feed de noticias: léelas en https://archlinux.org/news/ antes de actualizar"
+  [ "$news" -gt 0 ] || echo "    ninguna nueva"
+else
+  echo "    ! no pude descargar las noticias: ábrelas en https://archlinux.org/news/"
+  news=1
+fi
+if [ "$news" -gt 0 ] && [ "$DRY" = 0 ]; then
+  read -r -p "    ¿Leídas, y ninguna pide pasos manuales antes de actualizar? [s/N] " answer
+  case $answer in s|S|si|sí|Sí|SI) ;; *) echo "Sin cambios. Vuelve cuando las hayas leído."; exit 0 ;; esac
+fi
+
+pending_pinned() { grep -F '[ignored]' "$1" || true; }
+
+ritual() {  # ritual "lines of pacman -Qu marked [ignored]"
+  local names shown=${1//$'\n'/$'\n'    }
+  names=$(awk '{print $1}' <<<"$1" | tr '\n' ' ')
+  cat <<EOF
+
+==> La familia Hyprland tiene versión nueva y NO se ha tocado (está fijada):
+    $shown
+    Actualízala a propósito, con tiempo, no con prisa:
+      1. Lee las notas: https://github.com/hyprwm/Hyprland/releases (mejor esperar a la x.y.1).
+         Si tienes el portátil con Arch, actualízalo antes allí.
+      2. sudo pacman -S ${names% }
+         pacman avisa de que están en IgnorePkg: responde «s». Así se instalan una vez
+         sin quitar el pin, que sigue protegiendo los -Syu siguientes.
+      3. Hyprland --verify-config -c ~/.config/hypr/hyprland.lua   → debe decir «config ok»
+      4. Si no dice «config ok»: corrige el config en $REPO/hypr, o vuelve atrás con
+         sudo pacman -U /var/cache/pacman/pkg/<paquete>-<versión anterior>-x86_64.pkg.tar.zst
+         (o arranca la instantánea «pre» desde el menú de GRUB).
+EOF
+  local urgent=()
+  for n in $names; do
+    case $n in hyprlock|xdg-desktop-portal-hyprland|hyprpolkitagent) urgent+=("$n") ;; esac
+  done
+  if [ ${#urgent[@]} -gt 0 ]; then
+    echo "    ⚠ ${urgent[*]}: bloqueo de pantalla, portal o permisos. Sus actualizaciones suelen"
+    echo "      corregir fallos de seguridad: no las dejes pasar más de unos días."
+  fi
+}
+
+# --- dry run: what would come ---------------------------------------------------------------
+if [ "$DRY" = 1 ]; then
+  echo "==> Actualizaciones pendientes (simulación, base de datos temporal)"
+  if command -v checkupdates >/dev/null; then
+    checkupdates > "$tmp/pending" || true   # exit 2 = nothing pending
+    if [ -s "$tmp/pending" ]; then sed 's/^/    /' "$tmp/pending"; else echo "    nada"; fi
+    pinned=$(pending_pinned "$tmp/pending")
+    [ -z "$pinned" ] || ritual "$pinned"
+  else
+    echo "    ! falta checkupdates (pacman-contrib)"
+  fi
+  exit 0
+fi
+
+# --- 2. the upgrade ------------------------------------------------------------------------
+echo
+echo "==> Actualizando (sudo pacman -Syu)"
+echo "    snap-pac guarda una instantánea antes y otra después. Si algo sale mal, en el menú de"
+echo "    GRUB entra en «Arch Linux snapshots» y arranca la «pre» de hoy."
+status=0
+sudo pacman -Syu || status=$?
+if [ "$status" -ne 0 ]; then
+  echo
+  echo "    ! pacman ha fallado (código $status). Si dice que una actualización «breaks dependency …"
+  echo "      required by» un paquete de la familia Hyprland, toca actualizar la familia ahora (abajo)."
+fi
+if command -v snapper >/dev/null; then
+  echo "    Últimas instantáneas:"
+  sudo snapper -c root list 2>/dev/null | tail -n 2 | sed 's/^/      /' || true
+fi
+
+# --- 3. what is left on purpose -------------------------------------------------------------
+pacman -Qu > "$tmp/pending" 2>/dev/null || true
+pinned=$(pending_pinned "$tmp/pending")
+if [ -n "$pinned" ]; then ritual "$pinned"; else echo "==> La familia Hyprland está al día"; fi
+
+if command -v pacdiff >/dev/null && [ -n "$(pacdiff -o 2>/dev/null || true)" ]; then
+  echo "==> Hay ficheros .pacnew por revisar: sudo DIFFPROG='nvim -d' pacdiff"
+fi
+if [ ! -d "/usr/lib/modules/$(uname -r)" ]; then
+  echo "==> Se ha actualizado el kernel que estás usando: reinicia cuando puedas."
+fi
+exit "$status"

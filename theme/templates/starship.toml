@@ -1,0 +1,88 @@
+# starship 1.27, theme «{{theme.name}}»: the instrument line, ruled. One sober
+# reading per segment, dot separators, a hairline in fg2 out to the hour; below, the
+# prompt's character is the peonza itself:
+#
+#   ╭─ ~/Repos/ryce-pc · <branch> main ~1 +2 · <timer> 12s · <x> 1 ──────── 14:32
+#   ╰─ <peonza>  _
+#
+# The peonza is U+100003 of font «Ryce Peonza» (theme/peonza/glyph.py), three cells
+# wide: kitty draws it over the two spaces that follow, so it is always written
+# "<mark>  " inside its colour span, and the character module adds a third. Its
+# colour is the state, never its pose: the theme's own after a success, err after a
+# failure, muted in vi's normal mode. Once a command runs, fish redraws its prompt as
+# one line, "<time> <peonza>  command" (starship_transient_prompt_func in
+# apps/fish/config.fish), so no $COLUMNS-wide frame stays behind for kitty to rewrap
+# when the window resizes. Every theme keeps this frame; themes with their own look
+# have theme/templates/@<id>/starship.toml. Starship re-reads ~/.config/starship.toml
+# at every prompt and that path resolves through the theme state, so a switch shows
+# on the next prompt (fish repaints the current one, apps/fish/conf.d/ryce-theme.fish).
+
+format = """[╭─ ](mark)$hostname$directory$git_branch$git_status$cmd_duration$status $fill $time
+[╰─ ](mark)$character"""
+palette = "ryce"
+
+[palettes.ryce]
+text = "{{fg0}}"
+muted = "{{fg1}}"
+mark = "{{fg2}}"
+peonza = "{{fg0}}"
+add = "{{ansi.2}}"
+mod = "{{ansi.3}}"
+del = "{{ansi.1}}"
+err = "{{err}}"
+warn = "{{warn}}"
+
+[hostname]
+style = "muted"
+format = "[$hostname]($style)[ · ](mark)"  # ssh only
+
+[directory]
+style = "bold text"
+read_only = " {{glyph.lock_outline}}"
+read_only_style = "mark"
+format = "[$path]($style)[$read_only]($read_only_style)"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = "{{glyph.source_branch}} "
+style = "muted"
+format = "[ · ](mark)[$symbol$branch]($style)"
+
+[git_status]
+# Each count leads with its own space, so two never touch (~1 +2 ?3 ⇡4).
+format = "([$all_status$ahead_behind](muted))"
+ahead = " ⇡${count}"
+behind = " ⇣${count}"
+diverged = " ⇕"
+modified = "[ ~${count}](mod)"
+staged = "[ +${count}](add)"
+untracked = "[ ?${count}](muted)"
+deleted = "[ -${count}](del)"
+renamed = " »${count}"
+stashed = ""
+conflicted = "[ !${count}](warn)"
+
+[cmd_duration]
+min_time = 2000
+format = "[ · ](mark)[{{glyph.timer_outline}} $duration](muted)"
+
+[status]
+disabled = false
+format = "[ · ](mark)[{{glyph.uF0156}} $status]($style)"
+style = "err"
+
+[fill]
+symbol = "─"
+style = "mark"
+
+[time]
+disabled = false
+time_format = "%H:%M"
+format = "[$time](muted)"
+
+[character]
+success_symbol = "[{{glyph.u100003}}  ](peonza)"
+error_symbol = "[{{glyph.u100003}}  ](err)"
+vimcmd_symbol = "[{{glyph.u100003}}  ](muted)"

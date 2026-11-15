@@ -1,0 +1,224 @@
+{
+ "schema": "agentd.roster/1",
+ "generatedAt": 1794220000.0,
+ "hypr": {
+  "connected": true,
+  "focusedWorkspace": 2,
+  "outputs": [
+   "DP-1",
+   "HDMI-A-1"
+  ]
+ },
+ "counts": {
+  "waiting": 1,
+  "busy": 2,
+  "idle": 3
+ },
+ "sessions": [
+  {
+   "sessionId": "0b6f3f7e-0002-4c1a-9a51-0f7a9e1c0002",
+   "pid": 1103,
+   "kind": "interactive",
+   "project": "brujula",
+   "cwd": "/home/lameiro0x/Repos/brujula",
+   "title": "Arreglar el login con passkeys",
+   "name": null,
+   "state": "waiting",
+   "waitingFor": "permission prompt",
+   "since": 1794219940.0,
+   "doing": "Probar el login en el navegador",
+   "asked": "",
+   "did": "",
+   "waiting_on": null,
+   "subagents": [],
+   "workspace": 3,
+   "window": "0x5500000003",
+   "tagged": true
+  },
+  {
+   "sessionId": "0b6f3f7e-0001-4c1a-9a51-0f7a9e1c0001",
+   "pid": 1003,
+   "kind": "interactive",
+   "project": "ryce-pc",
+   "cwd": "/home/lameiro0x/Repos/ryce-pc",
+   "title": "Montar el rice del PC nuevo",
+   "name": null,
+   "state": "busy",
+   "waitingFor": null,
+   "since": 1794219800.0,
+   "doing": "Generar el fondo de pantalla",
+   "asked": "Haz el fondo de pantalla de la peonza para cada tema.",
+   "did": "Turno viejo que no debe salir",
+   "waiting_on": null,
+   "subagents": [
+    {
+     "id": "a1",
+     "type": "forge-scout",
+     "description": "Medir el contraste de cada tema",
+     "live": true
+    },
+    {
+     "id": "a2",
+     "type": "Explore",
+     "description": "Buscar dónde se pinta la barra",
+     "live": true
+    }
+   ],
+   "workspace": 2,
+   "window": "0x5500000002",
+   "tagged": false
+  },
+  {
+   "sessionId": "0b6f3f7e-0005-4c1a-9a51-0f7a9e1c0005",
+   "pid": 2000,
+   "kind": "bg",
+   "project": "cuadernillo",
+   "cwd": "/home/lameiro0x/Repos/cuadernillo",
+   "title": null,
+   "name": null,
+   "state": "busy",
+   "waitingFor": null,
+   "since": 1794219700.0,
+   "doing": "",
+   "asked": "",
+   "did": "",
+   "waiting_on": null,
+   "subagents": [],
+   "workspace": null,
+   "window": null,
+   "tagged": false
+  },
+  {
+   "sessionId": "0b6f3f7e-0004-4c1a-9a51-0f7a9e1c0004",
+   "pid": 1404,
+   "kind": "interactive",
+   "project": "teclados",
+   "cwd": "/home/lameiro0x/Repos/teclados",
+   "title": null,
+   "name": null,
+   "state": "shell",
+   "waitingFor": null,
+   "since": 1794219500.0,
+   "doing": "",
+   "asked": "",
+   "did": "",
+   "waiting_on": null,
+   "subagents": [],
+   "workspace": 5,
+   "window": "0x5500000006",
+   "tagged": false
+  },
+  {
+   "sessionId": "0b6f3f7e-0003-4c1a-9a51-0f7a9e1c0003",
+   "pid": 1203,
+   "kind": "interactive",
+   "project": "web-de-ejemplo",
+   "cwd": "/home/lameiro0x/Repos/web-de-ejemplo/src",
+   "title": "Nueva entrada del blog",
+   "name": "blog",
+   "state": "idle",
+   "waitingFor": null,
+   "since": 1794219000.0,
+   "doing": "",
+   "asked": "",
+   "did": "Entrada publicada en borrador",
+   "waiting_on": null,
+   "subagents": [],
+   "workspace": 4,
+   "window": "0x5500000004",
+   "tagged": false
+  },
+  {
+   "sessionId": "0b6f3f7e-0009-4c1a-9a51-0f7a9e1c0009",
+   "pid": 2400,
+   "kind": "interactive",
+   "project": "lameiro0x",
+   "cwd": "/home/lameiro0x",
+   "title": null,
+   "name": null,
+   "state": "unknown",
+   "waitingFor": null,
+   "since": null,
+   "doing": "",
+   "asked": "",
+   "did": "",
+   "waiting_on": null,
+   "subagents": [],
+   "workspace": null,
+   "window": null,
+   "tagged": false
+  }
+ ],
+ "workspaces": [
+  {
+   "id": 1,
+   "output": "DP-1",
+   "active": false,
+   "occupied": true,
+   "label": "Pull request #12 · lameiro0x/peonza-dots",
+   "icon": "browser",
+   "state": null,
+   "lead": null
+  },
+  {
+   "id": 2,
+   "output": "DP-1",
+   "active": true,
+   "occupied": true,
+   "label": "ryce-pc",
+   "icon": "claude",
+   "state": "busy",
+   "lead": "0b6f3f7e-0001-4c1a-9a51-0f7a9e1c0001"
+  },
+  {
+   "id": 3,
+   "output": "DP-1",
+   "active": false,
+   "occupied": true,
+   "label": "brujula",
+   "icon": "claude",
+   "state": "waiting",
+   "lead": "0b6f3f7e-0002-4c1a-9a51-0f7a9e1c0002"
+  },
+  {
+   "id": 4,
+   "output": "DP-1",
+   "active": false,
+   "occupied": true,
+   "label": "web-de-ejemplo",
+   "icon": "claude",
+   "state": "idle",
+   "lead": "0b6f3f7e-0003-4c1a-9a51-0f7a9e1c0003"
+  },
+  {
+   "id": 5,
+   "output": "DP-1",
+   "active": false,
+   "occupied": true,
+   "label": "teclados",
+   "icon": "claude",
+   "state": "idle",
+   "lead": "0b6f3f7e-0004-4c1a-9a51-0f7a9e1c0004"
+  },
+  {
+   "id": 9,
+   "output": "HDMI-A-1",
+   "active": true,
+   "occupied": true,
+   "label": "main.py - agentd",
+   "icon": "code",
+   "state": null,
+   "lead": null
+  },
+  {
+   "id": 11,
+   "output": "HDMI-A-1",
+   "active": false,
+   "occupied": true,
+   "label": "Downloads",
+   "icon": "term",
+   "state": null,
+   "lead": null
+  }
+ ]
+}

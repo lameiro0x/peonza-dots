@@ -1,0 +1,19 @@
+{
+  "projects": [
+    {"id": "p-musica", "name": "Música", "color": "#d08c3c"},
+    {"id": "p-lecturas", "name": "Lecturas", "color": "#5b8fd6"},
+    {"id": "p-casa", "name": "Casa", "color": "#5fae6e"},
+    {"id": "p-peonza", "name": "peonza-dots", "color": "#b46fd0"}
+  ],
+  "tasks": [
+    {"title": "Revisar el PR de la barra", "project": "p-peonza", "day": -2, "priority": 2},
+    {"title": "Regar el bonsái", "project": "p-casa", "day": 0, "time": "09:00:00"},
+    {"title": "Leer el Tractatus 4.1–4.2", "project": "p-lecturas", "day": 0, "priority": 2},
+    {"title": "Afinar la guitarra", "project": "p-musica", "day": 0, "time": "19:30:00"},
+    {"title": "Grabar el vídeo de los temas", "project": "p-peonza", "day": 0, "status": "completed"},
+    {"title": "Cambiar las cuerdas de nailon", "project": "p-musica", "day": 1},
+    {"title": "Devolver «Investigaciones filosóficas»", "project": "p-lecturas", "day": 3},
+    {"title": "Pasar el tutorial de los atajos", "project": "p-peonza", "day": 5},
+    {"title": "Ordenar los apuntes de lógica", "project": "p-lecturas"}
+  ]
+}

@@ -1,0 +1,4 @@
+name = ryce-peonza
+description = ryce-pc: the peonza as the mouse pointer (theme/cursor/build.py)
+version = 1
+cursors_directory = hyprcursors

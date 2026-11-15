@@ -1,0 +1,198 @@
+@import "palette.css";
+
+/* ryce fallback bar — «Marco». GTK3 CSS for Waybar 0.16.
+ *
+ * The Quickshell bar is the bar; this sheet draws its stand-in the same way: no
+ * strip, a transparent window, and three plates of @bar_bg floating on the
+ * wallpaper (left, centre, right), no glow, nothing that moves on its own. Colours come from palette.css,
+ * a link to the current theme's generated file (themes/<id>/waybar/palette.css;
+ * never edit it), so every theme repaints this sheet without touching it.
+ *
+ * One pill marks the workspace you are on. The theme's signal means exactly one
+ * thing: an AI session is waiting for you. Here it appears only on `.waiting`
+ * slots and on the agents counter when someone waits (tools/lint.py allowlists
+ * this file for it, nothing else).
+ *
+ * GTK3 traps this sheet is written around:
+ *   - one property GTK3 does not know makes Waybar exit 1 (waybar/tests gate it);
+ *   - no text-align: a min-width CENTRES a short label, so columns are padded by
+ *     agentd, not by CSS;
+ *   - a Pango span colour beats any CSS `color`: slot ink comes from agentd's markup,
+ *     this sheet owns the pill, the rings and the rhythm;
+ *   - no variables but colours: lengths (pill radius, bar height) are fixed here,
+ *     not per theme.
+ *
+ * Contrast (waybar/tests/test_contrast.py, every theme): every colour here is
+ * composited over a plate (@bar_bg over the lightest wallpaper band) and must
+ * clear 4.5:1 for text, 3:1 for marks.
+ */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans CJK SC", monospace;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    box-shadow: none;
+    transition-property: background-color, color;
+    transition-duration: 240ms;
+    transition-timing-function: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+/* No strip: the wallpaper shows around and between the plates. */
+window#waybar {
+    background-color: transparent;
+    color: @fg1;
+}
+
+/* The plates: 6 px off the screen's top edge, 36 px tall in the 48 px window,
+   the outer two 8 px in from the sides. Every module rides one of them. */
+.modules-left, .modules-center, .modules-right {
+    background-color: @bar_bg;
+    border-radius: 6px;
+    margin: 6px 0;
+}
+
+.modules-left  { margin-left: 8px; padding-left: 6px; }
+.modules-right { margin-right: 8px; padding-right: 6px; }
+
+/* ─── LEFT: the peonza + focused window ─────────────────────────────── */
+/* The 20 px cut of the logo; the Nerd Font behind it only so a missing Ryce
+   Peonza shows a tofu box instead of shifting the line. */
+#custom-peonza {
+    font-family: "Ryce Peonza", "JetBrainsMono Nerd Font";
+    font-size: 20px;
+    color: @fg0;
+    padding: 0 12px 0 10px;
+}
+
+/* The line you are working in. One step below the slot labels' project names,
+   so an idle workspace never out-shouts the window you are in. */
+#custom-window {
+    color: @fg1;
+    padding: 0 16px 0 2px;
+}
+
+#custom-window.empty {
+    padding: 0 4px 0 0;
+}
+
+/* ─── CENTRE: workspace slots ─────────────────────────────────────────
+   Focus changes fill, ink and ring, never width: padding is the same in every
+   state and agentd pads labels to fixed cell counts, so the row never reflows.
+   4 px above and below leave a 28 px pill on the 36 px plate. */
+#workspaces {
+    padding: 0 2px;
+}
+
+#custom-ws1, #custom-ws2, #custom-ws3, #custom-ws4, #custom-ws5, #custom-ws6,
+#custom-ws7, #custom-ws8, #custom-ws9, #custom-ws10, #custom-ws11 {
+    color: @fg2;
+    background-color: transparent;
+    border-radius: 4px;
+    padding: 0 10px;
+    margin: 4px 2px;
+    transition-property: background-color, color, box-shadow;
+}
+
+/* An empty workspace: its CJK numeral alone, dim but still a clickable mark.
+   The floor keeps it a pill rather than a sliver, in both focus states. */
+#workspaces .empty {
+    min-width: 28px;
+}
+
+/* A slot that lives on another monitor, or does not exist: no footprint at all. */
+#workspaces .off {
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+#workspaces .occupied:hover,
+#workspaces .empty:hover {
+    background-color: alpha(@pill, 0.06);
+}
+
+/* Where you are: the solid pill, flat. */
+#workspaces .active,
+#workspaces .active:hover {
+    background-color: @pill;
+    color: @ink_on_pill;
+}
+
+/* A session working in that workspace: a hairline ring in the slot's own grey.
+   Same contour language as the waiting ring at half its weight and none of its
+   colour, so "busy" is legible and still loses to "waiting" at a glance. */
+#workspaces .working {
+    box-shadow: inset 0 0 0 1px @fg2;
+}
+
+#workspaces .working.active {
+    box-shadow: inset 0 0 0 1px @dim_on_pill;
+}
+
+/* A session waiting for you: a closed 2 px contour in the signal. It eases in
+   with the slot's own transition and then holds still; no halo and no loop, which
+   would repaint the bar at the monitor's refresh rate for as long as you are away.
+   On the pill the signal's own pill shade keeps the ring above 3:1. */
+#workspaces .waiting {
+    box-shadow: inset 0 0 0 2px @signal;
+}
+
+#workspaces .waiting.active {
+    box-shadow: inset 0 0 0 2px @signal_on_pill;
+}
+
+/* ─── RIGHT: agents · volume · network · clock ───────────────────────── */
+#custom-agents,
+#wireplumber,
+#network {
+    color: @fg1;
+    padding: 0 10px;
+}
+
+/* The counter is a slot-sized box in every state, so the contour below costs no
+   reflow when someone starts waiting. */
+#custom-agents {
+    border-radius: 4px;
+    margin: 4px 4px 4px 10px;
+}
+
+/* Busy sessions lift the count one step; calm stays at the bar's grey. */
+#custom-agents.busy {
+    color: @fg0;
+}
+
+/* Someone waits: the slots' contour, not signal-coloured digits. A contour is a
+   mark (3:1) and every theme's signal clears it; as text, Grafito's red on black
+   would sit at 4.49:1, under the 4.5 floor for words. */
+#custom-agents.waiting {
+    color: @fg0;
+    box-shadow: inset 0 0 0 2px @signal;
+}
+
+#wireplumber.muted,
+#network.disconnected,
+#network.linked {
+    color: @fg2;
+}
+
+#clock {
+    color: @fg0;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 0 12px 0 8px;
+}
+
+/* ─── TOOLTIP ──────────────────────────────────────────────────────── */
+tooltip {
+    background-color: @tooltip_bg;
+    border: 1px solid @line;
+    border-radius: 6px;
+}
+
+tooltip label {
+    color: @fg0;
+    font-size: 12px;
+    padding: 6px 10px;
+}

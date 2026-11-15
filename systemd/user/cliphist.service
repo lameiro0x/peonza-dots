@@ -1,0 +1,19 @@
+# Shadows /usr/lib/systemd/user/cliphist.service (cliphist 0.7.0), whose
+# Requisite=graphical-session.target would make it fail instantly when started
+# from ryce-session.target. Without it the SUPER+c clipboard picker is empty.
+[Unit]
+Description=Clipboard history for the ryce session (cliphist)
+Documentation=https://github.com/sentriz/cliphist
+PartOf=ryce-session.target
+
+[Service]
+Type=simple
+# History lives on tmpfs (%t = $XDG_RUNTIME_DIR, 0700) and holds 100 items: copied
+# tokens and passwords die with the session instead of sitting in ~/.cache forever,
+# where every agent can read them. cliphist 0.7.0 flags go before the subcommand;
+# hypr/scripts/clipboard.sh reads the same -db-path.
+ExecStart=/usr/bin/wl-paste --watch /usr/bin/cliphist -db-path %t/cliphist.db -max-items 100 store
+Restart=on-failure
+RestartSec=2
+
+# No [Install]: ryce-session.target starts it once the compositor exists.

@@ -1,0 +1,8 @@
+/* Which side the new tab's column takes; theme/wallpaper/newtab.py reads it and draws
+   the theme's picture on the other side, which a narrower window keeps (--art-pos).
+   @ola and @tinta have their own (the column on the right). */
+:root {
+  --col-justify: start;
+  --scrim-dir: to right;
+  --art-pos: right center;
+}

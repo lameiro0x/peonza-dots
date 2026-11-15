@@ -1,0 +1,14 @@
+[Unit]
+Description=Agent terminals: kitty and the Claude Code sessions inside it
+Documentation=file:%h/.local/bin/ryce-term
+# bin/ryce-term launches every kitty with
+#   systemd-run --user --scope --slice=ryce-agents.slice ...
+# so agents, their browsers and their test runners share one memory budget.
+# On 32 GB that leaves 5 GB the slice can never take: the compositor, the bar and
+# the editor stay responsive while a runaway headless Chrome is reclaimed or
+# killed inside this slice (2026-08-01: 191 OOM events, the bar died of a failed
+# page fault). MemoryHigh throttles and reclaims first; MemoryMax is the wall.
+
+[Slice]
+MemoryHigh=24G
+MemoryMax=27G

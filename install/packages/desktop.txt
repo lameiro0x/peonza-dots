@@ -1,0 +1,65 @@
+# Desktop: compositor, bar, widgets, theming. Official repos only.
+# The hypr family is pinned in /etc/pacman.conf IgnorePkg by install/system-setup.sh.
+hyprland
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+hyprlock
+hypridle
+hyprpolkitagent
+hyprsunset
+hyprpicker
+qt5-wayland
+qt6-wayland
+waybar
+quickshell
+awww
+mako
+rofi
+kitty
+swayosd
+grim
+slurp
+swappy
+wl-clipboard
+cliphist
+playerctl
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+pavucontrol
+cava
+fastfetch
+btop
+thunar
+thunar-archive-plugin
+thunar-volman
+gvfs
+tumbler
+ffmpegthumbnailer
+yazi
+imv
+mpv
+mpv-mpris
+adw-gtk-theme
+papirus-icon-theme
+nwg-look
+qt6ct
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+inter-font
+# Boot and login surfaces of the three themes (install/boot-setup.sh): the Plymouth
+# splash with the peonza and the LUKS prompt, and the graphical greeter after logout
+# (regreet inside cage; tuigreet stays as its fallback).
+plymouth
+greetd-regreet
+cage
+gnome-keyring
+libsecret
+seahorse
+python-gobject
+gtk3
+# fastfetch decodes the animated peonza logo (WebP) through ImageMagick 7 (theme/fetch/fetch.py)
+imagemagick

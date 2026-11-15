@@ -1,0 +1,259 @@
+{
+  "schema": "ryce.theme/2",
+  "id": "papel",
+  "name": "Papel",
+  "temperature": "warm",
+  "tagline": "Papel de lectura: tinta cálida sobre crema, un punto por párrafo y un lápiz rojo que solo avisa.",
+  "colors": {
+    "bg0": "#dbc6ae",
+    "bg1": "#d4bfa8",
+    "bg2": "#cbb79f",
+    "bg3": "#c2ad96",
+    "line": "#aa9885",
+    "fg0": "#282623",
+    "fg1": "#413d38",
+    "fg2": "#534e49",
+    "pill": "#282623",
+    "ink_on_pill": "#dbc6ae",
+    "dim_on_pill": "#a29d95",
+    "busy": "#413d38",
+    "signal": "#a3311c",
+    "signal_dim": "#cab3aa",
+    "signal_on_pill": "#e88c78",
+    "tint": "#3d4b59",
+    "ok": "#1c5422",
+    "warn": "#684100",
+    "err": "#842543",
+    "claude": "#743900"
+  },
+  "hues": {
+    "cpu": "#413d38",
+    "mem": "#413d38",
+    "net": "#413d38",
+    "vol": "#413d38",
+    "media": "#413d38",
+    "clock": "#282623",
+    "disk": "#413d38"
+  },
+  "alpha": {
+    "bar": 1.0,
+    "panel": 0.96,
+    "tooltip": 0.97,
+    "term": 1.0
+  },
+  "ansi": [
+    "#282623",
+    "#8b2c49",
+    "#235a28",
+    "#6e4700",
+    "#215085",
+    "#733970",
+    "#00585c",
+    "#514e4a",
+    "#514e4b",
+    "#7e2a3c",
+    "#225a27",
+    "#6f460b",
+    "#1d4d87",
+    "#70306c",
+    "#00585d",
+    "#171614"
+  ],
+  "term": {
+    "cursor": "#282623",
+    "selection_bg": "#c3bd92",
+    "selection_fg": "#282623",
+    "url": "#174b7e",
+    "claude": "#6b3f0f",
+    "diff_add": "#b4bfaa",
+    "diff_del": "#c7b1aa",
+    "diff_add_word": "#9eb292",
+    "diff_del_word": "#bf9a91"
+  },
+  "fonts": {
+    "ui": "Space Mono",
+    "display": "Space Mono",
+    "mono": "JetBrainsMono Nerd Font",
+    "icon": "JetBrainsMono Nerd Font",
+    "display_min_px": 0
+  },
+  "geometry": {
+    "frame_top": 48,
+    "frame_rim": 0,
+    "frame_radius": 2,
+    "gaps_in": 5,
+    "gaps_out": 10,
+    "border": 1,
+    "rounding": 2,
+    "rounding_power": 2.0,
+    "pill_radius": 2
+  },
+  "blur": {
+    "enabled": true,
+    "size": 6,
+    "passes": 2,
+    "brightness": 1.0,
+    "desk": true
+  },
+  "motion": {
+    "preset": "pausada",
+    "ms": 360,
+    "qml_curve": [
+      0.25,
+      0.1,
+      0.25,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "hypr": {
+      "curves": {
+        "page": {
+          "type": "bezier",
+          "points": [
+            [
+              0.25,
+              0.1
+            ],
+            [
+              0.25,
+              1.0
+            ]
+          ]
+        },
+        "settle": {
+          "type": "bezier",
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.2,
+              1.0
+            ]
+          ]
+        },
+        "leave": {
+          "type": "bezier",
+          "points": [
+            [
+              0.4,
+              0.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ]
+        }
+      },
+      "leaves": {
+        "windowsIn": {
+          "speed": 3.6,
+          "curve": "page",
+          "style": "popin 96%"
+        },
+        "windowsOut": {
+          "speed": 2.6,
+          "curve": "leave",
+          "style": "popin 96%"
+        },
+        "windowsMove": {
+          "speed": 3.6,
+          "curve": "page"
+        },
+        "fadeIn": {
+          "speed": 3.6,
+          "curve": "settle"
+        },
+        "fadeOut": {
+          "speed": 2.6,
+          "curve": "leave"
+        },
+        "fadeSwitch": {
+          "speed": 3.6,
+          "curve": "settle"
+        },
+        "fadeDim": {
+          "speed": 4.0,
+          "curve": "settle"
+        },
+        "layersIn": {
+          "speed": 3.4,
+          "curve": "page",
+          "style": "fade"
+        },
+        "layersOut": {
+          "speed": 2.6,
+          "curve": "leave",
+          "style": "fade"
+        },
+        "fadeLayersIn": {
+          "speed": 3.4,
+          "curve": "settle"
+        },
+        "fadeLayersOut": {
+          "speed": 2.6,
+          "curve": "leave"
+        },
+        "fadePopupsIn": {
+          "speed": 3.0,
+          "curve": "settle"
+        },
+        "fadePopupsOut": {
+          "speed": 2.0,
+          "curve": "leave"
+        },
+        "workspacesIn": {
+          "speed": 4.5,
+          "curve": "page",
+          "style": "fade"
+        },
+        "workspacesOut": {
+          "speed": 4.5,
+          "curve": "page",
+          "style": "fade"
+        },
+        "specialWorkspace": {
+          "speed": 4.0,
+          "curve": "page",
+          "style": "fade"
+        },
+        "border": {
+          "speed": 4.0,
+          "curve": "settle"
+        },
+        "zoomFactor": {
+          "speed": 4.0,
+          "curve": "settle"
+        }
+      }
+    }
+  },
+  "wallpaper": {
+    "scene": "photo",
+    "source": "assets/wallpapers/papel.jpg",
+    "focus": [
+      0.66,
+      0.5
+    ],
+    "grade": "none",
+    "lock_source": "assets/wallpapers/papel-lock.jpg",
+    "alternates": [],
+    "transition": "fade",
+    "animated": false
+  },
+  "desktop": {
+    "gtk_theme": "adw-gtk3",
+    "icon_theme": "ryce-papel",
+    "folder": "#b9ad98",
+    "folder_dark": "#8f8472",
+    "cursor": "ryce-peonza",
+    "ambient": []
+  },
+  "contrast_floor": {
+    "text": 4.5,
+    "ui": 3.0
+  }
+}

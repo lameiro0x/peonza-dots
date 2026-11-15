@@ -1,0 +1,4 @@
+[Icon Theme]
+Name=ryce-peonza
+Comment=ryce-pc: the peonza as the mouse pointer (theme/cursor/build.py)
+Inherits=Adwaita

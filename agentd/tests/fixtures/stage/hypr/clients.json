@@ -1,0 +1,146 @@
+[
+ {
+  "address": "0x5500000001",
+  "mapped": true,
+  "hidden": false,
+  "at": [
+   0,
+   0
+  ],
+  "size": [
+   800,
+   600
+  ],
+  "workspace": {
+   "id": 1,
+   "name": "1"
+  },
+  "floating": false,
+  "monitor": 0,
+  "class": "firefox",
+  "title": "github.com — lameiro0x/peonza-dots — Mozilla Firefox",
+  "initialClass": "firefox",
+  "initialTitle": "firefox",
+  "pid": 500,
+  "xwayland": false,
+  "pinned": false,
+  "fullscreen": 0,
+  "fullscreenClient": 0,
+  "grouped": [],
+  "tags": [],
+  "swallowing": "0x0",
+  "focusHistoryID": 3,
+  "inhibitingIdle": false,
+  "xdgTag": "",
+  "xdgDescription": "",
+  "contentType": "none"
+ },
+ {
+  "address": "0x5500000002",
+  "mapped": true,
+  "hidden": false,
+  "at": [
+   0,
+   0
+  ],
+  "size": [
+   800,
+   600
+  ],
+  "workspace": {
+   "id": 2,
+   "name": "2"
+  },
+  "floating": false,
+  "monitor": 0,
+  "class": "kitty",
+  "title": "⠂ ryce-pc",
+  "initialClass": "kitty",
+  "initialTitle": "kitty",
+  "pid": 1000,
+  "xwayland": false,
+  "pinned": false,
+  "fullscreen": 0,
+  "fullscreenClient": 0,
+  "grouped": [],
+  "tags": [],
+  "swallowing": "0x0",
+  "focusHistoryID": 0,
+  "inhibitingIdle": false,
+  "xdgTag": "",
+  "xdgDescription": "",
+  "contentType": "none"
+ },
+ {
+  "address": "0x5500000003",
+  "mapped": true,
+  "hidden": false,
+  "at": [
+   0,
+   0
+  ],
+  "size": [
+   800,
+   600
+  ],
+  "workspace": {
+   "id": 3,
+   "name": "3"
+  },
+  "floating": false,
+  "monitor": 0,
+  "class": "kitty",
+  "title": "✳ brujula",
+  "initialClass": "kitty",
+  "initialTitle": "kitty",
+  "pid": 1100,
+  "xwayland": false,
+  "pinned": false,
+  "fullscreen": 0,
+  "fullscreenClient": 0,
+  "grouped": [],
+  "tags": [],
+  "swallowing": "0x0",
+  "focusHistoryID": 2,
+  "inhibitingIdle": false,
+  "xdgTag": "",
+  "xdgDescription": "",
+  "contentType": "none"
+ },
+ {
+  "address": "0x5500000004",
+  "mapped": true,
+  "hidden": false,
+  "at": [
+   0,
+   0
+  ],
+  "size": [
+   800,
+   600
+  ],
+  "workspace": {
+   "id": 4,
+   "name": "4"
+  },
+  "floating": false,
+  "monitor": 0,
+  "class": "kitty",
+  "title": "blog",
+  "initialClass": "kitty",
+  "initialTitle": "kitty",
+  "pid": 1200,
+  "xwayland": false,
+  "pinned": false,
+  "fullscreen": 0,
+  "fullscreenClient": 0,
+  "grouped": [],
+  "tags": [],
+  "swallowing": "0x0",
+  "focusHistoryID": 4,
+  "inhibitingIdle": false,
+  "xdgTag": "",
+  "xdgDescription": "",
+  "contentType": "none"
+ }
+]

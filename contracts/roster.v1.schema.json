@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentd.roster/1",
+  "title": "agentd roster v1 — what Quickshell (and verify.sh) read",
+  "description": "Raw strings only, never markup. Consumers must render text as plain text. Written atomically (tmp + os.replace) to $XDG_RUNTIME_DIR/agentd/roster.json; rewritten only when content other than generatedAt changes. contracts/check_roster.py is the executable form of this document.",
+  "type": "object",
+  "required": ["schema", "generatedAt", "hypr", "counts", "sessions", "workspaces"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "agentd.roster/1"},
+    "generatedAt": {"type": "number"},
+    "hypr": {
+      "type": "object",
+      "required": ["connected", "focusedWorkspace", "outputs"],
+      "additionalProperties": false,
+      "properties": {
+        "connected": {"type": "boolean"},
+        "focusedWorkspace": {"type": ["integer", "null"]},
+        "outputs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["waiting", "busy", "idle"],
+      "additionalProperties": false,
+      "properties": {
+        "waiting": {"type": "integer", "minimum": 0},
+        "busy": {"type": "integer", "minimum": 0},
+        "idle": {"type": "integer", "minimum": 0}
+      }
+    },
+    "sessions": {
+      "type": "array",
+      "description": "Sorted: waiting (oldest since first), then busy, then shell/idle/unknown (newest since first).",
+      "items": {
+        "type": "object",
+        "description": "Revised in place 2026-11-14 (agentd and every reader ship together): `doing` became one line, `subagents` a list, `asked` and `waiting_on` joined. Readers normalise defensively, so a stale agentd still writing the old shapes degrades to empty values.",
+        "required": ["sessionId", "pid", "kind", "project", "cwd", "title", "name", "state", "waitingFor", "since", "doing", "asked", "waiting_on", "subagents", "workspace", "window", "tagged"],
+        "additionalProperties": false,
+        "properties": {
+          "sessionId": {"type": "string"},
+          "pid": {"type": "integer"},
+          "kind": {"type": "string"},
+          "project": {"type": "string"},
+          "cwd": {"type": "string"},
+          "title": {"type": ["string", "null"]},
+          "name": {"type": ["string", "null"]},
+          "state": {"enum": ["waiting", "busy", "shell", "idle", "unknown"], "description": "Claude Code's status, except that an idle or shell session whose own background work (run_in_background Bash or Agent, Monitor) has not reported back is busy, with waiting_on set: it goes on by itself."},
+          "waitingFor": {"type": ["string", "null"]},
+          "since": {"type": ["number", "null"]},
+          "doing": {"type": "string", "maxLength": 60, "description": "What it is doing, one high-level line: the open turn's **Ahora:** bullets (whole ones only, joined with ' · '), else the current tool's description, else the background work it waits on. Empty when unknown."},
+          "asked": {"type": "string", "maxLength": 60, "description": "The first sentence of the user's last typed prompt (origin human), cut at a word, one line; code, pastes, quotes and tags skipped. The only text of the user's own that agentd publishes. Empty when unknown."},
+          "did": {"type": "string", "maxLength": 60, "description": "Optional, additive (2026-11-14). The first line of the session's latest **Hecho:** block, whatever turn wrote it, cut at a word, credentials redacted, one line. Empty when it never wrote one. Readers must accept its absence."},
+          "waiting_on": {"enum": ["shell", "agent", "monitor", null], "description": "Set only when state is busy because of pending background work: what it waits on (an agent first, then a shell, then a monitor)."},
+          "subagents": {
+            "type": "array",
+            "maxItems": 8,
+            "description": "From <session>/subagents/agent-<id>.meta.json: live ones first, then those finished in the last 10 minutes, newest first. Empty for an idle session.",
+            "items": {
+              "type": "object",
+              "required": ["id", "type", "description", "live"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string", "maxLength": 64},
+                "type": {"type": "string", "maxLength": 40, "description": "agentType (Explore, forge-scout…)"},
+                "description": {"type": "string", "maxLength": 60},
+                "live": {"type": "boolean", "description": "No `finished` in its meta, written after the session's process started."}
+              }
+            }
+          },
+          "workspace": {"type": ["integer", "null"]},
+          "window": {"type": ["string", "null"], "pattern": "^0x[0-9a-f]+$"},
+          "tagged": {"type": "boolean"}
+        }
+      }
+    },
+    "workspaces": {
+      "type": "array",
+      "description": "The slots each output shows, in output order then id: slots 1..always_shown (constants.json) always, the rest only while occupied or active. A bar slot needs, per item: slot id = `id` (the key you press, 1..max_ws); monitor = `output` (Hyprland monitor name); focus = `active` (this output's active workspace; the focused one overall is hypr.focusedWorkspace); `occupied`; label = `label` (with any session here, the lead session's project, whichever window was focused last; else the folder, page or window title of the most recently focused window); icon key = `icon` ('claude' exactly when a session lives here, revised 2026-11-14; else the most recently focused window's kind); waiting = state == 'waiting'; working = state == 'busy'; title = sessions[sessionId == lead].title, else its name, else nothing (a slot without a lead has no title beyond its label). Slots missing from the list for an output are not shown there.",
+      "items": {
+        "type": "object",
+        "required": ["id", "output", "active", "occupied", "label", "icon", "state"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "integer", "minimum": 1},
+          "output": {"type": "string"},
+          "active": {"type": "boolean"},
+          "occupied": {"type": "boolean"},
+          "label": {"type": "string"},
+          "icon": {"enum": ["claude", "term", "nvim", "code", "files", "browser", "window"]},
+          "state": {"enum": ["busy", "waiting", "idle", null], "description": "waiting if any session here waits, else busy if any works, else idle; null without sessions."},
+          "lead": {
+            "type": ["string", "null"],
+            "description": "Optional, additive (2026-11-09). sessionId of the most relevant session here: waiting > busy > shell/idle/unknown; ties go to the most recently focused window (the focused one while the workspace is active) and, inside it, to the session that names the window; then to the oldest `since`. Null exactly when state is null. Readers must accept its absence."
+          }
+        }
+      }
+    }
+  }
+}

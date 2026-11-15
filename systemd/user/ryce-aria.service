@@ -1,0 +1,25 @@
+# The player behind the Aria drawer (quickshell/ryce/aria): an idle, headless mpv that
+# the drawer drives over its JSON IPC socket. Quickshell can read MPRIS but not publish
+# it, so playback lives here; with mpv-mpris installed (/etc/mpv/scripts autoloads) the
+# bar's media module, the sidebar player and the media keys see it as any other player.
+[Unit]
+Description=Aria music player for the ryce shell (mpv, JSON IPC)
+Documentation=man:mpv(1)
+PartOf=ryce-session.target
+
+[Service]
+Type=simple
+# Stream URLs carry the Subsonic token (t, s): mpv logs nothing (no terminal, every
+# module silenced, no --log-file) and never writes the watch-later file that would keep
+# the URL. Its own mpv.conf still loads, and with it the system scripts (mpv-mpris).
+ExecStart=/usr/bin/mpv --idle=yes --no-video --no-terminal --msg-level=all=no --input-ipc-server=%t/ryce-aria.sock --ytdl=no --audio-display=no --save-position-on-quit=no --resume-playback=no --cache=yes --demuxer-max-bytes=32MiB --network-timeout=15
+Restart=on-failure
+RestartSec=2
+# It only plays: reads its config, writes nothing but the socket (cache stays in memory).
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%t
+
+# No [Install]: the drawer starts it on first use (systemctl --user start ryce-aria.service).

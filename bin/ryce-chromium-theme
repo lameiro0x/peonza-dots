@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""Dress Chromium in the current ryce theme: refresh the two unpacked extensions it loads.
+
+    ryce-chromium-theme
+
+~/.local/share/ryce/chromium/ holds what ~/.config/chromium-flags.conf hands Chromium with
+--load-extension, built from the theme ~/.local/state/ryce/theme/current points at:
+
+  theme/    the window's colours (themes/<id>/chromium/theme/manifest.json). Chromium
+            compiles a theme into «Cached Theme.pak» inside this folder and keeps using
+            that pack while it exists, so a new theme gets a new version and the pack is
+            deleted. Chromium paints it on its next start.
+  newtab/   the new tab page: apps/chromium/newtab plus the theme's theme.css, layout.css,
+            peonza and its own picture at both sizes (theme/wallpaper/newtab.py: not the
+            desk's, so `ryce-theme wall` leaves it alone). Read from disk on every new
+            tab: a switch shows at once.
+
+Outside the repo on purpose: Chromium writes into an unpacked theme's folder. Running it
+again with nothing changed touches nothing. bin/ryce-theme runs it on every switch.
+
+Exit: 0 done · 2 bad input, nothing written.
+Env (tests): RYCE_THEME_STATE, RYCE_CHROMIUM_DIR.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+STATE = Path(os.environ.get("RYCE_THEME_STATE") or Path.home() / ".local/state/ryce/theme")
+OUT = Path(os.environ.get("RYCE_CHROMIUM_DIR") or Path.home() / ".local/share/ryce/chromium")
+NEWTAB = REPO / "apps" / "chromium" / "newtab"
+PACK = "Cached Theme.pak"
+
+
+class Refused(Exception):
+    pass
+
+
+def write_atomic(path: Path, data: bytes) -> bool:
+    """Write `data` unless the file already holds it; True when it changed."""
+    try:
+        if path.read_bytes() == data:
+            return False
+    except OSError:
+        pass
+    tmp = path.with_name(f".{path.name}.ryce-tmp")
+    try:
+        tmp.write_bytes(data)
+        os.replace(tmp, path)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    return True
+
+
+def sources() -> tuple[bytes, dict[str, Path]]:
+    """The theme manifest (version set) and every new tab file, all checked before a write."""
+    cur = STATE / "current"
+    if not cur.is_dir():
+        raise Refused(f"no hay tema actual en {cur}: ejecuta bash {REPO}/install/deploy.sh")
+    d = cur.resolve()
+    files = {f.name: f for f in sorted(NEWTAB.iterdir()) if f.is_file()}
+    files.update({
+        "theme.css": d / "chromium/newtab/theme.css",
+        "layout.css": d / "chromium/newtab/layout.css",
+        "art-1920.jpg": d / "chromium/newtab/1920x1080.jpg",
+        "art-2560.jpg": d / "chromium/newtab/2560x1440.jpg",
+        "peonza.png": d / "peonza/logo.png",
+    })
+    manifest_src = d / "chromium/theme/manifest.json"
+    missing = [p for p in (manifest_src, *files.values()) if not p.is_file()]
+    if "newtab.html" not in files or missing:
+        raise Refused(f"falta {missing[0] if missing else NEWTAB / 'newtab.html'}"
+                      " (¿python3 theme/render.py y theme/wallpaper/newtab.py?)")
+    try:
+        manifest = json.loads(manifest_src.read_text(encoding="utf-8"))
+    except ValueError as e:
+        raise Refused(f"{manifest_src} no es JSON válido: {e}") from None
+    # A version per content: the same theme keeps its version (and Chromium its pack).
+    digest = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).digest()
+    manifest["version"] = f"1.{int.from_bytes(digest[:2], 'big') % 65535 + 1}"
+    return (json.dumps(manifest, indent=2, ensure_ascii=False) + "\n").encode("utf-8"), files
+
+
+def refresh() -> None:
+    manifest, files = sources()
+    theme, newtab = OUT / "theme", OUT / "newtab"
+    try:
+        theme.mkdir(parents=True, exist_ok=True)
+        newtab.mkdir(parents=True, exist_ok=True)
+        if write_atomic(theme / "manifest.json", manifest):
+            (theme / PACK).unlink(missing_ok=True)
+        for name, src in files.items():
+            write_atomic(newtab / name, src.read_bytes())
+        (newtab / "wall.jpg").unlink(missing_ok=True)      # the desk picture it showed until 2026-11-15
+    except OSError as e:
+        raise Refused(f"no pude escribir en {OUT}: {e}") from None
+
+
+def main(argv: list[str]) -> int:
+    argparse.ArgumentParser(description=__doc__.split("\n", 1)[0]).parse_args(argv)
+    try:
+        refresh()
+    except Refused as e:
+        print(f"ryce-chromium-theme: {e}", file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

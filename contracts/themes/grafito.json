@@ -1,0 +1,262 @@
+{
+  "schema": "ryce.theme/2",
+  "id": "grafito",
+  "name": "Grafito",
+  "temperature": "neutral",
+  "tagline": "Grises puros, números de puntos y un solo punto rojo.",
+  "colors": {
+    "bg0": "#000000",
+    "bg1": "#0a0a0a",
+    "bg2": "#141414",
+    "bg3": "#1e1e1e",
+    "line": "#2a2a2a",
+    "fg0": "#f2f2f2",
+    "fg1": "#a8a8a8",
+    "fg2": "#848484",
+    "pill": "#e8e8e8",
+    "ink_on_pill": "#000000",
+    "dim_on_pill": "#5c5c5c",
+    "busy": "#a8a8a8",
+    "signal": "#e62d33",
+    "signal_dim": "#3a0709",
+    "signal_on_pill": "#c4131b",
+    "tint": "#9a9a9a",
+    "ok": "#9bb59a",
+    "warn": "#d9c38a",
+    "err": "#c47a8a",
+    "claude": "#d97757"
+  },
+  "hues": {
+    "cpu": "#a8a8a8",
+    "mem": "#a8a8a8",
+    "net": "#a8a8a8",
+    "vol": "#a8a8a8",
+    "media": "#a8a8a8",
+    "clock": "#f2f2f2",
+    "disk": "#a8a8a8"
+  },
+  "alpha": {
+    "bar": 0.9,
+    "panel": 1.0,
+    "tooltip": 0.98,
+    "term": 0.78
+  },
+  "ansi": [
+    "#1a1a1a",
+    "#e8857f",
+    "#9ecf9a",
+    "#f0d58c",
+    "#c4c4c4",
+    "#d2b0d2",
+    "#92d4cc",
+    "#cfcfcf",
+    "#848484",
+    "#f4a9a4",
+    "#b8e0b4",
+    "#f7e3ad",
+    "#e2e2e2",
+    "#e4c9e4",
+    "#b3e6df",
+    "#ffffff"
+  ],
+  "term": {
+    "cursor": "#f2f2f2",
+    "selection_bg": "#2e2e2e",
+    "selection_fg": "#ffffff",
+    "url": "#e2e2e2",
+    "claude": "#f2f2f2",
+    "diff_add": "#16261a",
+    "diff_del": "#2a1414",
+    "diff_add_word": "#264430",
+    "diff_del_word": "#4a2222"
+  },
+  "fonts": {
+    "ui": "Space Grotesk",
+    "display": "Doto",
+    "mono": "JetBrainsMono Nerd Font",
+    "icon": "JetBrainsMono Nerd Font",
+    "display_min_px": 26
+  },
+  "geometry": {
+    "frame_top": 48,
+    "frame_rim": 0,
+    "frame_radius": 1,
+    "gaps_in": 3,
+    "gaps_out": 6,
+    "border": 1,
+    "rounding": 1,
+    "rounding_power": 2.0,
+    "pill_radius": 1
+  },
+  "blur": {
+    "enabled": true,
+    "size": 2,
+    "passes": 1,
+    "brightness": 0.8,
+    "desk": true
+  },
+  "motion": {
+    "preset": "mecanica",
+    "ms": 220,
+    "qml_curve": [
+      0.25,
+      1.0,
+      0.5,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "hypr": {
+      "curves": {
+        "snap": {
+          "type": "bezier",
+          "points": [
+            [
+              0.25,
+              1.0
+            ],
+            [
+              0.5,
+              1.0
+            ]
+          ]
+        },
+        "quick": {
+          "type": "bezier",
+          "points": [
+            [
+              0.4,
+              0.0
+            ],
+            [
+              0.2,
+              1.0
+            ]
+          ]
+        },
+        "lin": {
+          "type": "bezier",
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ]
+        }
+      },
+      "leaves": {
+        "windowsIn": {
+          "speed": 2.5,
+          "curve": "snap",
+          "style": "popin 96%"
+        },
+        "windowsOut": {
+          "speed": 1.5,
+          "curve": "lin",
+          "style": "popin 96%"
+        },
+        "windowsMove": {
+          "speed": 2.5,
+          "curve": "snap"
+        },
+        "fadeIn": {
+          "speed": 2.0,
+          "curve": "snap"
+        },
+        "fadeOut": {
+          "speed": 1.5,
+          "curve": "lin"
+        },
+        "fadeSwitch": {
+          "speed": 2.0,
+          "curve": "snap"
+        },
+        "fadeDim": {
+          "speed": 2.0,
+          "curve": "snap"
+        },
+        "layersIn": {
+          "speed": 2.0,
+          "curve": "snap",
+          "style": "slide top"
+        },
+        "layersOut": {
+          "speed": 1.5,
+          "curve": "lin",
+          "style": "fade"
+        },
+        "fadeLayersIn": {
+          "speed": 2.0,
+          "curve": "snap"
+        },
+        "fadeLayersOut": {
+          "speed": 1.5,
+          "curve": "lin"
+        },
+        "fadePopupsIn": {
+          "speed": 1.5,
+          "curve": "snap"
+        },
+        "fadePopupsOut": {
+          "speed": 1.0,
+          "curve": "lin"
+        },
+        "workspacesIn": {
+          "speed": 3.0,
+          "curve": "quick",
+          "style": "slide"
+        },
+        "workspacesOut": {
+          "speed": 3.0,
+          "curve": "quick",
+          "style": "slide"
+        },
+        "specialWorkspace": {
+          "speed": 2.5,
+          "curve": "snap",
+          "style": "slidevert"
+        },
+        "border": {
+          "speed": 2.0,
+          "curve": "snap"
+        },
+        "zoomFactor": {
+          "speed": 3.0,
+          "curve": "snap"
+        }
+      }
+    }
+  },
+  "wallpaper": {
+    "scene": "grafito",
+    "source": null,
+    "focus": [
+      0.5,
+      0.5
+    ],
+    "grade": "none",
+    "lock_source": null,
+    "alternates": [
+      "assets/wallpapers/grafito-ondas.jpg",
+      "assets/wallpapers/grafito-relieve.jpg"
+    ],
+    "transition": "wipe",
+    "animated": false
+  },
+  "desktop": {
+    "gtk_theme": "adw-gtk3-dark",
+    "icon_theme": "ryce-grafito",
+    "folder": "#8c8c8c",
+    "folder_dark": "#5a5a5a",
+    "cursor": "ryce-peonza",
+    "ambient": []
+  },
+  "contrast_floor": {
+    "text": 4.5,
+    "ui": 3.0
+  }
+}

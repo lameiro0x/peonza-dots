@@ -1,0 +1,23 @@
+[
+ {
+  "id": 0,
+  "name": "HEADLESS-1",
+  "description": "synthetic",
+  "width": 1920,
+  "height": 1080,
+  "refreshRate": 144.0,
+  "x": 0,
+  "y": 0,
+  "activeWorkspace": {
+   "id": 2,
+   "name": "2"
+  },
+  "specialWorkspace": {
+   "id": 0,
+   "name": ""
+  },
+  "focused": true,
+  "dpmsStatus": true,
+  "disabled": false
+ }
+]

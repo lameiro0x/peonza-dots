@@ -1,0 +1,30 @@
+# Managed by ryce-pc (install/boot-setup.sh, install/system-setup.sh): change it in the repo and re-run.
+# ReGreet 0.5, the login's first fallback (install/boot/ryce-greeter). One look whatever the
+# desktop theme, like GRUB: Tinta's greys, Martian Mono. Keys from
+# /usr/share/doc/greetd-regreet/regreet.sample.toml; the stylesheet is regreet.css next to it.
+
+[background]
+# theme/boot/greeter/background.jpg, the same picture the login page stands on.
+path = "/usr/share/ryce/greeter/background.jpg"
+fit = "Cover"
+
+[GTK]
+application_prefer_dark_theme = true
+cursor_theme_name = "ryce-peonza"
+font_name = "Martian Mono 11"
+icon_theme_name = "Adwaita"
+theme_name = "adw-gtk3-dark"
+
+[commands]
+reboot = ["systemctl", "reboot"]
+poweroff = ["systemctl", "poweroff"]
+
+[appearance]
+greeting_msg = "RYCE // ACCESO"
+
+[widget.clock]
+# The bar's middle dot between hours and minutes (Doto draws ':' as a dagger).
+format = "%H·%M  %A %-d de %B"
+resolution = "1s"
+label_width = 320
+locale = "es_ES"

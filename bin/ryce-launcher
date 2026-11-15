@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""The launcher (CTRL+space): rofi on the current theme, its left panel filled at open.
+
+    ryce-launcher [drun|window|filebrowser|run]     default drun (Apps)
+
+The theme's rofi/style.rasi draws the panel (the theme's art, the peonza, the
+widgets' look); this wrapper fills the widgets' text once per open through
+-theme-str: a greeting by the hour, the clock (hours and minutes apart, so each
+theme keeps its own separator), the date in Spanish, the uptime and how many AI
+sessions are working or waiting. Counts only: no project name or title from the
+roster ever reaches the screen. Without this wrapper (the clipboard picker runs
+`rofi -dmenu` on the same theme) the panel is the art and the signature alone.
+
+Every app it starts is its own scope in the user manager's app.slice, where
+systemd-oomd can see and pick it (the filebrowser's opener is set in the theme's
+configuration block, rofi has no flag for it).
+
+Env: RYCE_THEME_STATE (theme state dir), RYCE_AGENTD_DIR (agentd runtime dir),
+the same overrides tools/stage/nested.sh sets.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import sys
+import time
+
+MODES = ("drun", "window", "filebrowser", "run")
+SCOPE = "systemd-run --user --scope --slice=app.slice --collect"
+DAYS = ("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
+MONTHS = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+          "septiembre", "octubre", "noviembre", "diciembre")
+
+
+def greeting(hour: int) -> str:
+    # Spanish afternoons start after lunch, not at noon.
+    if 6 <= hour < 14:
+        return "Buenos días"
+    return "Buenas tardes" if 14 <= hour < 21 else "Buenas noches"
+
+
+def spanish_date(t: time.struct_time) -> str:
+    return f"{DAYS[t.tm_wday]}, {t.tm_mday} de {MONTHS[t.tm_mon - 1]}"
+
+
+def uptime_text(seconds: float) -> str:
+    m = int(seconds) // 60
+    d, h, m = m // 1440, m // 60 % 24, m % 60
+    if d:
+        return f"{d} d {h} h"
+    return f"{h} h {m:02d} min" if h else f"{m} min"
+
+
+def agents_text(counts: dict | None) -> str:
+    """'2 trabajando · 1 te espera'; 'ninguno' when idle; '' when agentd is not running."""
+    if not isinstance(counts, dict):
+        return ""
+    busy, waiting = (c if isinstance(c, int) and c > 0 else 0
+                     for c in (counts.get("busy"), counts.get("waiting")))
+    parts = [f"{busy} trabajando"] if busy else []
+    if waiting:
+        parts.append(f"{waiting} te espera" + ("n" if waiting > 1 else ""))
+    return " · ".join(parts) or "ninguno"
+
+
+def read_counts(agentd_dir: str) -> dict | None:
+    try:
+        with open(os.path.join(agentd_dir, "roster.json"), encoding="utf-8") as f:
+            doc = json.load(f)
+    except (OSError, ValueError):
+        return None             # agentd stopped or mid-write: show nothing rather than guess
+    if not isinstance(doc, dict) or doc.get("schema") != "agentd.roster/1":
+        return None
+    return doc.get("counts")
+
+
+def read_uptime() -> float | None:
+    try:
+        with open("/proc/uptime", encoding="ascii") as f:
+            return float(f.read().split()[0])
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def rasi(s: str) -> str:
+    return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def theme_str(now: time.struct_time, uptime: float | None, agents: str, panel: str) -> str:
+    texts = {
+        "textbox-greet": greeting(now.tm_hour),
+        "textbox-hh": f"{now.tm_hour:02d}",
+        "textbox-mm": f"{now.tm_min:02d}",
+        "textbox-date": spanish_date(now),
+        "textbox-uptime": uptime_text(uptime) if uptime is not None else "?",
+        "textbox-agents": agents,
+    }
+    out = [f"{w} {{ content: {rasi(v)}; }}" for w, v in texts.items()]
+    # The theme ships the face and the readout disabled and a blank (still-air)
+    # holding the signature down; with them on, the face takes that free space.
+    out += ["face { enabled: true; }", "readout { enabled: true; }", "still-air { enabled: false; }"]
+    if not agents:
+        out.append("agents-row { enabled: false; }")
+    if os.path.isfile(panel):
+        out.append(f"still {{ background-image: url({rasi(panel)}, both); }}")
+    # One block per line: rofi 2.0.0 reads a string up to the LAST quote on its line,
+    # so two strings on one line swallow everything between them.
+    return "\n".join(out)
+
+
+def command(mode: str, env: dict) -> list[str]:
+    home = env.get("HOME") or os.path.expanduser("~")
+    state = env.get("RYCE_THEME_STATE") or os.path.join(home, ".local/state/ryce/theme")
+    runtime = env.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+    agentd = env.get("RYCE_AGENTD_DIR") or os.path.join(runtime, "agentd")
+    current = os.path.join(state, "current")
+    style = os.path.join(current, "rofi", "style.rasi")
+    argv = ["rofi", "-show", mode, "-modes", ",".join(MODES)]
+    if os.path.isfile(style):
+        argv += ["-theme", style]
+    else:
+        print(f"ryce-launcher: no hay tema en {style}; rofi usa el suyo"
+              " (despliega con install/deploy.sh)", file=sys.stderr)
+    argv += ["-theme-str", theme_str(time.localtime(), read_uptime(), agents_text(read_counts(agentd)),
+                                     os.path.join(current, "wallpaper", "panel.png")),
+             "-run-command", f"{SCOPE} {{cmd}}",
+             "-run-shell-command", f"{SCOPE} kitty -e {{cmd}}"]
+    return argv
+
+
+def main(args: list[str]) -> int:
+    mode = args[0] if args else "drun"
+    if len(args) > 1 or mode not in MODES:
+        print(f"uso: ryce-launcher [{'|'.join(MODES)}]", file=sys.stderr)
+        return 2
+    if not shutil.which("rofi"):
+        print("ryce-launcher: rofi no está instalado (sudo pacman -S rofi)", file=sys.stderr)
+        return 1
+    argv = command(mode, dict(os.environ))
+    os.execvp(argv[0], argv)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

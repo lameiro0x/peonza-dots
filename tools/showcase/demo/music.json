@@ -1,0 +1,15 @@
+{
+  "artist": "Taller Peonza",
+  "album": "Acabados",
+  "songs": [
+    {"id": "acabado-origen", "title": "Origen al atardecer", "coverArt": "origen", "duration": 83},
+    {"id": "acabado-grafito", "title": "Trama de grafito", "coverArt": "grafito", "duration": 83},
+    {"id": "acabado-ola", "title": "Ola en calma", "coverArt": "ola", "duration": 83},
+    {"id": "acabado-tinta", "title": "Estudio en revolución", "coverArt": "tinta", "duration": 83},
+    {"id": "acabado-papel", "title": "Proposiciones", "coverArt": "papel", "duration": 83}
+  ],
+  "playlists": [
+    {"id": "pl-acabados", "name": "Acabados", "songs": ["acabado-origen", "acabado-grafito", "acabado-ola", "acabado-tinta", "acabado-papel"]},
+    {"id": "pl-trabajo", "name": "Para trabajar", "songs": ["acabado-grafito", "acabado-tinta"]}
+  ]
+}

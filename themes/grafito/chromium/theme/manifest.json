@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Ryce · Grafito",
+  "description": "Colores del tema «Grafito» de ryce. Lo genera theme/render.py; bin/ryce-chromium-theme lo copia a ~/.local/share/ryce/chromium/theme.",
+  "version": "1.0",
+  "theme": {
+    "colors": {
+      "frame": [0, 0, 0],
+      "frame_inactive": [0, 0, 0],
+      "frame_incognito": [10, 10, 10],
+      "frame_incognito_inactive": [10, 10, 10],
+      "background_tab": [0, 0, 0],
+      "background_tab_inactive": [0, 0, 0],
+      "toolbar": [20, 20, 20],
+      "toolbar_text": [242, 242, 242],
+      "toolbar_button_icon": [168, 168, 168],
+      "tab_text": [242, 242, 242],
+      "tab_background_text": [168, 168, 168],
+      "tab_background_text_inactive": [132, 132, 132],
+      "tab_background_text_incognito": [168, 168, 168],
+      "bookmark_text": [168, 168, 168],
+      "omnibox_background": [0, 0, 0],
+      "omnibox_text": [242, 242, 242],
+      "ntp_background": [0, 0, 0],
+      "ntp_text": [242, 242, 242],
+      "ntp_link": [154, 154, 154],
+      "ntp_header": [42, 42, 42],
+      "button_background": [0, 0, 0, 0]
+    }
+  }
+}

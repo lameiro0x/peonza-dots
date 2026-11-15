@@ -1,0 +1,68 @@
+# starship 1.27, theme «Tinta»: a monochrome HUD. Bracketed readings on a ruled
+# line, hairlines in fg2, letters white; the only tint is err (the frame, the
+# peonza's three cells and the transient line: see theme/templates/starship.toml):
+#
+#   ┌─[ ~/Repos/ryce-pc ]─[ main ]─[ ~1 ]─[ 12s ]────────────────────[ 14:32 ]
+#   └─ <peonza>  _
+
+format = """[┌─](mark)$hostname$directory$git_branch$git_status$cmd_duration$status$fill$time
+[└─ ](mark)$character"""
+palette = "ryce"
+
+[palettes.ryce]
+text = "{{fg0}}"
+muted = "{{fg1}}"
+mark = "{{fg2}}"
+peonza = "{{fg0}}"
+err = "{{err}}"
+
+[hostname]
+style = "muted"
+format = '[\[ ](mark)[$hostname]($style)[ \]─](mark)'  # ssh only
+
+[directory]
+read_only = " {{glyph.lock_outline}}"
+format = '[\[ ](mark)[$path$read_only](bold text)[ \]](mark)'
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = "{{glyph.source_branch}} "
+format = '[─\[ ](mark)[$symbol$branch](muted)[ \]](mark)'
+
+[git_status]
+# Each count leads with its own space, so two never touch (~1 +2 ?3 ⇡4).
+format = '([─\[](mark)[$all_status$ahead_behind](text)[ \]](mark))'
+ahead = " ⇡${count}"
+behind = " ⇣${count}"
+diverged = " ⇕"
+modified = " ~${count}"
+staged = " +${count}"
+untracked = " ?${count}"
+deleted = " -${count}"
+renamed = " »${count}"
+stashed = ""
+conflicted = "[ !${count}](err)"
+
+[cmd_duration]
+min_time = 2000
+format = '[─\[ ](mark)[$duration](muted)[ \]](mark)'
+
+[status]
+disabled = false
+format = '[─\[ ](mark)[{{glyph.uF0156}} $status](bold err)[ \]](mark)'
+
+[fill]
+symbol = "─"
+style = "mark"
+
+[time]
+disabled = false
+time_format = "%H:%M"
+format = '[\[ ](mark)[$time](muted)[ \]](mark)'
+
+[character]
+success_symbol = "[{{glyph.u100003}}  ](peonza)"
+error_symbol = "[{{glyph.u100003}}  ](err)"
+vimcmd_symbol = "[{{glyph.u100003}}  ](muted)"

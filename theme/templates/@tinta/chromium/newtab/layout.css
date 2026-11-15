@@ -1,0 +1,7 @@
+/* Tinta: the column stands on the right; theme/wallpaper/newtab.py draws the picture on
+   the left, which a narrower window keeps (--art-pos). */
+:root {
+  --col-justify: end;
+  --scrim-dir: to left;
+  --art-pos: left center;
+}

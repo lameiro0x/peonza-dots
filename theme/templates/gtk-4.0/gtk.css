@@ -1,0 +1,154 @@
+/* GTK4. libadwaita >= 1.6 reads the CSS variables; plain GTK4 apps on adw-gtk3-dark
+   read the named colours. Same stance as GTK3: selection a tint of the theme's cool
+   hue, the place you stand in its warm hue, the pill only for what is "here" (the
+   current folder, a suggested action, a switch that is on), chips in its radius.
+   GTK4 apps pick this up when they start; a theme switch does not restyle them live. */
+
+:root {
+    --accent-color:              {{fg0}};
+    --accent-bg-color:           {{pill}};
+    --accent-fg-color:           {{ink_on_pill}};
+    --destructive-color:         {{err}};
+    --destructive-bg-color:      {{err}};
+    --destructive-fg-color:      {{ink_on_pill}};
+    --success-color:             {{ok}};
+    --success-bg-color:          {{ok}};
+    --success-fg-color:          {{ink_on_pill}};
+    --warning-color:             {{warn}};
+    --warning-bg-color:          {{warn}};
+    --warning-fg-color:          {{ink_on_pill}};
+    --error-color:               {{err}};
+    --error-bg-color:            {{err}};
+    --error-fg-color:            {{ink_on_pill}};
+    --window-bg-color:           {{bg1}};
+    --window-fg-color:           {{fg0}};
+    --view-bg-color:             {{bg0}};
+    --view-fg-color:             {{fg0}};
+    --headerbar-bg-color:        {{bg1}};
+    --headerbar-fg-color:        {{fg0}};
+    --headerbar-border-color:    {{line}};
+    --headerbar-backdrop-color:  {{bg1}};
+    --headerbar-shade-color:     {{line}};
+    --headerbar-darker-shade-color: {{bg0}};
+    --sidebar-bg-color:          {{bg1}};
+    --sidebar-fg-color:          {{fg1}};
+    --sidebar-backdrop-color:    {{bg1}};
+    --sidebar-border-color:      {{line}};
+    --sidebar-shade-color:       {{line}};
+    --secondary-sidebar-bg-color: {{bg1}};
+    --secondary-sidebar-fg-color: {{fg1}};
+    --secondary-sidebar-backdrop-color: {{bg1}};
+    --secondary-sidebar-border-color: {{line}};
+    --secondary-sidebar-shade-color: {{line}};
+    --card-bg-color:             {{bg2}};
+    --card-fg-color:             {{fg0}};
+    --card-shade-color:          {{line}};
+    --dialog-bg-color:           {{bg2}};
+    --dialog-fg-color:           {{fg0}};
+    --popover-bg-color:          {{bg2}};
+    --popover-fg-color:          {{fg0}};
+    --popover-shade-color:       rgba(0, 0, 0, 0.4);
+    --thumbnail-bg-color:        {{bg2}};
+    --thumbnail-fg-color:        {{fg0}};
+    --shade-color:               rgba(0, 0, 0, 0.3);
+    --scrollbar-outline-color:   {{bg0}};
+    --border-color:              {{line}};
+}
+
+@define-color accent_color          {{fg0}};
+@define-color accent_bg_color       {{pill}};
+@define-color accent_fg_color       {{ink_on_pill}};
+@define-color window_bg_color       {{bg1}};
+@define-color window_fg_color       {{fg0}};
+@define-color view_bg_color         {{bg0}};
+@define-color view_fg_color         {{fg0}};
+@define-color headerbar_bg_color    {{bg1}};
+@define-color headerbar_fg_color    {{fg0}};
+@define-color headerbar_border_color {{line}};
+@define-color sidebar_bg_color      {{bg1}};
+@define-color sidebar_fg_color      {{fg1}};
+@define-color card_bg_color         {{bg2}};
+@define-color card_fg_color         {{fg0}};
+@define-color dialog_bg_color       {{bg2}};
+@define-color dialog_fg_color       {{fg0}};
+@define-color popover_bg_color      {{bg2}};
+@define-color popover_fg_color      {{fg0}};
+@define-color borders               {{line}};
+
+/* ---- everywhere ------------------------------------------------------------ */
+
+row:selected,
+columnview > listview > row:selected,
+gridview > child:selected {
+  background-color: rgba({{hue.net.rgb}}, 0.26);
+  color: {{fg0}};
+}
+
+rubberband {
+  border: 1px solid {{hue.net}};
+  border-radius: {{geometry.pill_radius}}px;
+  background-color: rgba({{hue.net.rgb}}, 0.12);
+}
+
+.navigation-sidebar > row:selected {
+  background-color: rgba({{hue.cpu.rgb}}, 0.16);
+  color: {{hue.cpu}};
+}
+
+tooltip.background {
+  background-color: {{bg2}};
+  border: 1px solid {{line}};
+  border-radius: {{geometry.pill_radius}}px;
+}
+
+popover > contents { border: 1px solid {{line}}; }
+
+/* ---- File chooser: a framed gate of film black, breadcrumbs, the folder as pill */
+
+filechooser placessidebar,
+filechooser placessidebar list {
+  background-color: {{bg1}};
+}
+
+filechooser placessidebar row {
+  color: {{fg1}};
+  border-radius: {{geometry.pill_radius}}px;
+}
+
+filechooser placessidebar row:selected {
+  background-color: rgba({{hue.cpu.rgb}}, 0.16);
+  color: {{hue.cpu}};
+}
+
+filechooser pathbar button {
+  background: rgba({{fg0.rgb}}, 0.05);
+  border: 1px solid {{line}};
+  box-shadow: none;
+  border-radius: {{geometry.pill_radius}}px;
+  color: {{fg1}};
+}
+
+filechooser pathbar button:hover {
+  background-color: {{bg2}};
+  color: {{fg0}};
+}
+
+filechooser pathbar button:checked {
+  background-color: {{pill}};
+  color: {{ink_on_pill}};
+}
+
+filechooser stack.view,
+filechooser .browser {
+  background-color: {{bg0}};
+}
+
+filechooser columnview,
+filechooser gridview {
+  background-color: {{bg0}};
+}
+
+filechooser columnview > header > button {
+  color: {{fg1}};
+  border-bottom: 1px solid {{line}};
+}

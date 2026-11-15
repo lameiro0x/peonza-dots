@@ -1,0 +1,20 @@
+/* The new tab's palette, letters and radius (apps/chromium/newtab reads only these
+   names). bin/ryce-chromium-theme copies it beside newtab.html: a new tab opened after
+   a theme switch already wears the new one. */
+:root {
+  color-scheme: {{theme.scheme}};
+  --bg0: {{bg0}};
+  --bg1: {{bg1}};
+  --bg2: {{bg2}};
+  --bg3: {{bg3}};
+  --line: {{line}};
+  --fg0: {{fg0}};
+  --fg1: {{fg1}};
+  --fg2: {{fg2}};
+  --tint: {{tint}};
+  --font-ui: "{{font.ui}}", system-ui, sans-serif;
+  --font-display: "{{font.display}}", "{{font.ui}}", sans-serif;
+  --radius: {{geometry.pill_radius}}px;
+  --clock-sep: "{{clock.sep}}";
+  --theme-name: "{{theme.name}}";
+}

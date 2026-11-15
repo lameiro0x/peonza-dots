@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Nueva pestaña</title>
+  <!-- theme.css and layout.css are the current theme's, copied here by bin/ryce-chromium-theme. -->
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="layout.css">
+  <link rel="stylesheet" href="newtab.css">
+  <script src="newtab.js" defer></script>
+</head>
+<body>
+  <div class="art" aria-hidden="true"></div>
+  <main class="col">
+    <header class="now">
+      <h1 class="sr">Nueva pestaña</h1>
+      <time id="clock" class="clock"></time>
+      <p id="date" class="date"></p>
+    </header>
+    <form id="search" class="search" role="search">
+      <label for="q" class="sr">Buscar en la web</label>
+      <input id="q" name="q" type="search" placeholder="Busca o escribe una dirección"
+             autocomplete="off" spellcheck="false" autofocus>
+    </form>
+    <nav id="marks" class="marks" aria-label="Barra de marcadores"></nav>
+    <footer class="sign"><img src="peonza.png" alt="" width="18" height="18"><span class="name"></span></footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,566 @@
+#!/usr/bin/env python3
+"""Switch the desktop theme: one atomic link swap, then every running app reloads.
+
+    ryce-theme list [--json]              the themes; * marks the current one
+    ryce-theme get                        the current theme's id
+    ryce-theme set <id> [--boot]          switch; --boot also re-themes Plymouth (GRUB and the login keep one look)
+    ryce-theme next | prev                the next/previous theme (contracts/constants.json order)
+    ryce-theme apply                      tell every app to reload the current theme again
+    ryce-theme wallpaper [--no-transition]
+    ryce-theme wall [next|prev|reset|<n>] the current theme's next/previous picture, its main one,
+                                          or picture n (0 the main one; the wallpaper picker's choice)
+
+~/.local/state/ryce/theme/ holds one link per theme into the repo's themes/<id>/ (made by
+install/deploy.sh) and `current -> <id>`, a relative link and the single commit point: every
+app config links through it, so replacing it (symlink + rename, atomic) moves them all at
+once. Then each app is told to reload: an app that is not running is skipped, one that fails
+is reported and never stops the rest. wallpapers.json there remembers, per theme, which of
+its pictures shows (0 is wallpaper/, n is wallpaper/alt-n/ for theme.json's
+wallpaper.alternates); `set` and `wallpaper` paint that one.
+
+Exit: 0 done · 2 bad input, nothing changed · 3 switched, but some app did not reload.
+Env (tests): RYCE_HOME, RYCE_THEME_STATE, RYCE_THEME_LOCK_WAIT (seconds, default 5).
+"""
+
+from __future__ import annotations
+
+import fcntl
+import importlib.util
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+from typing import Callable
+
+REPO = Path(__file__).resolve().parents[1]
+HOME = Path(os.environ.get("RYCE_HOME") or Path.home())
+UID = str(os.getuid())
+DEPLOY = f"bash {REPO}/install/deploy.sh"
+
+# awww transition per theme.json wallpaper.transition; unknown names fade. awww renders
+# transitions at 30 fps unless told otherwise, which on a 144 Hz monitor is the stutter
+# the user felt on every switch: the frame rate follows the fastest monitor (measured
+# 2026-11-09: every reload step takes < 70 ms; the jerk was the wallpaper's cadence).
+TRANSITIONS = {
+    "fade": ["--transition-type", "fade", "--transition-bezier", ".4,0,.2,1"],
+    "wipe": ["--transition-type", "wipe", "--transition-angle", "30"],
+    "grow": ["--transition-type", "grow", "--transition-pos", "center"],
+    "wave": ["--transition-type", "wave", "--transition-angle", "20", "--transition-wave", "28,14"],
+}
+WALL_DURATION = ["--transition-duration", "1.0"]
+FPS_DEFAULT = 60
+
+# Only the value of this key; a commented-out line (// first) never matches.
+COLOR_KEY = re.compile(r'(?m)^(\s*"workbench\.colorTheme"\s*:\s*)"(?:[^"\\\n]|\\.)*"')
+
+
+class Refused(Exception):
+    """Bad input or nothing committed: exit 2 with this message."""
+
+
+def load_constants() -> dict:
+    path = REPO / "contracts" / "constants.json"
+    try:
+        c = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise Refused(f"no puedo leer la lista de temas de {path}: {e}") from None
+    if not isinstance(c, dict) or not c.get("themes") or not all(k in c for k in ("theme_files", "theme_state")):
+        raise Refused(f"{path} no define themes, theme_files y theme_state")
+    return c
+
+
+C: dict = {}         # contracts/constants.json, loaded by __main__
+STATE = Path()       # ~/<theme_state>, set by __main__
+
+
+# --- state ----------------------------------------------------------------------------------
+
+def current() -> str | None:
+    """The committed theme, or None when `current` is missing or points at no theme."""
+    try:
+        tid = os.readlink(STATE / "current")
+    except OSError:
+        return None
+    return tid if tid in C["themes"] and (STATE / "current" / "theme.json").is_file() else None
+
+
+def require_current() -> str:
+    tid = current()
+    if tid is None:
+        raise Refused(f"no hay tema activo en {STATE}: ejecuta {DEPLOY}")
+    return tid
+
+
+def theme_dir(tid: str) -> Path:
+    """The theme's own folder in the repo, refused unless it has every theme_files entry."""
+    if tid not in C["themes"]:
+        raise Refused(f"no existe el tema «{tid}»: elige {', '.join(C['themes'])}")
+    link = STATE / tid
+    if not link.is_dir():
+        raise Refused(f"el tema «{tid}» no está instalado en {STATE}: ejecuta {DEPLOY}")
+    missing = [f for f in C["theme_files"] if not (link / f).is_file()]
+    if missing:
+        raise Refused(f"al tema «{tid}» le faltan {', '.join(missing)}: "
+                      "regenera con python3 tools/tokens.py y python3 theme/render.py")
+    return link.resolve()
+
+
+def meta(d: Path) -> dict:
+    try:
+        return json.loads((d / "theme.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise Refused(f"{d / 'theme.json'} no se puede leer: {e}") from None
+
+
+def lock() -> int:
+    """Hold $STATE/.lock until the process exits: one switch at a time."""
+    if not STATE.is_dir():
+        raise Refused(f"no existe {STATE}: ejecuta {DEPLOY}")
+    fd = os.open(STATE / ".lock", os.O_RDWR | os.O_CREAT, 0o600)
+    deadline = time.monotonic() + float(os.environ.get("RYCE_THEME_LOCK_WAIT", "5"))
+    while True:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return fd
+        except BlockingIOError:
+            if time.monotonic() >= deadline:
+                raise Refused("otro cambio de tema sigue en curso: inténtalo en un momento") from None
+            time.sleep(0.05)
+
+
+def commit(tid: str) -> None:
+    tmp, cur = STATE / "current.tmp", STATE / "current"
+    try:
+        tmp.unlink(missing_ok=True)
+        os.symlink(tid, tmp)
+        os.replace(tmp, cur)
+        dfd = os.open(STATE, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(dfd)
+        finally:
+            os.close(dfd)
+    except OSError as e:
+        tmp.unlink(missing_ok=True)
+        raise Refused(f"no pude cambiar {cur}: {e}") from None
+
+
+# --- the fan-out ------------------------------------------------------------------------------
+
+def run(argv: list[str], timeout: float = 2.0, ok: tuple[int, ...] = (0,)) -> str | None:
+    """None when it worked or the command is not installed; otherwise why it failed."""
+    if not shutil.which(argv[0]):
+        return None
+    try:
+        r = subprocess.run(argv, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.PIPE, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return f"no respondió en {timeout:g} s"
+    except OSError as e:
+        return str(e)
+    if r.returncode in ok:
+        return None
+    lines = r.stderr.strip().splitlines()
+    return (lines[-1] if lines else f"salió con código {r.returncode}")[:160]
+
+
+def running(pattern: str) -> bool:
+    if not shutil.which("pgrep"):
+        return True  # cannot tell: try, and report it if it fails
+    return run(["pgrep", "-x", "-u", UID, pattern], timeout=1) is None
+
+
+def signal(name: str, sig: str) -> str | None:
+    return run(["pkill", f"-{sig}", "-x", "-u", UID, name], timeout=1, ok=(0, 1))  # 1: not running
+
+
+def write_atomic(path: Path, data: bytes) -> None:
+    tmp = path.with_name(f".{path.name}.ryce-tmp")
+    try:
+        with open(tmp, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        if path.exists():
+            shutil.copymode(path, tmp)
+        os.replace(tmp, path)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+
+
+_MONITORS: list[dict] | None = None
+
+
+def monitors() -> list[dict]:
+    """hyprctl monitors, asked once per run (the frame rate and the sizes both need it)."""
+    global _MONITORS
+    if _MONITORS is None:
+        _MONITORS = _ask_monitors()
+    return _MONITORS
+
+
+def _ask_monitors() -> list[dict]:
+    if os.environ.get("HYPRLAND_INSTANCE_SIGNATURE") and shutil.which("hyprctl"):
+        try:
+            r = subprocess.run(["hyprctl", "monitors", "-j"], capture_output=True, text=True, timeout=2)
+            mons = json.loads(r.stdout)
+            if isinstance(mons, list):
+                return mons
+        except (OSError, subprocess.SubprocessError, ValueError):
+            pass
+    return []
+
+
+def refresh_rate() -> int:
+    """The fastest monitor's refresh, for awww's transition frame rate (30..240)."""
+    rates = [m.get("refreshRate") for m in monitors()]
+    rates = [round(r) for r in rates if isinstance(r, (int, float)) and r > 0]
+    return max(30, min(240, max(rates))) if rates else FPS_DEFAULT
+
+
+def outputs() -> list[tuple[str, int]]:
+    """(name, larger side in px) per monitor: Hyprland when it runs, else the awww daemon."""
+    try:
+        mons = [(m["name"], max(m["width"], m["height"])) for m in monitors()]
+    except (KeyError, TypeError):
+        mons = []
+    if mons:
+        return mons
+    try:
+        r = subprocess.run(["awww", "query"], capture_output=True, text=True, timeout=2)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    found = (re.search(r"([^\s:]+):\s*(\d+)x(\d+)", line) for line in r.stdout.splitlines())
+    return [(m[1], max(int(m[2]), int(m[3]))) for m in found if m]
+
+
+def pictures(info: dict) -> int:
+    """How many pictures the theme has: its main one and its alternates."""
+    alts = info.get("wallpaper", {}).get("alternates")
+    return 1 + (len(alts) if isinstance(alts, list) else 0)
+
+
+def picture_dir(d: Path, pick: int) -> Path:
+    return d / "wallpaper" / (f"alt-{pick}" if pick else "")
+
+
+def remembered() -> dict[str, int]:
+    """wallpapers.json: theme id -> picture index; unreadable or malformed reads as empty."""
+    try:
+        doc = json.loads((STATE / "wallpapers.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(doc, dict):
+        return {}
+    return {k: v for k, v in doc.items() if type(v) is int and v >= 0}
+
+
+def pick_of(tid: str, info: dict) -> int:
+    """The remembered picture, or the main one when it is gone from the theme."""
+    pick = remembered().get(tid, 0)
+    return pick if pick < pictures(info) else 0
+
+
+def wallpaper(tid: str, d: Path, info: dict, transition: bool = True) -> str | None:
+    if not shutil.which("awww") or not running("awww-daemon"):
+        return None
+    if transition:
+        kind = info.get("wallpaper", {}).get("transition")
+        how = (TRANSITIONS.get(kind, TRANSITIONS["fade"]) + WALL_DURATION
+               + ["--transition-fps", str(refresh_rate())])
+    else:
+        how = ["--transition-type", "none"]
+    by_size: dict[str, list[str]] = {}
+    for name, px in outputs() or [("", 2560)]:  # outputs unknown: one image for all of them
+        by_size.setdefault("2560x1440" if px > 1920 else "1920x1080", []).append(name)
+    errors = []
+    folder = picture_dir(d, pick_of(tid, info))
+    for size, names in by_size.items():
+        img = folder / f"{size}.jpg"
+        if not img.is_file():
+            errors.append(f"falta {img}")
+            continue
+        where = ["--outputs", ",".join(names)] if all(names) else []
+        if err := run(["awww", "img", *how, *where, str(img)], timeout=3):
+            errors.append(err)
+    return "; ".join(errors) or None
+
+
+def gsettings(tid: str) -> str | None:
+    script = HOME / ".local/lib/ryce/gsettings.sh"
+    return run(["sh", str(script), tid], timeout=4) if script.is_file() else None
+
+
+def qt6ct() -> None:
+    """Replace qt6ct.conf by an identical file: the rename wakes qt6ct's watcher."""
+    conf = HOME / ".config/qt6ct/qt6ct.conf"
+    if conf.is_symlink():
+        tmp = conf.with_name(f".{conf.name}.ryce-tmp")
+        tmp.unlink(missing_ok=True)
+        os.symlink(os.readlink(conf), tmp)
+        os.replace(tmp, conf)
+    elif conf.is_file():
+        write_atomic(conf, conf.read_bytes())
+
+
+def set_color_theme(text: str, name: str) -> str:
+    """Point "workbench.colorTheme" at `name`, leaving every other byte as it was."""
+    module = REPO / "theme/vscode/settings_edit.py"
+    if module.is_file():
+        spec = importlib.util.spec_from_file_location("ryce_settings_edit", module)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.set_color_theme(text, name)
+    value = json.dumps(name)
+    new, n = COLOR_KEY.subn(lambda m: m.group(1) + value, text)
+    if n:
+        return new
+    if not text.strip():
+        return "{\n    \"workbench.colorTheme\": " + value + "\n}\n"
+    brace = text.find("{")
+    if brace < 0:
+        raise ValueError("settings.json no es un objeto JSON")
+    return f'{text[:brace + 1]}\n    "workbench.colorTheme": {value},{text[brace + 1:]}'
+
+
+def vscode(name: str) -> None:
+    settings = HOME / ".config/Code/User/settings.json"
+    if not settings.exists():
+        return
+    real = settings.resolve()  # write through a dotfile manager's link, never over it
+    text = real.read_text(encoding="utf-8")
+    new = set_color_theme(text, f"Ryce {name}")
+    if new == text:
+        return
+    backup = real.with_name(real.name + ".ryce-bak")
+    if not backup.exists():  # the settings as they were before ryce ever touched them
+        shutil.copy2(real, backup)
+    write_atomic(real, new.encode("utf-8"))
+
+
+def feishin() -> str | None:
+    """Feishin watches only its Themes folder: touching the link (not its target) is the
+    change event it reloads the «Ryce» theme on. A Feishin never started has no link."""
+    link = HOME / ".config/feishin/Themes/ryce.json"
+    try:
+        if link.is_symlink():
+            os.utime(link, follow_symlinks=False)
+    except OSError as e:
+        return str(e)
+    return None
+
+
+def chromium() -> str | None:
+    """Rebuild the theme and new-tab extensions Chromium loads (ryce-chromium-theme): the
+    new tab (its own picture per theme, theme/wallpaper/newtab.py) shows at once, the window
+    chrome on Chromium's next start."""
+    tool = REPO / "bin" / "ryce-chromium-theme"
+    if not tool.is_file():
+        return None
+    return run([sys.executable, str(tool)], timeout=3)
+
+
+def agentd() -> str | None:
+    if not shutil.which("systemctl") or run(["systemctl", "--user", "is-active", "--quiet", "agentd.service"]):
+        return None
+    return run(["systemctl", "--user", "kill", "--kill-whom=main", "-s", "HUP", "agentd.service"])
+
+
+def claude_theme(d: Path) -> str | None:
+    """Claude Code watches ~/.claude/themes/ and recolours open sessions when a file there
+    changes; `theme: "custom:ryce"` in its settings selects this one. A real file written
+    by rename (a symlink swap elsewhere would not wake the watcher)."""
+    src = d / "claude" / "ryce.json"
+    if not src.is_file():
+        return None
+    dst_dir = HOME / ".claude" / "themes"
+    try:
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        write_atomic(dst_dir / "ryce.json", src.read_bytes())
+    except OSError as e:
+        return str(e)
+    return None
+
+
+def fan_out(tid: str, d: Path, info: dict) -> int:
+    """Tell every app to reload, in order; return how many failed (one stderr line each)."""
+    qs = C.get("qs_config", "ryce")
+    # What the eye follows first: the wallpaper's transition starts at once (awww animates
+    # on its own), and the bar's colours cross-fade alongside it; the rest lands within
+    # the same second, behind the moving picture.
+    steps: list[tuple[str, Callable[[], str | None]]] = [
+        ("el fondo", lambda: wallpaper(tid, d, info)),
+        ("la barra (Quickshell)", lambda: run(["qs", "-c", qs, "ipc", "call", "theme", "reload"])
+            if running("qs|quickshell") else None),
+        ("Hyprland", lambda: run(["hyprctl", "reload"])
+            if os.environ.get("HYPRLAND_INSTANCE_SIGNATURE") else None),
+        ("kitty", lambda: signal("kitty", "USR1")),
+        ("Claude Code", lambda: claude_theme(d)),
+        ("mako", lambda: run(["makoctl", "reload"]) if running("mako") else None),
+        ("fish", lambda: run(["fish", "-c", f"set -U ryce_theme {tid}"])),
+        ("GTK (gsettings)", lambda: gsettings(tid)),
+        ("Qt (qt6ct)", qt6ct),
+        ("btop", lambda: signal("btop", "USR2")),
+        ("cava", lambda: signal("cava", "USR2")),
+        ("Feishin", feishin),
+        ("VS Code", lambda: vscode(info.get("name", tid))),
+        ("Chromium", chromium),
+        ("waybar", lambda: signal("waybar", "USR2")),
+        ("agentd", agentd),
+    ]
+    failed: list[str] = []
+    for label, step in steps:
+        try:
+            err = step()
+        except Exception as e:  # noqa: BLE001 — one broken app must not stop the others
+            err = f"{type(e).__name__}: {e}"
+        if err:
+            failed.append(label)
+            print(f"ryce-theme: no se pudo recargar {label}: {err}", file=sys.stderr)
+    if failed:
+        notify(f"Tema «{info.get('name', tid)}» aplicado a medias",
+               "No se pudo avisar a: " + ", ".join(failed) + ". Prueba «ryce-theme apply».")
+    return len(failed)
+
+
+def notify(summary: str, body: str) -> None:
+    """A keybind or the selector has no terminal: say a partial failure on screen too.
+    Only when stderr is not a terminal, and never fatal."""
+    if sys.stderr.isatty() or not os.environ.get("WAYLAND_DISPLAY"):
+        return
+    run(["notify-send", "-a", "ryce-theme", "-u", "normal", summary, body])
+
+
+# --- commands ---------------------------------------------------------------------------------
+
+def switch(tid: str, boot: bool = False) -> int:
+    fd = lock()
+    d = theme_dir(tid)
+    info = meta(d)
+    commit(tid)
+    failed = fan_out(tid, d, info)
+    # The boot step runs as root for a minute or more: free the lock first, so a
+    # keybind switch or deploy's `apply` meanwhile is not refused.
+    os.close(fd)
+    if boot and (err := boot_setup(tid)):
+        print(f"ryce-theme: el arranque (Plymouth) sigue con el tema anterior: {err}",
+              file=sys.stderr)
+        failed += 1
+    return 3 if failed else 0
+
+
+def boot_setup(tid: str) -> str | None:
+    script = REPO / "install/boot-setup.sh"
+    if not script.is_file():
+        return f"falta {script}"
+    if not shutil.which("pkexec"):
+        return "falta pkexec (polkit)"
+    return run(["pkexec", "bash", str(script), "--theme", tid, "--only", "plymouth"], timeout=900)
+
+
+def wall(how: str | int) -> int:
+    """Show the current theme's next, previous or main picture, or picture `how` when it
+    is a number, and remember it. Only on demand: nothing here ever rotates them."""
+    lock()
+    tid = require_current()
+    d = theme_dir(tid)
+    info = meta(d)
+    n = pictures(info)
+    if isinstance(how, int):
+        if how >= n:
+            raise Refused(f"el tema «{info.get('name', tid)}» tiene {n} fondo{'s' if n > 1 else ''}: "
+                          f"elige un número de 0 a {n - 1}")
+        pick = how
+    elif n == 1 and how != "reset":
+        print(f"ryce-theme: el tema «{info.get('name', tid)}» tiene un solo fondo", file=sys.stderr)
+        return 0
+    else:
+        pick = 0 if how == "reset" else (pick_of(tid, info) + (1 if how == "next" else -1)) % n
+    missing = [f for f in (picture_dir(d, pick) / f"{s}.jpg" for s in ("1920x1080", "2560x1440"))
+               if not f.is_file()]
+    if missing:
+        raise Refused(f"falta {missing[0]}: regenera con python3 theme/wallpaper/scenes.py")
+    memory = remembered()
+    memory.pop(tid, None)
+    if pick:
+        memory[tid] = pick
+    try:
+        write_atomic(STATE / "wallpapers.json", (json.dumps(memory, sort_keys=True) + "\n").encode("utf-8"))
+    except OSError as e:
+        raise Refused(f"no pude guardar el fondo elegido en {STATE / 'wallpapers.json'}: {e}") from None
+    err = wallpaper(tid, d, info)
+    if err:
+        print(f"ryce-theme: no se pudo poner el fondo: {err}", file=sys.stderr)
+    return 3 if err else 0
+
+
+def listing(as_json: bool) -> int:
+    cur, rows = current(), []
+    for tid in C["themes"]:
+        try:
+            info = json.loads((STATE / tid / "theme.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            print(f"ryce-theme: el tema «{tid}» no está instalado: ejecuta {DEPLOY}", file=sys.stderr)
+            continue
+        rows.append({"id": tid, "name": info.get("name", tid), "tagline": info.get("tagline", ""),
+                     "current": tid == cur})
+    if as_json:
+        print(json.dumps(rows, ensure_ascii=False))
+    else:
+        for r in rows:
+            print(f"{'*' if r['current'] else ' '} {r['id']:<9} {r['name']} — {r['tagline']}")
+    return 0
+
+
+def step(delta: int) -> int:
+    ids = C["themes"]
+    base = current() or C.get("default_theme", ids[0])
+    return switch(ids[(ids.index(base) + delta) % len(ids)])
+
+
+def main(args: list[str]) -> int:
+    cmd, rest = (args[0], args[1:]) if args else ("", [])
+    if cmd in ("-h", "--help", "help"):
+        print(__doc__.split("\n\n")[1])
+        return 0
+    if cmd == "list" and rest in ([], ["--json"]):
+        return listing(rest == ["--json"])
+    if cmd == "get" and not rest:
+        print(require_current())
+        return 0
+    if cmd == "set" and rest and rest[1:] in ([], ["--boot"]):
+        return switch(rest[0], boot=rest[1:] == ["--boot"])
+    if cmd in ("next", "prev") and not rest:
+        return step(1 if cmd == "next" else -1)
+    if cmd == "apply" and not rest:
+        lock()
+        tid = require_current()
+        d = theme_dir(tid)
+        return 3 if fan_out(tid, d, meta(d)) else 0
+    if cmd == "wallpaper" and rest in ([], ["--no-transition"]):
+        tid = require_current()
+        d = theme_dir(tid)
+        err = wallpaper(tid, d, meta(d), transition=not rest)
+        if err:
+            print(f"ryce-theme: no se pudo poner el fondo: {err}", file=sys.stderr)
+        return 3 if err else 0
+    if cmd == "wall" and rest in ([], ["next"], ["prev"], ["reset"]):
+        return wall(rest[0] if rest else "next")
+    if cmd == "wall" and len(rest) == 1 and re.fullmatch(r"[0-9]{1,3}", rest[0]):
+        return wall(int(rest[0]))
+    raise Refused(f"uso: ryce-theme list [--json] | get | set <tema> [--boot] | next | prev | apply | "
+                  f"wallpaper [--no-transition] | wall [next|prev|reset|<n>]  (--help para más)")
+
+
+if __name__ == "__main__":
+    try:
+        C.update(load_constants())
+        STATE = Path(os.environ.get("RYCE_THEME_STATE") or HOME / C["theme_state"])
+        sys.exit(main(sys.argv[1:]))
+    except Refused as e:
+        print(f"ryce-theme: {e}", file=sys.stderr)
+        sys.exit(2)

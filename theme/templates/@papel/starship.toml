@@ -1,0 +1,69 @@
+# starship 1.27, theme «Papel»: a running head. The place in bold ink, the rest
+# as a book's header line (middle dots, no brackets), a hairline rule out to the
+# hour in the margin; the only colour is err (a failure's code, the peonza's three
+# cells and the transient line: see theme/templates/starship.toml):
+#
+#   ┌─ ryce-pc · main · ~1 · 12 s ──────────────────────────────────── 14:32
+#   └─ <peonza>  _
+
+format = """[┌─ ](rule)$hostname$directory$git_branch$git_status$cmd_duration$status[ ](rule)$fill[ ](rule)$time
+[└─ ](rule)$character"""
+palette = "ryce"
+
+[palettes.ryce]
+text = "{{fg0}}"
+muted = "{{fg1}}"
+rule = "{{fg2}}"
+peonza = "{{fg0}}"
+err = "{{err}}"
+
+[hostname]
+style = "muted"
+format = '[$hostname]($style)[ · ](rule)'  # ssh only
+
+[directory]
+read_only = " {{glyph.lock_outline}}"
+format = '[$path$read_only](bold text)'
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+format = '[ · ](rule)[$branch](muted)'
+
+[git_status]
+# Each count leads with its own space, so two never touch (~1 +2 ?3 ⇡4).
+format = '([ ·](rule)[$all_status$ahead_behind](text))'
+ahead = " ⇡${count}"
+behind = " ⇣${count}"
+diverged = " ⇕"
+modified = " ~${count}"
+staged = " +${count}"
+untracked = " ?${count}"
+deleted = " -${count}"
+renamed = " »${count}"
+stashed = ""
+conflicted = "[ !${count}](err)"
+
+[cmd_duration]
+min_time = 2000
+format = '[ · ](rule)[$duration](muted)'
+
+[status]
+disabled = false
+format = '[ · ](rule)[$status](bold err)'
+
+[fill]
+symbol = "─"
+style = "rule"
+
+[time]
+disabled = false
+time_format = "%H:%M"
+format = '[$time](muted)'
+
+[character]
+success_symbol = "[{{glyph.u100003}}  ](peonza)"
+error_symbol = "[{{glyph.u100003}}  ](err)"
+vimcmd_symbol = "[{{glyph.u100003}}  ](muted)"

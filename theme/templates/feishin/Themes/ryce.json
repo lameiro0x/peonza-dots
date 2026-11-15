@@ -1,0 +1,35 @@
+{
+  "mode": "{{theme.scheme}}",
+  "colors": {
+    "background": "{{bg1}}",
+    "background-alternate": "{{bg0}}",
+    "surface": "{{bg2}}",
+    "surface-foreground": "{{fg0}}",
+    "foreground": "{{fg0}}",
+    "foreground-muted": "{{fg1}}",
+    "primary": "{{hue.media}}",
+    "state-error": "{{err}}",
+    "state-info": "{{tint}}",
+    "state-success": "{{ok}}",
+    "state-warning": "{{warn}}"
+  },
+  "app": {
+    "overlay-header": "linear-gradient(transparent 0%, rgba({{bg0.rgb}}, 0.85) 100%)",
+    "overlay-subheader": "linear-gradient(180deg, rgba({{bg0.rgb}}, 0.05) 0%, var(--theme-colors-background) 100%)",
+    "scrollbar-size": "8px",
+    "scrollbar-handle-background": "rgba({{fg2.rgb}}, 0.3)",
+    "scrollbar-handle-hover-background": "rgba({{fg2.rgb}}, 0.55)",
+    "scrollbar-handle-active-background": "rgba({{fg2.rgb}}, 0.75)",
+    "scrollbar-handle-border-radius": "{{geometry.pill_radius}}px"
+  },
+  "mantineOverride": {
+    "radius": {
+      "xs": "calc({{geometry.rounding}}px / 3)",
+      "sm": "calc({{geometry.rounding}}px / 2)",
+      "md": "calc({{geometry.rounding}}px * 2 / 3)",
+      "lg": "{{geometry.rounding}}px",
+      "xl": "calc({{geometry.rounding}}px * 4 / 3)"
+    }
+  },
+  "stylesheets": ["ryce.css"]
+}

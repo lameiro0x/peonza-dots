@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Ryce",
+  "version": "1.0.0",
+  "description": "Zotero in the desktop's current Ryce theme: interface colours and fonts, and the reader's paper and ink. Follows ryce-theme live.",
+  "applications": {
+    "zotero": {
+      "id": "ryce@ryce-pc",
+      "update_url": "https://127.0.0.1/ryce-zotero/updates.json",
+      "strict_min_version": "7.0",
+      "strict_max_version": "10.*"
+    }
+  }
+}

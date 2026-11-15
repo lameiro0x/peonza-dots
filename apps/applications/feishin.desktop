@@ -1,0 +1,16 @@
+[Desktop Entry]
+# The package's entry (/usr/share/applications/feishin.desktop), shadowed by name so
+# Feishin's «add server» form opens set to Navidrome; the user types the address, the
+# username and the password once. No server address or credential ever goes here.
+Name=Feishin
+GenericName=Reproductor de música
+Exec=env SERVER_TYPE=navidrome SERVER_NAME=Navidrome feishin %U
+TryExec=feishin
+Terminal=false
+Type=Application
+Icon=feishin
+StartupWMClass=feishin
+SingleMainWindow=true
+Categories=AudioVideo;Audio;Player;Music;
+Keywords=Navidrome;Jellyfin;Subsonic;OpenSubsonic;música;
+Comment=Tu música de Navidrome

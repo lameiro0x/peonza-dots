@@ -1,0 +1,30 @@
+[Unit]
+Description=ryce desktop session on Hyprland
+Documentation=file:%h/.config/hypr/hyprland.lua
+# Started by hyprland.lua on `hyprland.start`, right after
+#   systemctl --user import-environment WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP
+# so every unit below starts with the live compositor in its environment.
+#
+# Not graphical-session.target: greetd launches start-hyprland directly and nothing
+# on this machine ever activates that target, so anything hanging off it would
+# simply never run (vault decision 2026-08-11).
+#
+# Wants=, never Requires=: each piece fails alone. A dead wallpaper or notifier
+# must never take the bar with it, and a failed want never fails the target.
+#
+# Every graphical unit here is PartOf= this target, so `systemctl --user stop
+# ryce-session.target` on Hyprland shutdown takes them all down. agentd is not:
+# it is enabled at login and waits for the next compositor by itself.
+#
+# Ours (systemd/user): agentd, quickshell (the frame and the bar), cliphist (it
+# shadows a packaged unit that is Requisite= on graphical-session.target and
+# would fail here), ryce-wallpaper. Not waybar: it is the fallback bar, started
+# by quickshell.service's OnFailure= only. Packaged by Arch (/usr/lib/systemd/user)
+# plus a PartOf= drop-in each: mako, hypridle, hyprpolkitagent. Their own
+# PartOf/After on graphical-session.target are inert: Wants= starts them anyway.
+Wants=agentd.service quickshell.service ryce-wallpaper.service cliphist.service
+Wants=mako.service hypridle.service hyprpolkitagent.service
+
+# No [Install]: started by the compositor, never at login. default.target is
+# reached before Hyprland exists and the graphical units would flap against a
+# missing Wayland socket.

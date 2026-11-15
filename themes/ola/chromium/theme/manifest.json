@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Ryce · Ola",
+  "description": "Colores del tema «Ola» de ryce. Lo genera theme/render.py; bin/ryce-chromium-theme lo copia a ~/.local/share/ryce/chromium/theme.",
+  "version": "1.0",
+  "theme": {
+    "colors": {
+      "frame": [22, 22, 29],
+      "frame_inactive": [22, 22, 29],
+      "frame_incognito": [31, 31, 40],
+      "frame_incognito_inactive": [31, 31, 40],
+      "background_tab": [22, 22, 29],
+      "background_tab_inactive": [22, 22, 29],
+      "toolbar": [42, 42, 55],
+      "toolbar_text": [220, 215, 186],
+      "toolbar_button_icon": [200, 192, 147],
+      "tab_text": [220, 215, 186],
+      "tab_background_text": [200, 192, 147],
+      "tab_background_text_inactive": [161, 159, 147],
+      "tab_background_text_incognito": [200, 192, 147],
+      "bookmark_text": [200, 192, 147],
+      "omnibox_background": [22, 22, 29],
+      "omnibox_text": [220, 215, 186],
+      "ntp_background": [22, 22, 29],
+      "ntp_text": [220, 215, 186],
+      "ntp_link": [126, 156, 216],
+      "ntp_header": [63, 63, 85],
+      "button_background": [0, 0, 0, 0]
+    }
+  }
+}
