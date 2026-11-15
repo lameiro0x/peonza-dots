@@ -107,7 +107,7 @@ El único claro, para leer: tinta cálida sobre crema. Space Mono · una hoja de
 
 ## En marcha
 
-<!-- VIDEO -->
+https://github.com/user-attachments/assets/42c5e769-f902-4be1-b90a-a8c7440fbc11
 
 <sub>Grabado dentro de un Hyprland anidado con tareas, sesiones y una pista de música inventadas;
 `tools/showcase/` lo vuelve a hacer desde cero.</sub>

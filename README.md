@@ -107,7 +107,7 @@ The only light one, for reading: warm ink on cream. Space Mono · a sheet, nearl
 
 ## In motion
 
-<!-- VIDEO -->
+https://github.com/user-attachments/assets/42c5e769-f902-4be1-b90a-a8c7440fbc11
 
 <sub>Recorded inside a nested Hyprland with invented tasks, sessions and a procedurally
 generated track; `tools/showcase/` rebuilds it from scratch.</sub>
