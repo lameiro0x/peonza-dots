@@ -51,6 +51,12 @@ gsettings set $schema font-name "$ui $size"
 gsettings set $schema monospace-font-name "$mono 11"
 # The portal's colour-scheme (libadwaita, Firefox) follows the theme's polarity.
 gsettings set $schema color-scheme "prefer-$scheme"
+# File pickers (GTK3, GTK4 and the portal's) show hidden files: Ctrl+H, their own toggle,
+# is the desk's focus-left key (keys/keymap.tsv) and never reaches them; the user keeps
+# Ctrl+H/J/K/L for the focus (2026-11-15).
+gsettings set org.gtk.Settings.FileChooser show-hidden true
+gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true 2>/dev/null || true
+# The toggle goes last: running GTK3 apps re-read gtk.css only on a gtk-theme change.
 [ "$gtk" = Adwaita ] && away=HighContrast || away=Adwaita
 gsettings set $schema gtk-theme "$away"
 gsettings set $schema gtk-theme "$gtk"

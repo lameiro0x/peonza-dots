@@ -350,6 +350,13 @@ class Gsettings(unittest.TestCase):
         self.assertEqual(g[-2:], ["gsettings set org.gnome.desktop.interface gtk-theme Adwaita",
                                   "gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark"])
 
+    def test_file_pickers_show_hidden_files(self):
+        # Ctrl+H is the focus-left key, so the pickers' own toggle never reaches them.
+        r, calls = self.run_script("origen")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("gsettings set org.gtk.Settings.FileChooser show-hidden true", calls)
+        self.assertIn("gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true", calls)
+
     def test_a_paper_theme_asks_for_light(self):
         r, calls = self.run_script("papel")
         self.assertEqual(r.returncode, 0, r.stderr)
