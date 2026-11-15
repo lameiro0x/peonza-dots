@@ -75,6 +75,7 @@ def what(action: str, arg: str) -> str:
             ("call hito", "Abrir o cerrar tus tareas de Hito"),
             ("call keys", "Ver esta chuleta de atajos"),
             ("call aria", "Abrir o cerrar Aria, tu música"),
+            ("call headset", "Conectar los cascos Bluetooth, o reconectarlos si ya están conectados"),
             ("call wallpick", "Elegir fondo"),
             ("wall", "Cambiar el fondo de pantalla"),
             ("switchxkblayout", "Cambiar teclado inglés/español"),
@@ -222,7 +223,7 @@ def group_of(b: gen.Bind) -> str:
     low = b.arg.lower()
     if "screenshot" in low:
         return "Capturas"
-    if "wpctl" in low or "playerctl" in low:
+    if "wpctl" in low or "playerctl" in low or "call headset" in low:
         return "Sonido"
     if "hyprlock" in low or "systemctl hibernate" in low:
         return "Ventanas"

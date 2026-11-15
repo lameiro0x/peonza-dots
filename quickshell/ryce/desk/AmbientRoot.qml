@@ -1,12 +1,15 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs
 
 // The ambient layer: desk widgets (clock, stats), the volume OSD and the live-wallpaper
 // experiment, one DeskScreen per monitor. Toggles live in desk.json under the XDG state
 // dir, so they survive a reload and a restart:
 //   qs -c ryce ipc call desk toggle clock|stats|wall
 //   qs -c ryce ipc call osd flash volume
+//   qs -c ryce ipc call headset reconnect|toggle|peek|status
+//                                  (SUPER+b reconnects; Headset.qml, osd/HeadsetOsd.qml)
 Scope {
     id: ambient
 
@@ -36,6 +39,21 @@ Scope {
             }
             ambient.osdShow();
         }
+    }
+
+    // The headset lives in its singleton; its OSD in each DeskScreen beside the volume's.
+    // (No function may be named after a `qs ipc` subcommand — show, call, wait, listen,
+    // prop: `qs ipc call headset show` prints the target instead of calling it.)
+    IpcHandler {
+        target: "headset"
+
+        // SUPER+b: connect; already connected, reconnect, which brings the sound back.
+        function reconnect(): void { Headset.reconnect(true); }
+        // Connect or disconnect, as the sidebar's pill does.
+        function toggle(): void { Headset.toggle(true); }
+        // The OSD with what the headset is doing now, without touching it.
+        function peek(): void { Headset.announced(); }
+        function status(): string { return Headset.status(); }
     }
 
     FileView {

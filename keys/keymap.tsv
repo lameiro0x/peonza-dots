@@ -140,6 +140,7 @@ SUPER		Escape			exec			pidof hyprlock || hyprlock
 SUPER SHIFT	Escape			exec			systemctl hibernate
 SUPER		c			exec			~/.config/hypr/scripts/clipboard.sh
 SUPER		m			exec			qs -c ryce ipc call aria toggle
+SUPER		b			exec			qs -c ryce ipc call headset reconnect
 SUPER		h			exec			qs -c ryce ipc call hito toggle
 SUPER		F1			exec			qs -c ryce ipc call keys toggle
 SUPER SHIFT	w			exec			qs -c ryce ipc call wallpick toggle

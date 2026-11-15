@@ -94,29 +94,58 @@ ColumnLayout {
         nightSet.running = true;
     }
 
-    RowLayout {
+    // The quick toggles and the headset: one group of pills, one gap.
+    ColumnLayout {
         Layout.fillWidth: true
         spacing: 8
 
-        Pill {
+        RowLayout {
             Layout.fillWidth: true
-            Layout.preferredWidth: 1
-            glyph: Ui.bellOff
-            label: "No molestar"
-            on: root.dnd
-            available: root.dndKnown
-            onClicked: {
-                root.dnd = !root.dnd;
-                dndToggle.running = true;
+            spacing: 8
+
+            Pill {
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                glyph: Ui.bellOff
+                label: "No molestar"
+                on: root.dnd
+                available: root.dndKnown
+                onClicked: {
+                    root.dnd = !root.dnd;
+                    dndToggle.running = true;
+                }
+            }
+            Pill {
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                glyph: Ui.night
+                label: "Luz nocturna"
+                on: root.night
+                onClicked: root.toggleNight()
             }
         }
+
+        // The headset (Headset.qml), as a row that names it: the press says what it acts
+        // on. Connected: its battery on the right; while a press is on its way, or failed,
+        // the state. A click connects or disconnects (SUPER+b only connects, or reconnects).
+        // Hidden on a machine with no Bluetooth at all.
         Pill {
+            readonly property bool saying: Headset.busy || Headset.failed || Headset.device === null || Headset.blocked
+            readonly property bool charge: Headset.connected && !saying && Headset.batteryLevel >= 0
+
             Layout.fillWidth: true
-            Layout.preferredWidth: 1
-            glyph: Ui.night
-            label: "Luz nocturna"
-            on: root.night
-            onClicked: root.toggleNight()
+            visible: Headset.present
+            row: true
+            glyph: Ui.headphones
+            label: Headset.device === null ? "Cascos" : Headset.name
+            meta: saying ? Headset.word : charge ? Headset.batteryLevel + " %" : ""
+            metaGlyph: charge ? Ui.battery(Headset.batteryLevel) : ""
+            metaSpoken: charge ? "batería " + meta : meta
+            metaColor: Headset.failed ? Ryce.Palette.warn : Headset.connected ? Ryce.Palette.dimOnPill : Ryce.Palette.fg2
+            on: Headset.connected
+            busy: Headset.busy
+            available: Headset.device !== null && !Headset.blocked
+            onClicked: Headset.toggle(false)
         }
     }
 

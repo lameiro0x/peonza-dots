@@ -293,6 +293,13 @@
       "Ant."
      ],
      "what": "Canción anterior"
+    },
+    {
+     "keys": [
+      "Super",
+      "B"
+     ],
+     "what": "Conectar los cascos Bluetooth, o reconectarlos si ya están conectados"
     }
    ]
   },

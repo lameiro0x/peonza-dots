@@ -108,6 +108,9 @@ RYCE_EXTRAS: dict[Combo, tuple[str, str]] = {
     # Widgets: the Aria music drawer, Hito's tasks drawer, the keybinding cheat sheet
     # and the wallpaper picker (IpcHandler `aria`, `hito`, `keys`, `wallpick`).
     combo("SUPER", "m"): ('hl.dsp.exec_cmd("qs -c ryce ipc call aria toggle")', ""),
+    # The Bluetooth headset (IpcHandler `headset`): connect the paired audio device, or
+    # reconnect it when it is connected (the sound comes back); the OSD says what happened.
+    combo("SUPER", "b"): ('hl.dsp.exec_cmd("qs -c ryce ipc call headset reconnect")', ""),
     combo("SUPER", "h"): ('hl.dsp.exec_cmd("qs -c ryce ipc call hito toggle")', ""),
     combo("SUPER", "F1"): ('hl.dsp.exec_cmd("qs -c ryce ipc call keys toggle")', ""),
     combo("SUPER SHIFT", "w"): ('hl.dsp.exec_cmd("qs -c ryce ipc call wallpick toggle")', ""),

@@ -151,6 +151,7 @@
 | `Mayús` + `Super` + `Esc` | Hibernar el PC (las sesiones siguen al volver) |
 | `Super` + `C` | Historial del portapapeles |
 | `Super` + `M` | Abrir o cerrar Aria, tu música |
+| `Super` + `B` | Conectar los cascos Bluetooth, o reconectarlos si ya están conectados |
 | `Super` + `H` | Abrir o cerrar tus tareas de Hito |
 | `Super` + `F1` | Ver esta chuleta de atajos |
 | `Mayús` + `Super` + `W` | Elegir fondo |

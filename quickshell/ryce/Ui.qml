@@ -28,6 +28,16 @@ Singleton {
     readonly property string music: String.fromCodePoint(0xf0387)      // md-music_note
     readonly property string bellOff: String.fromCodePoint(0xf0a91)    // md-bell_off_outline
     readonly property string night: String.fromCodePoint(0xf0594)      // md-weather_night
+    readonly property string headphones: String.fromCodePoint(0xf02cb)     // md-headphones
+    readonly property string headphonesOff: String.fromCodePoint(0xf07ce)  // md-headphones_off
+    // md-battery_20 … md-battery_90 by tens, md-battery when full, md-battery_alert when low
+    // (≤ 15 %, HeadsetLogic.low: time to charge).
+    function battery(level) {
+        if (level < 0) return "";
+        if (level <= 15) return String.fromCodePoint(0xf0083);
+        if (level >= 95) return String.fromCodePoint(0xf0079);
+        return String.fromCodePoint(0xf007a + Math.max(0, Math.min(8, Math.floor(level / 10) - 1)));
+    }
     readonly property string volHigh: String.fromCodePoint(0xf057e)    // md-volume_high
     readonly property string volMid: String.fromCodePoint(0xf0580)     // md-volume_medium
     readonly property string volLow: String.fromCodePoint(0xf057f)     // md-volume_low

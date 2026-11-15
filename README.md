@@ -147,7 +147,7 @@ times in a row, Waybar takes over with the same palette.
 
 | № | Part | What it does |
 |:-:|---|---|
-| 13 | **Side panel**<br><kbd>Super</kbd>&nbsp;<kbd>A</kbd> | the sessions and their current step, music with a visualiser, do-not-disturb, night light, volume |
+| 13 | **Side panel**<br><kbd>Super</kbd>&nbsp;<kbd>A</kbd> | the sessions and their current step, music with a visualiser, do-not-disturb, night light, your Bluetooth headphones with their battery, volume |
 | 14 | **Music**<br><kbd>Super</kbd>&nbsp;<kbd>M</kbd> | a player for Navidrome and other Subsonic servers, with covers and a queue; mpv plays, so media keys and the bar see it |
 | 15 | **Tasks**<br><kbd>Super</kbd>&nbsp;<kbd>H</kbd> | Hito's lists: today, overdue, upcoming |
 | 16 | **Cheatsheet**<br><kbd>Super</kbd>&nbsp;<kbd>F1</kbd> | every bind, generated from the same table that defines them |
@@ -232,6 +232,7 @@ is never committed.
 | <kbd>Ctrl</kbd>&nbsp;<kbd>H</kbd>&nbsp;<kbd>J</kbd>&nbsp;<kbd>K</kbd>&nbsp;<kbd>L</kbd> | move focus |
 | <kbd>Super</kbd>&nbsp;<kbd>T</kbd> · <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>T</kbd> | theme picker · next theme |
 | <kbd>Super</kbd>&nbsp;<kbd>A</kbd> | side panel |
+| <kbd>Super</kbd>&nbsp;<kbd>B</kbd> | connect the Bluetooth headphones, or reconnect them when they are connected but silent |
 | <kbd>Super</kbd>&nbsp;<kbd>M</kbd> · <kbd>Super</kbd>&nbsp;<kbd>H</kbd> | music · tasks |
 | <kbd>Super</kbd>&nbsp;<kbd>D</kbd> · <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>D</kbd> | desk clock · desk stats |
 | <kbd>Super</kbd>&nbsp;<kbd>Shift</kbd>&nbsp;<kbd>W</kbd> | wallpaper picker |

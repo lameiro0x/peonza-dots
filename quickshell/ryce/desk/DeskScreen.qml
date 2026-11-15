@@ -151,9 +151,18 @@ Scope {
         }
     }
 
+    // Both drawers come out of the right edge at mid-height: the newest one wins.
     VolumeOsd {
         id: osd
         screen: desk.screen
         armed: !Hyprland.focusedMonitor || Hyprland.focusedMonitor === desk.monitor
+        yielding: headsetOsd.shown
+    }
+
+    HeadsetOsd {
+        id: headsetOsd
+        screen: desk.screen
+        armed: !Hyprland.focusedMonitor || Hyprland.focusedMonitor === desk.monitor
+        yielding: osd.shown
     }
 }

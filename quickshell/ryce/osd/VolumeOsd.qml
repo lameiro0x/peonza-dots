@@ -13,6 +13,7 @@ import qs as Ryce
 PanelWindow {
     id: osd
     property bool armed
+    property bool yielding                  // the headset OSD came out at the same spot (DeskScreen)
     property bool shown: false
     property real p: shown ? 1 : 0
 
@@ -25,6 +26,12 @@ PanelWindow {
     readonly property int fillet: Math.max(4, Ryce.Palette.frameRadius)
     readonly property int bodyWidth: 46
     readonly property int bodyHeight: 188
+
+    // The newest of the two OSDs at mid-height wins: this one leaves when the headset's comes.
+    onYieldingChanged: if (yielding) {
+        hide.stop();
+        shown = false;
+    }
 
     function flash() {
         if (!armed) return;
@@ -97,6 +104,26 @@ PanelWindow {
             PathLine { x: edge.w - edge.f; y: edge.h - edge.f }
             PathArc { x: edge.w; y: edge.h; radiusX: edge.f; radiusY: edge.f }
             PathLine { x: edge.w; y: 0 }
+        }
+        // The rim: a hairline along the free side only (not along the screen's edge), so the
+        // drawer reads where the wallpaper is the frame's own colour (Papel, Grafito). Half a
+        // pixel inside the fill's outline: a 1 px line on the pixel grid, not two half rows
+        // (and not half cut off by the window's left edge).
+        ShapePath {
+            id: rim
+            readonly property real o: 0.5
+            fillColor: "transparent"
+            strokeColor: Ryce.Palette.line
+            strokeWidth: 1
+            startX: edge.w
+            startY: rim.o
+            PathArc { x: edge.w - edge.f; y: edge.f + rim.o; radiusX: edge.f; radiusY: edge.f }
+            PathLine { x: edge.r + rim.o; y: edge.f + rim.o }
+            PathArc { x: rim.o; y: edge.f + edge.r + rim.o; radiusX: edge.r; radiusY: edge.r; direction: PathArc.Counterclockwise }
+            PathLine { x: rim.o; y: edge.h - edge.f - edge.r - rim.o }
+            PathArc { x: edge.r + rim.o; y: edge.h - edge.f - rim.o; radiusX: edge.r; radiusY: edge.r; direction: PathArc.Counterclockwise }
+            PathLine { x: edge.w - edge.f; y: edge.h - edge.f - rim.o }
+            PathArc { x: edge.w; y: edge.h - rim.o; radiusX: edge.f; radiusY: edge.f }
         }
 
         // The pill's face, centred in the body.

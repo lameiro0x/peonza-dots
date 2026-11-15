@@ -147,7 +147,7 @@ seguidas, Waybar toma el relevo con la misma paleta.
 
 | Nº | Pieza | Qué hace |
 |:-:|---|---|
-| 13 | **Panel lateral**<br><kbd>Super</kbd>&nbsp;<kbd>A</kbd> | las sesiones y su paso actual, la música con un visualizador, no molestar, luz nocturna, volumen |
+| 13 | **Panel lateral**<br><kbd>Super</kbd>&nbsp;<kbd>A</kbd> | las sesiones y su paso actual, la música con un visualizador, no molestar, luz nocturna, tus cascos Bluetooth con su batería, volumen |
 | 14 | **Música**<br><kbd>Super</kbd>&nbsp;<kbd>M</kbd> | un reproductor para Navidrome y otros servidores Subsonic, con portadas y cola; suena por mpv, así que las teclas multimedia y la barra lo ven |
 | 15 | **Tareas**<br><kbd>Super</kbd>&nbsp;<kbd>H</kbd> | las listas de Hito: hoy, atrasadas, próximas |
 | 16 | **Chuleta**<br><kbd>Super</kbd>&nbsp;<kbd>F1</kbd> | todos los atajos, generados de la misma tabla que los define |
@@ -232,6 +232,7 @@ Claude Code. Lo propio de cada máquina, como los monitores y la distribución d
 | <kbd>Ctrl</kbd>&nbsp;<kbd>H</kbd>&nbsp;<kbd>J</kbd>&nbsp;<kbd>K</kbd>&nbsp;<kbd>L</kbd> | mover el foco |
 | <kbd>Super</kbd>&nbsp;<kbd>T</kbd> · <kbd>Super</kbd>&nbsp;<kbd>Mayús</kbd>&nbsp;<kbd>T</kbd> | selector de temas · tema siguiente |
 | <kbd>Super</kbd>&nbsp;<kbd>A</kbd> | panel lateral |
+| <kbd>Super</kbd>&nbsp;<kbd>B</kbd> | conectar los cascos Bluetooth, o reconectarlos si están conectados pero no suenan |
 | <kbd>Super</kbd>&nbsp;<kbd>M</kbd> · <kbd>Super</kbd>&nbsp;<kbd>H</kbd> | música · tareas |
 | <kbd>Super</kbd>&nbsp;<kbd>D</kbd> · <kbd>Super</kbd>&nbsp;<kbd>Mayús</kbd>&nbsp;<kbd>D</kbd> | reloj del escritorio · datos del PC |
 | <kbd>Super</kbd>&nbsp;<kbd>Mayús</kbd>&nbsp;<kbd>W</kbd> | selector de fondos |
