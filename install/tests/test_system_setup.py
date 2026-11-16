@@ -130,6 +130,21 @@ class SystemSetup(ScriptTest):
         self.assertIn("usermod -aG docker,kvm,libvirt,render,video ana", calls)
         self.assertTrue((self.home / ".config/user-dirs.dirs").exists())
 
+    def test_sshd_answers_the_lan_read_at_install_time_never_a_public_one(self):
+        # Made-up networks (allowed for this file in tools/publish/denylist.json).
+        out = self.setup(FAKE_LAN="10.0.0.0/24")
+        nft = self.read("etc/nftables.conf")
+        self.assertIn('ip saddr 10.0.0.0/24 tcp dport ssh accept comment "sshd: the home LAN only"', nft)
+        self.assertIn('iifname "tailscale0" tcp dport ssh accept', nft)
+        self.assertNotIn("no veo la red local", out)
+        for lan in ("", "203.0.113.0/24", "10.0.0.0"):          # no network, a public link, junk
+            with self.subTest(lan=lan):
+                out = self.setup(FAKE_LAN=lan)
+                nft = self.read("etc/nftables.conf")
+                self.assertNotIn("ip saddr", nft)
+                self.assertIn("# sshd: no private LAN was up at install time", nft)
+                self.assertIn("no veo la red local", out)
+
     def test_firewall_and_docker_on_localhost(self):
         out = self.setup()
         nft = self.read("etc/nftables.conf")

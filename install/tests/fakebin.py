@@ -132,6 +132,18 @@ def systemd_run(args, st):
     os.execvp(cmd[0], cmd)
 
 
+def ip(args, st):
+    """The two route lookups system-setup.sh makes; FAKE_LAN (a CIDR) is the link's network."""
+    lan = os.environ.get("FAKE_LAN", "")
+    if not lan:
+        return 0
+    if args[:4] == ["-4", "route", "show", "default"]:
+        print("default via GATEWAY dev eth0 proto dhcp metric 100")
+    elif args[:5] == ["-4", "route", "show", "dev", "eth0"]:
+        print(f"{lan} proto kernel scope link src HOST metric 100")
+    return 0
+
+
 def silent(args, st):
     return 0
 

@@ -9,7 +9,7 @@ import unittest
 REPO = pathlib.Path(__file__).resolve().parents[2]
 FAKE = pathlib.Path(__file__).with_name("fakebin.py")
 FAKED = ("pacman systemctl btrfs chattr chown findmnt lsblk getent usermod runuser virsh "
-         "sysctl nft hyprctl claude systemd-run kitty").split()
+         "sysctl nft hyprctl claude systemd-run kitty ip").split()
 
 
 class ScriptTest(unittest.TestCase):

@@ -575,13 +575,36 @@ fi
 
 # --- firewall -------------------------------------------------------------------------------
 step "Cortafuegos (nftables) y Docker solo en localhost"
+# sshd's LAN: the on-link IPv4 network of the default route's interface, read at each run and
+# never written in this (published) file. Only a private range counts: with no network yet, or
+# a public address on the link, sshd answers the tailnet alone until a run with the LAN up.
+lan_cidr() {
+  local dev net
+  dev=$(ip -4 route show default 2>/dev/null | awk '{ for (i = 1; i < NF; i++) if ($i == "dev") { print $(i + 1); exit } }')
+  [ -n "$dev" ] || return 0
+  net=$(ip -4 route show dev "$dev" scope link proto kernel 2>/dev/null | awk '{ print $1; exit }')
+  [[ $net =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}/[0-9]{1,2}$ ]] || return 0
+  case $net in
+    10.* | 192.168.* | 172.1[6-9].* | 172.2[0-9].* | 172.3[01].*) printf '%s\n' "$net" ;;
+  esac
+}
+LAN=$(lan_cidr)
+if [ -n "$LAN" ]; then
+  SSH_LAN="ip saddr $LAN tcp dport ssh accept comment \"sshd: the home LAN only\""
+else
+  SSH_LAN="# sshd: no private LAN was up at install time, so the tailnet only (re-run with it up)"
+  warn "no veo la red local (¿sin red?): sshd solo por la tailnet hasta que lo vuelvas a ejecutar con red"
+fi
+
 fw=0
 put_file /etc/nftables.conf 0644 <<EOF || fw=1
 #!/usr/bin/nft -f
 $MANAGED
 # Arch's default ruleset (nftables package) plus what a box with Docker and libvirt needs.
 # Input: nothing from the LAN reaches the agents' dev servers, Docker or libvirt; only replies,
-# loopback, ICMP, DHCPv6 replies, the VMs' DHCP/DNS and sshd (if you ever enable it).
+# loopback, ICMP, DHCPv6 replies, the VMs' DHCP/DNS, sshd from the home LAN and the tailnet
+# only (never the global IPv6 address the ISP hands this PC), and Torre's
+# remote port from the tailnet interface alone (it binds the 100.x address and nothing else).
 # Forward: this PC routes only for its own containers and VMs (their bridges), never the LAN.
 # "destroy table" replaces only this table: Docker's and libvirt's tables stay, so reloading
 # (sudo nft -f /etc/nftables.conf) is always safe.
@@ -599,7 +622,9 @@ table inet filter {
     ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept comment "allow DHCPv6 replies"
     iifname "virbr*" udp dport { 53, 67 } accept comment "libvirt VMs: DHCP and DNS"
     iifname "virbr*" tcp dport 53 accept comment "libvirt VMs: DNS over TCP"
-    tcp dport ssh accept comment "allow sshd"
+    $SSH_LAN
+    iifname "tailscale0" tcp dport ssh accept comment "sshd: the tailnet"
+    iifname "tailscale0" tcp dport 47714 accept comment "Torre: its peers and the phone, over the tailnet only"
     pkttype host limit rate 5/second counter reject with icmpx type admin-prohibited
     counter
   }
