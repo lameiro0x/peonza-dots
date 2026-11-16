@@ -104,6 +104,13 @@ for g in "${want[@]}"; do
 done
 if [ ${#missing[@]} -eq 0 ]; then ok "estás en los grupos ${want[*]}"
 else bad "te faltan los grupos: ${missing[*]}" "sudo bash install/system-setup.sh y luego cierra sesión y vuelve a entrar"; fi
+# polkit asks once per process: without the window an agent (a new shell per command) asks on
+# every pkexec. The rule itself is unreadable here (rules.d is root:polkitd 0750); PAM is not.
+if grep -qs 'ryce/polkit-stamp' /etc/pam.d/polkit-1 && [ -s /etc/tmpfiles.d/ryce-polkit.conf ]; then
+  ok "la contraseña de administrador vale 30 min para todo (install/polkit-setup.sh)"
+else
+  note "pkexec pide la contraseña en cada orden" "pkexec bash install/polkit-setup.sh: una contraseña abre 30 min"
+fi
 
 if swapon --show=NAME --noheadings 2>/dev/null | grep -q zram0; then
   size=$(swapon --show=NAME,SIZE --noheadings 2>/dev/null | awk '/zram0/ {print $2}' || true)
