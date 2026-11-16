@@ -32,9 +32,11 @@ HYPR_PIN=(
 RETIRED_PIN=(quickshell)
 PIN_MARKER="# ryce-pc: the hypr family moves as one unit; ryce-update explains how to upgrade it"
 MANAGED="# Managed by ryce-pc (install/system-setup.sh): change it in the repo and re-run."
-# docker is root without a password (the summary says so); libvirt is not granted: virt-manager
-# asks through polkit (hyprpolkitagent) instead. kvm only opens /dev/kvm.
-USER_GROUPS=(docker kvm render video)
+# docker and libvirt are root without a password (the summary says so). libvirt is granted
+# since 2026-11-16: without it polkit asks for the password once per virsh process, so an
+# agent that polls a VM (`until virsh …; do sleep 5; done`) raised the dialog every 5 s.
+# Arch's /usr/share/polkit-1/rules.d/50-libvirt.rules lets the group in. kvm only opens /dev/kvm.
+USER_GROUPS=(docker kvm libvirt render video)
 
 DRY=0 YES=0 TARGET_USER=
 CHANGES=0
@@ -692,10 +694,6 @@ else
   change "añadir $TARGET_USER a: ${add[*]} (efectivo en tu próximo inicio de sesión)"
   run usermod -aG "$(IFS=,; echo "${add[*]}")" "$TARGET_USER"
 fi
-line=$(getent group libvirt || true)
-case ",${line##*:}," in
-  *",$TARGET_USER,"*) warn "$TARGET_USER está en el grupo libvirt (= root sin contraseña); virt-manager funciona sin él: 'sudo gpasswd -d $TARGET_USER libvirt'" ;;
-esac
 put_file /etc/profile.d/ryce-localbin.sh 0644 <<EOF || true
 $MANAGED
 # ~/.local/bin holds claude (native installer), ryce-update and ryce-term. Every login shell
@@ -739,8 +737,8 @@ esac
 printf '\n==> Resumen: %d cambios%s, %d avisos\n' "$CHANGES" \
   "$([ "$DRY" = 1 ] && echo ' (simulados)')" "${#WARNINGS[@]}"
 for w in "${WARNINGS[@]}"; do printf '    ! %s\n' "$w"; done
-echo "    · Grupo docker = root sin contraseña: cualquier proceso tuyo (también un agente) puede"
-echo "      hacerse root a través de Docker. Lo explica docs/seguridad.md."
+echo "    · Grupos docker y libvirt = root sin contraseña: cualquier proceso tuyo (también un"
+echo "      agente) puede hacerse root a través de Docker o de una VM. Lo explica docs/seguridad.md."
 if [ "$DRY" = 1 ]; then
   echo "    Para aplicarlo: sudo bash install/system-setup.sh"
 else

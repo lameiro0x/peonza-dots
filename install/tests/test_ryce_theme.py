@@ -38,10 +38,21 @@ if name == "hyprctl" and args[:1] == ["monitors"]:
 if name == "awww" and args[:1] == ["query"]:
     print(os.environ.get("FAKE_AWWW_QUERY", ""))
 if name == "systemctl" and "is-active" in args:
-    sys.exit(0 if "agentd" in procs else 3)
+    sys.exit(0 if args[-1].removesuffix(".service") in procs else 3)
+def pop(var):
+    """Next answer from the JSON list in the file $var; the last one repeats."""
+    path = os.environ[var]
+    seq = json.load(open(path))
+    if len(seq) > 1:
+        json.dump(seq[1:], open(path, "w"))
+    return seq[0]
+if name == "systemctl" and "--property=MainPID" in args:
+    print(pop("FAKE_MAINPID").get(args[-1], 0) if os.environ.get("FAKE_MAINPID") else 0)
+if name == "hyprctl" and args[:1] == ["clients"]:
+    print(json.dumps(pop("FAKE_CLIENTS")) if os.environ.get("FAKE_CLIENTS") else "[]")
 '''
 
-FAKED = "pgrep pkill qs hyprctl awww makoctl fish systemctl pkexec".split()
+FAKED = "pgrep pkill qs hyprctl awww makoctl fish systemctl pkexec systemd-run".split()
 ALL_PROCS = "quickshell mako awww-daemon kitty btop cava waybar agentd"
 MONITORS = json.dumps([
     {"name": "DP-1", "width": 2560, "height": 1440, "transform": 0, "refreshRate": 59.95},
@@ -145,6 +156,10 @@ class RyceTheme(unittest.TestCase):
             ["makoctl", "reload"],
             ["fish", "-c", "set -U ryce_theme grafito"],
             ["gsettings.sh", "grafito"],
+            ["systemd-run", "--user", "--quiet", "--collect", "--unit=ryce-gtk3-refresh",
+             "--description=ryce-theme: restart Thunar and the file chooser once their windows close",
+             "--setenv=HYPRLAND_INSTANCE_SIGNATURE=test", str(self.repo.resolve() / "bin/ryce-theme"),
+             "gtk3-refresh"],
             ["pkill", "-USR2", "-x", "-u", uid, "btop"],
             ["pkill", "-USR2", "-x", "-u", uid, "cava"],
             ["pkill", "-USR2", "-x", "-u", uid, "waybar"],
@@ -166,6 +181,44 @@ class RyceTheme(unittest.TestCase):
         self.assertEqual(r.stderr, "")
         self.assertEqual(self.current(), "grafito")
         self.assertEqual({c[0] for c in self.calls()}, {"pgrep", "pkill"})
+
+    # --- gtk3-refresh: Thunar's daemon and the file chooser outlive their windows ------------
+
+    def gtk3(self, mainpid, clients, rc=0, env=None):
+        mp, cl = self.tmp / "mainpid.json", self.tmp / "clients.json"
+        mp.write_text(json.dumps(mainpid))
+        cl.write_text(json.dumps(clients))
+        return self.theme("gtk3-refresh", rc=rc, env={"FAKE_MAINPID": str(mp), "FAKE_CLIENTS": str(cl),
+                                                      "RYCE_GTK3_POLL": "0.01", **(env or {})})
+
+    def restarts(self):
+        return [c[-1] for c in self.calls() if c[:3] == ["systemctl", "--user", "try-restart"]]
+
+    def test_a_switch_leaves_a_waiting_refresh_alone(self):
+        self.theme("set", "grafito", env={"FAKE_PROCS": ALL_PROCS + " ryce-gtk3-refresh"})
+        self.assertEqual([c for c in self.calls() if c[0] == "systemd-run"], [])
+
+    def test_refresh_restarts_each_service_once_its_windows_close(self):
+        pids = {"thunar.service": 41, "xdg-desktop-portal-gtk.service": 52}
+        thunar_open = [{"pid": 41, "class": "thunar"}, {"pid": 7, "class": "kitty"}]
+        self.gtk3([pids], [thunar_open, thunar_open, [{"pid": 7, "class": "kitty"}]])
+        # The idle file chooser goes at the first look; Thunar waits for its window.
+        self.assertEqual(self.restarts(), ["xdg-desktop-portal-gtk.service", "thunar.service"])
+        self.assertEqual(len([c for c in self.calls() if c[:2] == ["hyprctl", "clients"]]), 3)
+
+    def test_refresh_leaves_alone_what_is_not_running_or_was_restarted_meanwhile(self):
+        before = {"thunar.service": 41, "xdg-desktop-portal-gtk.service": 0}
+        self.gtk3([before, before, {"thunar.service": 99}], [[{"pid": 41}]])
+        self.assertEqual(self.restarts(), [])
+
+    def test_refresh_with_nothing_running_asks_hyprland_nothing(self):
+        self.gtk3([{}], [[]])
+        self.assertEqual([c for c in self.calls() if c[0] == "hyprctl"], [])
+
+    def test_refresh_gives_up_without_restarting_when_hyprland_is_gone(self):
+        r = self.gtk3([{"thunar.service": 41}], [[]], rc=1, env={"FAKE_FAIL": "hyprctl"})
+        self.assertEqual(self.restarts(), [])
+        self.assertIn("Hyprland no responde", r.stderr)
 
     def test_unknown_or_incomplete_theme_is_refused_and_current_untouched(self):
         r = self.theme("set", "magenta", rc=2)

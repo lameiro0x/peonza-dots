@@ -127,8 +127,7 @@ class SystemSetup(ScriptTest):
                      "fstrim.timer", "paccache.timer", "reflector.timer", "NetworkManager.service"):
             self.assertIn(f"systemctl enable --quiet {unit}", calls)
         self.assertNotIn("thermald", calls.replace("pacman -Q thermald", ""))
-        self.assertIn("usermod -aG docker,kvm,render,video ana", calls)
-        self.assertNotIn("libvirt,", calls)
+        self.assertIn("usermod -aG docker,kvm,libvirt,render,video ana", calls)
         self.assertTrue((self.home / ".config/user-dirs.dirs").exists())
 
     def test_firewall_and_docker_on_localhost(self):
@@ -196,11 +195,16 @@ class SystemSetup(ScriptTest):
                                env={"PATH": home_path, "HOME": "/home/ana"}, capture_output=True, text=True, timeout=10)
             self.assertEqual(r.stdout.count("/home/ana/.local/bin"), 1, r.stdout)
 
-    def test_libvirt_membership_is_flagged_not_granted(self):
-        st = {"installed": [], "enabled": [], "active": [], "subvols": [], "groups": {"libvirt": ["ana"]}}
+    def test_libvirt_membership_is_granted_not_flagged(self):
+        # Without it polkit asked for the password on every virsh process (2026-11-16).
+        st = {"installed": [], "enabled": [], "active": [], "subvols": [],
+              "groups": {g: ["ana"] for g in ("docker", "kvm", "libvirt", "render", "video")}}
         self.state.mkdir()
         (self.state / "state.json").write_text(json.dumps(st))
-        self.assertIn("gpasswd -d ana libvirt", self.setup())
+        out = self.setup()
+        self.assertNotIn("gpasswd -d ana libvirt", out)
+        self.assertIn("ana está en docker kvm libvirt render video", out)
+        self.assertNotIn("usermod", "\n".join(self.calls()))
 
     def test_pacman_conf_edit_is_idempotent_and_keeps_user_pins(self):
         self.setup()

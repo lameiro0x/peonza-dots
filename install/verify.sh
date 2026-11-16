@@ -96,7 +96,7 @@ fi
 
 # --- system ---------------------------------------------------------------------------------
 section "Sistema"
-want=(docker kvm render video)
+want=(docker kvm libvirt render video)
 read -r -a mine <<<"$(id -nG)"
 missing=()
 for g in "${want[@]}"; do
@@ -104,9 +104,6 @@ for g in "${want[@]}"; do
 done
 if [ ${#missing[@]} -eq 0 ]; then ok "estás en los grupos ${want[*]}"
 else bad "te faltan los grupos: ${missing[*]}" "sudo bash install/system-setup.sh y luego cierra sesión y vuelve a entrar"; fi
-case " ${mine[*]} " in
-  *" libvirt "*) note "estás en el grupo libvirt (= root sin contraseña)" "virt-manager funciona sin él (te pide la contraseña): sudo gpasswd -d $(id -un) libvirt" ;;
-esac
 
 if swapon --show=NAME --noheadings 2>/dev/null | grep -q zram0; then
   size=$(swapon --show=NAME,SIZE --noheadings 2>/dev/null | awk '/zram0/ {print $2}' || true)

@@ -340,15 +340,17 @@ class Gsettings(unittest.TestCase):
             calls = log.read_text().splitlines() if log.exists() else []
             return r, calls
 
-    def test_sets_the_theme_silently_and_toggles_gtk_theme(self):
+    def test_sets_the_theme_silently_without_flashing_gtk_theme(self):
         r, calls = self.run_script("origen")
         self.assertEqual((r.returncode, r.stdout, r.stderr), (0, "", ""))
         g = [c for c in calls if c.startswith("gsettings")]
         self.assertIn("gsettings set org.gnome.desktop.interface icon-theme ryce-origen", g)
         self.assertIn("gsettings set org.gnome.desktop.interface font-name Martian Mono 10", g)
         self.assertIn("gsettings set org.gnome.desktop.interface color-scheme prefer-dark", g)
-        self.assertEqual(g[-2:], ["gsettings set org.gnome.desktop.interface gtk-theme Adwaita",
-                                  "gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark"])
+        # Set once: the away-and-back toggle never made GTK3 re-read gtk.css (GTK 3.24.52),
+        # it only flashed every window in Adwaita.
+        self.assertEqual([c for c in g if " gtk-theme " in c],
+                         ["gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark"])
 
     def test_file_pickers_show_hidden_files(self):
         # Ctrl+H is the focus-left key, so the pickers' own toggle never reaches them.

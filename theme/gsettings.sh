@@ -8,8 +8,11 @@
 #                             <state> = $RYCE_THEME_STATE or ~/.local/state/ryce/theme;
 #                             no ID = the theme <state>/current points at (autostart)
 #
-# Running GTK3 apps (Thunar) re-read ~/.config/gtk-3.0/gtk.css only when gtk-theme
-# changes, so it is toggled away and back. GTK4/libadwaita apps restyle on restart.
+# A running GTK app never re-reads ~/.config/gtk-3.0/gtk.css: GTK loads it once per
+# process, and a gtk-theme change does not reload it (measured on GTK 3.24.52,
+# 2026-11-16; the away-and-back toggle that used to live here changed nothing but
+# flashed every GTK3 window). Apps restyle when reopened; bin/ryce-theme restarts the
+# two that outlive their windows (Thunar's daemon, the portal's file chooser).
 # Idempotent, silent on success. Needs the session bus: run it inside the Hyprland
 # session (or a user shell on the same seat), not from a bare TTY or chroot.
 set -eu
@@ -44,6 +47,7 @@ gtk=$(line 1) icons=$(line 2) cursor=$(line 3) ui=$(line 4) mono=$(line 5) schem
 # Martian Mono is a wide monospace: at 10 it sets the same measure as a grotesque at 11.
 case $ui in "Martian Mono") size=10 ;; *) size=11 ;; esac
 
+gsettings set $schema gtk-theme "$gtk"
 gsettings set $schema icon-theme "$icons"
 gsettings set $schema cursor-theme "$cursor"
 gsettings set $schema cursor-size 32   # as hypr/env.lua's XCURSOR_SIZE
@@ -56,10 +60,6 @@ gsettings set $schema color-scheme "prefer-$scheme"
 # Ctrl+H/J/K/L for the focus (2026-11-15).
 gsettings set org.gtk.Settings.FileChooser show-hidden true
 gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true 2>/dev/null || true
-# The toggle goes last: running GTK3 apps re-read gtk.css only on a gtk-theme change.
-[ "$gtk" = Adwaita ] && away=HighContrast || away=Adwaita
-gsettings set $schema gtk-theme "$away"
-gsettings set $schema gtk-theme "$gtk"
 
 # Thunar: the look in gtk.css assumes breadcrumbs, symbolic side-pane icons (they
 # take the text colour) and a status line. Set only while unset, so a choice made

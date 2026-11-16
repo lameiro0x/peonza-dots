@@ -9,6 +9,8 @@
     ryce-theme wallpaper [--no-transition]
     ryce-theme wall [next|prev|reset|<n>] the current theme's next/previous picture, its main one,
                                           or picture n (0 the main one; the wallpaper picker's choice)
+    ryce-theme gtk3-refresh               (set and apply start it in a unit of its own) restart Thunar
+                                          and the file chooser once their windows close
 
 ~/.local/state/ryce/theme/ holds one link per theme into the repo's themes/<id>/ (made by
 install/deploy.sh) and `current -> <id>`, a relative link and the single commit point: every
@@ -53,6 +55,15 @@ TRANSITIONS = {
 }
 WALL_DURATION = ["--transition-duration", "1.0"]
 FPS_DEFAULT = 60
+
+# GTK3 reads ~/.config/gtk-3.0/gtk.css once, when the process starts; a gtk-theme change
+# does not re-read it (measured on GTK 3.24.52, 2026-11-16). Thunar's D-Bus service keeps
+# one Thunar for the whole session (thunar.service runs `Thunar --daemon`) and the portal's
+# file chooser lives in xdg-desktop-portal-gtk.service: both outlive their windows, so
+# closing and reopening them showed the theme of the moment they started, forever.
+GTK3_SERVICES = ("thunar.service", "xdg-desktop-portal-gtk.service")
+GTK3_UNIT = "ryce-gtk3-refresh"
+GTK3_MISSES = 15     # hyprctl failing this many polls in a row: Hyprland is gone, give up
 
 # Only the value of this key; a commented-out line (// first) never matches.
 COLOR_KEY = re.compile(r'(?m)^(\s*"workbench\.colorTheme"\s*:\s*)"(?:[^"\\\n]|\\.)*"')
@@ -364,6 +375,77 @@ def chromium() -> str | None:
     return run([sys.executable, str(tool)], timeout=3)
 
 
+def gtk3_services() -> str | None:
+    """Restart Thunar and the file chooser behind the switch, each once it shows no window.
+    A transient user unit does the waiting, so it outlives this command; while one waits,
+    the next switch leaves it be (what it restarts reads whatever theme is current then)."""
+    sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+    if not sig or not shutil.which("systemd-run"):
+        return None
+    if run(["systemctl", "--user", "is-active", "--quiet", f"{GTK3_UNIT}.service"]) is None:
+        return None
+    env = [f"--setenv=HYPRLAND_INSTANCE_SIGNATURE={sig}"]
+    if xdg := os.environ.get("XDG_RUNTIME_DIR"):
+        env.append(f"--setenv=XDG_RUNTIME_DIR={xdg}")
+    return run(["systemd-run", "--user", "--quiet", "--collect", f"--unit={GTK3_UNIT}",
+                "--description=ryce-theme: restart Thunar and the file chooser once their windows close",
+                *env, str(Path(__file__).resolve()), "gtk3-refresh"], timeout=5)
+
+
+def main_pid(unit: str) -> int:
+    """The unit's main process, 0 when it is not running (or systemctl cannot tell)."""
+    try:
+        r = subprocess.run(["systemctl", "--user", "show", "--property=MainPID", "--value", unit],
+                           stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=5)
+        return int(r.stdout.strip() or 0) if r.returncode == 0 else 0
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return 0
+
+
+def window_pids() -> set[int] | None:
+    """The process of every Hyprland window, None when hyprctl does not answer."""
+    try:
+        r = subprocess.run(["hyprctl", "clients", "-j"], stdin=subprocess.DEVNULL,
+                           capture_output=True, text=True, timeout=5)
+        if r.returncode == 0:
+            return {c.get("pid") for c in json.loads(r.stdout)}
+    except (OSError, ValueError, subprocess.TimeoutExpired, AttributeError, TypeError):
+        pass
+    return None
+
+
+def gtk3_refresh() -> int:
+    """`gtk3-refresh`, run by gtk3_services in its own unit: restart each GTK3 service once no
+    window of its process is open, so an open folder or a copy in progress is never cut. One
+    that exits or restarts meanwhile already reads the new sheet and is left alone."""
+    poll = float(os.environ.get("RYCE_GTK3_POLL") or 2)
+    # The GTK portal is also the Settings portal: let it pass gsettings.sh's colour-scheme
+    # change on to Chromium and libadwaita before it goes down.
+    time.sleep(poll)
+    stale = {unit: pid for unit in GTK3_SERVICES if (pid := main_pid(unit))}
+    misses = 0
+    while stale:
+        shown = window_pids()
+        if shown is None:
+            misses += 1
+            if misses >= GTK3_MISSES:
+                print("ryce-theme: Hyprland no responde; Thunar y el selector de archivos siguen "
+                      "con el tema anterior hasta que se reinicien", file=sys.stderr)
+                return 1
+        else:
+            misses = 0
+            for unit, pid in list(stale.items()):
+                if main_pid(unit) != pid:
+                    del stale[unit]
+                elif pid not in shown:
+                    if err := run(["systemctl", "--user", "try-restart", unit], timeout=30):
+                        print(f"ryce-theme: no se pudo reiniciar {unit}: {err}", file=sys.stderr)
+                    del stale[unit]
+        if stale:
+            time.sleep(poll)
+    return 0
+
+
 def agentd() -> str | None:
     if not shutil.which("systemctl") or run(["systemctl", "--user", "is-active", "--quiet", "agentd.service"]):
         return None
@@ -403,6 +485,7 @@ def fan_out(tid: str, d: Path, info: dict) -> int:
         ("mako", lambda: run(["makoctl", "reload"]) if running("mako") else None),
         ("fish", lambda: run(["fish", "-c", f"set -U ryce_theme {tid}"])),
         ("GTK (gsettings)", lambda: gsettings(tid)),
+        ("Thunar y el selector de archivos", gtk3_services),
         ("Qt (qt6ct)", qt6ct),
         ("btop", lambda: signal("btop", "USR2")),
         ("cava", lambda: signal("cava", "USR2")),
@@ -541,6 +624,8 @@ def main(args: list[str]) -> int:
         tid = require_current()
         d = theme_dir(tid)
         return 3 if fan_out(tid, d, meta(d)) else 0
+    if cmd == "gtk3-refresh" and not rest:
+        return gtk3_refresh()
     if cmd == "wallpaper" and rest in ([], ["--no-transition"]):
         tid = require_current()
         d = theme_dir(tid)
