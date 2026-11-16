@@ -88,6 +88,10 @@ SIDE = 'function() if hl.get_monitor("{0}") then hl.dispatch({1}({{ monitor = "{
 # Everything ryce-pc binds that dotsArch does not: (dispatcher, bind options).
 # Adding a bind to keymap.tsv without adding it here fails the parity test.
 RYCE_EXTRAS: dict[Combo, tuple[str, str]] = {
+    # Workspaces 6-8, on the second screen (1-5 the main one, 6-10 the second). dotsArch, a
+    # laptop, dropped them along with its workspaces 6-8; ryce keeps all ten.
+    **{combo("CTRL", str(n)): (f"hl.dsp.focus({{ workspace = {n} }})", "") for n in (6, 7, 8)},
+    **{combo("CTRL SHIFT", str(n)): (f"hl.dsp.window.move({{ workspace = {n} }})", "") for n in (6, 7, 8)},
     # The agents sidebar (Quickshell config `ryce`, IpcHandler target `sidebar`).
     combo("SUPER", "a"): ('hl.dsp.exec_cmd("qs -c ryce ipc call sidebar toggle")', ""),
     # Theme selector drawer (IpcHandler `selector`), and a blind step to the next
