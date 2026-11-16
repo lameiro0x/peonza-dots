@@ -37,11 +37,11 @@ const polkit = {
   Result: {YES: "yes", NO: "no", NOT_HANDLED: null, AUTH_ADMIN: "auth_admin"},
   addRule: (f) => rules.push(f),
   log: (s) => logs.push(s),
-  spawn: (argv) => {
+  spawn: (argv) => {   // stat -c %Y FILE...: one line per file, exit 1 if any is missing
     spawned++;
-    const m = mtimes[argv[argv.length - 1]];
-    if (m === undefined) throw new Error("stat: exit 1");
-    return String(m) + "\n";
+    const files = argv.slice(3);
+    if (files.some((f) => mtimes[f] === undefined)) throw new Error("stat: exit 1");
+    return files.map((f) => String(mtimes[f]) + "\n").join("");
   },
 };
 Date.now = () => clock;
@@ -143,6 +143,8 @@ class PolkitSetup(ScriptTest):
     def test_the_caller_gets_the_window_at_once(self):
         self.setup_run(env={"PKEXEC_UID": str(os.getuid())})
         self.assertTrue((self.root / "run/ryce-polkit" / ME).is_file())
+        self.assertTrue((self.root / "run/ryce-polkit" / f"{ME}.auth").is_file())
+        self.assertIn(f"{ME}: abierta", self.setup_run("--check").stdout)
 
     def test_rollback_removes_every_piece_and_leaves_a_foreign_file(self):
         self.setup_run()
@@ -176,9 +178,9 @@ class PolkitSetup(ScriptTest):
     def test_stamp_after_a_password_names_the_user_who_typed_it(self):
         prog, stamps = self.stamp_program()
         self.stamp(prog, PAM_TYPE="account", PAM_USER="ana")
-        self.assertEqual([p.name for p in stamps.iterdir()], ["ana"])
+        self.assertEqual(sorted(p.name for p in stamps.iterdir()), ["ana", "ana.auth"])
 
-    def test_stamp_from_pkexec_names_the_caller_not_root(self):
+    def test_stamp_from_pkexec_names_the_caller_and_never_counts_as_a_password(self):
         prog, stamps = self.stamp_program()
         self.stamp(prog, PAM_TYPE="open_session", PAM_USER="root")
         self.assertEqual([p.name for p in stamps.iterdir()], [ME])
@@ -210,8 +212,11 @@ class PolkitSetup(ScriptTest):
         return json.loads(r.stdout)
 
     @staticmethod
-    def ago(seconds, user="ana"):
-        return {f"/run/ryce-polkit/{user}": 1_800_000_000 - seconds}
+    def ago(seconds, auth=None, user="ana"):
+        """Stamps: last use `seconds` ago, last password `auth` seconds ago (default: the same)."""
+        now = 1_800_000_000
+        return {f"/run/ryce-polkit/{user}": now - seconds,
+                f"/run/ryce-polkit/{user}.auth": now - (seconds if auth is None else auth)}
 
     def test_rule_is_es5_for_duktape(self):
         self.setup_run()
@@ -239,6 +244,16 @@ class PolkitSetup(ScriptTest):
     def test_a_stamp_from_the_future_does_not_open_it(self):
         self.assertEqual(self.rule([{"t": 0}], mtimes=self.ago(-600))["results"], [None])
 
+    def test_use_extends_it_but_never_past_eight_hours_since_the_password(self):
+        out = self.rule([{"t": 0}], mtimes=self.ago(60, auth=8 * 3600 - 120))
+        self.assertEqual(out["results"], ["yes"])
+        out = self.rule([{"t": 0}], mtimes=self.ago(60, auth=8 * 3600 + 60))
+        self.assertEqual(out["results"], [None])
+
+    def test_without_the_password_stamp_it_stays_closed(self):
+        use_only = {"/run/ryce-polkit/ana": 1_800_000_000 - 60}
+        self.assertEqual(self.rule([{"t": 0}], mtimes=use_only)["results"], [None])
+
     def test_the_same_refused_command_is_not_asked_again_for_two_minutes(self):
         stale = self.ago(3600)
         out = self.rule([
@@ -257,7 +272,7 @@ class PolkitSetup(ScriptTest):
         out = self.rule([
             {"t": 0, "command": "/usr/bin/pacman -Syu"},
             {"t": 20_000, "command": "/usr/bin/pacman -Syu",
-             "mtimes": {"/run/ryce-polkit/ana": 1_800_000_010}},
+             "mtimes": {"/run/ryce-polkit/ana": 1_800_000_010, "/run/ryce-polkit/ana.auth": 1_800_000_010}},
         ], mtimes=self.ago(3600))
         self.assertEqual(out["results"], [None, "yes"])
 

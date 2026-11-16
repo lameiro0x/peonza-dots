@@ -17,9 +17,12 @@
 #     agent helper, which runs in a read-only /run, gets that one folder writable)
 #   - 49-ryce-admin-window.rules lets an admin (wheel) of the active local session in, for any
 #     action and without asking, while that stamp is under 30 minutes old; every pkexec that
-#     runs extends it. Outside the window the usual rules ask, and the same pkexec command that
-#     was refused (or is still waiting) is not asked again for 2 minutes: a loop cannot flood
-#     the screen. SSH and inactive sessions never get the window
+#     runs extends it, but never past 8 hours since the password was last typed (the account
+#     stage also touches <user>.auth): a periodic job cannot keep it open for days. Outside the
+#     window the usual rules ask, and the same pkexec command that was refused (or is still
+#     waiting) is not asked again for 2 minutes: a loop cannot flood the screen. SSH and
+#     inactive sessions never get the window. Hygiene, not a wall: whatever is root inside the
+#     window can stamp, as it could install its own rule
 #
 # Order is safety: the stamp folder and the helper's permission first, then the stamp program,
 # then PAM (from then on stamps are written, but nothing reads them), the rule last. Rollback
@@ -35,6 +38,7 @@ MODE=apply
 CHANGES=0
 FAILS=0
 WINDOW_MIN=30
+CAP_H=8
 
 RULE=etc/polkit-1/rules.d/49-ryce-admin-window.rules
 PAM=etc/pam.d/polkit-1
@@ -87,31 +91,41 @@ rule_text() {
 // an authorization per process and pkexec's subject is the process that runs it, so an agent
 // (a new shell per command) was asked on every command. An admin (wheel) of the active local
 // session who typed the password, or ran pkexec, in the last $WINDOW_MIN minutes is let in
-// without asking: /usr/local/lib/ryce/polkit-stamp marks those moments from PAM
-// (/etc/pam.d/polkit-1) in /run/ryce-polkit/<user>, which only root writes. Outside the window
-// the usual rules ask; the same pkexec command refused or still waiting is not asked again for
-// two minutes. To close the window now: pkexec rm -f /run/ryce-polkit/\$USER (a reboot does too).
+// without asking, for at most $CAP_H hours since the password was last typed:
+// /usr/local/lib/ryce/polkit-stamp marks those moments from PAM (/etc/pam.d/polkit-1) in
+// /run/ryce-polkit/<user> (last use) and <user>.auth (last password), which only root writes.
+// Outside the window the usual rules ask; the same pkexec command refused or still waiting is
+// not asked again for two minutes. To close it now: pkexec rm -f /run/ryce-polkit/\$USER*
 
 var RYCE_WINDOW_S = $((WINDOW_MIN * 60));
+var RYCE_CAP_S = $((CAP_H * 3600));
 var RYCE_REPEAT_MS = 120000;
 var RYCE_RECHECK_MS = 5000;
 var ryceSeen = {};
 var ryceAsked = {};
 
+function ryceRecent(stamp, now, limit) {
+    var age = now / 1000 - stamp;
+    return stamp > 0 && age > -60 && age < limit;
+}
+
 function ryceFresh(user) {
     var now = Date.now();
     var seen = ryceSeen[user];
     if (!seen || now - seen.checked >= RYCE_RECHECK_MS || now < seen.checked) {
-        var mtime = 0;
+        var use = 0, auth = 0;
         try {
-            mtime = parseInt(polkit.spawn(["/usr/bin/stat", "-c", "%Y", "/run/ryce-polkit/" + user]), 10) || 0;
+            var dir = "/run/ryce-polkit/";
+            var out = String(polkit.spawn(["/usr/bin/stat", "-c", "%Y", dir + user, dir + user + ".auth"])).split("\n");
+            use = parseInt(out[0], 10) || 0;
+            auth = parseInt(out[1], 10) || 0;
         } catch (e) {
-            mtime = 0;
+            use = 0;
+            auth = 0;
         }
-        seen = ryceSeen[user] = {mtime: mtime, checked: now};
+        seen = ryceSeen[user] = {use: use, auth: auth, checked: now};
     }
-    var age = now / 1000 - seen.mtime;
-    return seen.mtime > 0 && age > -60 && age < RYCE_WINDOW_S;
+    return ryceRecent(seen.use, now, RYCE_WINDOW_S) && ryceRecent(seen.auth, now, RYCE_CAP_S);
 }
 
 polkit.addRule(function (action, subject) {
@@ -149,22 +163,25 @@ stamp_text() {
 # $MANAGED
 # Run by pam_exec from /etc/pam.d/polkit-1 once polkit let an admin in: «account» after the
 # agent accepted a password, «open_session» when pkexec is about to run a command. Touches
-# /run/ryce-polkit/<user>, which 49-ryce-admin-window.rules reads: under $WINDOW_MIN minutes old, that
-# user is let in without a password. Optional in PAM: whatever happens here, it exits 0.
+# /run/ryce-polkit/<user> (last use) and, after a password, <user>.auth too; the rule
+# 49-ryce-admin-window.rules lets that user in while the first is under $WINDOW_MIN minutes old
+# and the second under $CAP_H hours. Optional in PAM: whatever happens here, it exits 0.
 PATH=/usr/bin
 export PATH
 dir=/run/ryce-polkit
 case \${PAM_TYPE-} in
-  account) user=\${PAM_USER-} ;;
+  account) user=\${PAM_USER-} auth=1 ;;
   open_session)
     # pkexec opens the session for the target (root); the caller is pkexec's real uid.
     uid=\$(awk '\$1 == "Uid:" { print \$2; exit }' "/proc/\$PPID/status" 2>/dev/null) || exit 0
-    user=\$(id -nu "\$uid" 2>/dev/null) || exit 0 ;;
+    user=\$(id -nu "\$uid" 2>/dev/null) || exit 0
+    auth=0 ;;
   *) exit 0 ;;
 esac
 case \$user in '' | -* | *[!a-z0-9_-]*) exit 0 ;; esac
 if [ ! -d "\$dir" ] || [ -L "\$dir" ]; then exit 0; fi
 touch -- "\$dir/\$user" 2>/dev/null || exit 0
+if [ "\$auth" = 1 ]; then touch -- "\$dir/\$user.auth" 2>/dev/null || exit 0; fi
 logger -t ryce-polkit -- "ventana de administración de \$user abierta o alargada ($WINDOW_MIN min, \$PAM_TYPE)" 2>/dev/null
 exit 0
 EOF
@@ -284,8 +301,9 @@ apply() {
 
   local who
   if who=$(invoker) && [ "$DRY" = 0 ]; then
-    step "Ventana abierta para $who: acabas de escribir la contraseña"
-    touch -- "$ROOT/$STAMPS/$who" && ok "$WINDOW_MIN minutos desde ahora, y cada pkexec la alarga"
+    step "Ventana abierta para $who"
+    touch -- "$ROOT/$STAMPS/$who" "$ROOT/$STAMPS/$who.auth" \
+      && ok "$WINDOW_MIN minutos desde ahora; cada pkexec la alarga, como mucho $CAP_H horas"
   fi
   printf '\n==> %d cambios%s\n' "$CHANGES" "$([ "$DRY" = 1 ] && echo ' (simulados)')"
 }
@@ -306,14 +324,20 @@ check() {
   fi
 
   step "La ventana"
-  local f age
+  local f now use auth left
+  now=$(date +%s)
   for f in "$ROOT/$STAMPS"/*; do
     [ -f "$f" ] || continue
-    age=$(( $(date +%s) - $(stat -c %Y "$f") ))
-    if [ "$age" -lt $((WINDOW_MIN * 60)) ]; then
-      ok "$(basename "$f"): abierta, le quedan $(( (WINDOW_MIN * 60 - age + 59) / 60 )) min sin otro uso"
+    case $f in *.auth) continue ;; esac
+    use=$(( now - $(stat -c %Y "$f") ))
+    auth=$(( CAP_H * 3600 ))
+    [ ! -f "$f.auth" ] || auth=$(( now - $(stat -c %Y "$f.auth") ))
+    if [ "$use" -lt $((WINDOW_MIN * 60)) ] && [ "$auth" -lt $((CAP_H * 3600)) ]; then
+      left=$(( WINDOW_MIN * 60 - use ))
+      [ $(( CAP_H * 3600 - auth )) -ge "$left" ] || left=$(( CAP_H * 3600 - auth ))
+      ok "$(basename "$f"): abierta, se cierra en $(( (left + 59) / 60 )) min si nada la usa (la contraseña se escribió hace $((auth / 60)) min)"
     else
-      ok "$(basename "$f"): cerrada (último uso hace $((age / 60)) min)"
+      ok "$(basename "$f"): cerrada"
     fi
   done
   if [ "$FAILS" -eq 0 ]; then printf '\n==> todo en su sitio\n'; return 0; fi
