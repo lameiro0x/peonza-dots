@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Callable, Mapping, TextIO
 
 from . import render
+from .awake import LOCKER, Awake, working
 from .claude import ClaudeHome
 from .const import MAX_WS, RUNTIME
 from .hypr import FakeHypr, Hypr, RealHypr
@@ -82,6 +83,7 @@ class App:
         self.session_windows: set[str] = set()   # their title events are spinner noise
         self._last_error = ""
         self._tag_errors: set[str] = set()
+        self.awake: Awake | None = None     # the daemon only: see main()
 
     def log(self, msg: str) -> None:
         print(f"agentd: {msg}", file=self.err or sys.stderr, flush=True)
@@ -93,7 +95,27 @@ class App:
             self._report(reconcile(self.hypr, snap.desired_tags, snap.current_tags))
         self.active = any(s.state in ("busy", "waiting") for s in snap.sessions)
         self.session_windows = {s.window for s in snap.sessions if s.window}
+        if self.awake is not None:
+            self.keep_awake(snap)
         return snap
+
+    def keep_awake(self, snap: Snapshot) -> None:
+        """Hold the idle inhibitor while a session works (awake.py), and keep
+        cycling while it is held so the release comes on time.
+
+        A locked screen holds nothing: an inhibitor taken behind the lock does
+        not unlock it, and one that comes and goes after hypridle turned the
+        screens off would lose their wake-up (hypridle recreates its idle
+        notifications on release, and the new ones never send `resumed`)."""
+        awake = self.awake
+        if awake is None:
+            return
+        now = self.clock()
+        want = any(working(s, now) for s in snap.sessions)
+        if want and self.proc.running(LOCKER):
+            want = False
+        awake.update(want)
+        self.active = self.active or awake.held
 
     def _report(self, errors: list[str]) -> None:
         """Log a rejected tag once, not on every 2 s cycle while it persists."""
@@ -119,6 +141,11 @@ class App:
         try:
             snap = self.cycle()
         except Exception as e:  # the daemon's outer boundary: report, keep serving
+            if self.awake is not None:
+                # Fail toward locking: a cycle that keeps failing must not keep
+                # the screen on for ever. The grace period still applies.
+                self.awake.update(False)
+                self.active = self.active or self.awake.held
             frame = traceback.extract_tb(e.__traceback__)[-1]
             line = f"cycle failed: {type(e).__name__} at {Path(frame.filename).name}:{frame.lineno}"
             if line != self._last_error:
@@ -340,9 +367,16 @@ def main(argv: list[str] | None = None, stdout: TextIO | None = None, stderr: Te
             print("\n".join(summary(snap, app)), file=stdout)
         return 0 if snap.connected else 1
 
+    if not a.no_dispatch:
+        app.awake = Awake(log=app.log)
     loop = Loop(app)
     handle_signals(loop)
-    loop.run()
+    try:
+        loop.run()
+    finally:
+        # The lock goes with the process anyway (awake.py); this lets it go first.
+        if app.awake is not None:
+            app.awake.release()
     # A stopped agentd must not leave a ringing bar and a bordered window behind.
     app.reset()
     return 0

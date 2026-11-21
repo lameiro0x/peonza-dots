@@ -143,6 +143,11 @@ terminal runs which session, whether it works, waits or rests, and its current s
 reads your prompts. If it stops, the bar falls back to plain numbers; if Quickshell crashes three
 times in a row, Waybar takes over with the same palette.
 
+While a session is working, `agentd` also keeps the screen from locking or going dark, so you
+can watch it from across the room. It holds a single logind idle lock, but only while a
+session's files are still changing. Waiting for your answer doesn't count. The lock is
+released a minute after the work stops, then the usual timers take over.
+
 ## The shell
 
 | № | Part | What it does |

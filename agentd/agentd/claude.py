@@ -40,7 +40,7 @@ import textwrap
 import time
 from pathlib import Path
 from datetime import datetime
-from typing import Callable, NamedTuple
+from typing import Callable, Iterable, NamedTuple
 
 from .strings import clip, printable, width
 
@@ -62,6 +62,7 @@ _TAG = {k: re.compile(rf"<{k}>([^<]{{1,128}})</{k}>") for k in ("tool-use-id", "
 _FENCE = re.compile(r"^\s*(```|~~~)")
 _SENTENCE = re.compile(r"(?<=[.!?…])\s")
 _META = re.compile(r"^agent-([A-Za-z0-9_-]{1,64})\.meta\.json$")
+_AGENT_ID = re.compile(r"[A-Za-z0-9_-]{1,64}")     # fullmatch: the id _META captures, joined into a path
 SESSION_ID = re.compile(r"^[0-9a-f-]{36}$")
 # Credentials (redact): every pattern is bounded or linear, the input is ≤ CLEAN_MAX.
 _TOKEN = re.compile(r"\b(?:sk-|gh[pousr]_|github_pat_|glpat-|xox[abposr]-|AKIA|eyJ)[A-Za-z0-9_\-./+=]{6,}")
@@ -617,6 +618,31 @@ class ClaudeHome:
         subs = [s._replace(live=s.live and (started is None or s.mtime >= started))
                 for _, s in seen.values()]
         return sorted(subs, key=lambda s: (not s.live, -s.mtime, s.id))
+
+    def activity(self, sid: str, cwd: str, agents: Iterable[str] = ()) -> tuple[float | None, float | None]:
+        """When the session last wrote: (its transcript, the newest transcript of
+        the subagents named in `agents`), epoch seconds, None when unknown.
+
+        A working turn appends to its transcript and a working subagent to its
+        own `agent-<id>.jsonl`; the subagent's meta is written only when it
+        starts and when it finishes, so it says nothing about now. Only lstat:
+        nothing here is opened.
+        """
+        t = self._tails.get(sid)
+        path = t.path if t and t.path else self._locate(sid, cwd)
+        if path is None:
+            return None, None
+
+        def mtime(p: Path) -> float | None:
+            try:
+                st = os.lstat(p)
+            except OSError:
+                return None
+            return st.st_mtime if stat.S_ISREG(st.st_mode) else None
+
+        sub = path.parent / sid / "subagents"
+        seen = [m for a in agents if _AGENT_ID.fullmatch(a) and (m := mtime(sub / f"agent-{a}.jsonl")) is not None]
+        return mtime(path), max(seen, default=None)
 
     def forget(self, live: set[str]) -> None:
         """Drop the caches of sessions that ended."""

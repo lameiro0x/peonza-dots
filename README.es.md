@@ -143,6 +143,12 @@ para saber qué terminal lleva qué sesión, si trabaja, espera o descansa, y su
 lee tus prompts. Si se para, la barra vuelve a los números; si Quickshell se cae tres veces
 seguidas, Waybar toma el relevo con la misma paleta.
 
+Mientras una sesión trabaja, `agentd` también impide que la pantalla se bloquee o se apague,
+para que la sigas desde el otro lado de la habitación. Mantiene un único candado de inactividad
+de logind, solo mientras los ficheros de la sesión siguen cambiando. Esperar tu respuesta no
+cuenta. El candado se suelta un minuto después de que el trabajo pare, y vuelven los tiempos de
+siempre.
+
 ## La shell
 
 | Nº | Pieza | Qué hace |

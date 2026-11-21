@@ -109,6 +109,11 @@ hl.config({
         disable_splash_rendering = true,
         -- What shows before the wallpaper paints, and behind it on a switch.
         background_color         = P.bg0,
+        -- Any key or mouse move turns the screens back on, not only hypridle's
+        -- on-resume: agentd's idle inhibitor (Claude working) coming and going
+        -- makes hypridle recreate its timers, and a recreated one never resumes.
+        mouse_move_enables_dpms  = true,
+        key_press_enables_dpms   = true,
     },
 
     input = {

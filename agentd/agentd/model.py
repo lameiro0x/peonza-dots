@@ -70,6 +70,8 @@ class Session:
     waiting_on: str | None = None    # busy only because of background work: WAITING_ON
     did: str = ""                    # first line of the latest Hecho
     job: str = ""                    # what `claude attach <job>` names (jobId), bg sessions
+    moved: float | None = None       # last sign of life: status change or transcript write
+    agents_moved: float | None = None  # newest write of a live subagent's transcript
 
 
 @dataclass
@@ -211,9 +213,15 @@ def read_sessions(proc: Proc, home: ClaudeHome, fsroot: str = "/") -> dict[int, 
             state = "busy"
             waiting_on = next(k for k in WAITING_ON if any(p.kind == k for p in pending))
         source, lines = doing(dig, state)
+        upd = d.get("statusUpdatedAt")
+        since = upd / 1000 if _number(upd) is not None else None
+        # Signs of life, for awake.working: read only for a session that claims work.
+        moved = agents_moved = None
+        if state == "busy":
+            wrote, agents_moved = home.activity(sid, cwd, [s.id for s in subs if s.live])
+            moved = max((t for t in (since, wrote) if t is not None), default=None)
         horizon = home.clock() - SUBAGENT_KEEP_S
         subs = [s for s in subs if s.live or s.mtime >= horizon][:SUBAGENT_MAX]
-        upd = d.get("statusUpdatedAt")
         name = d.get("name")
         out[pid] = Session(
             pid=pid, sid=sid, kind=str(d.get("kind") or "unknown"), cwd=cwd,
@@ -223,10 +231,11 @@ def read_sessions(proc: Proc, home: ClaudeHome, fsroot: str = "/") -> dict[int, 
             state=state,
             waiting_for=printable(d["waitingFor"]) if state == "waiting"
             and isinstance(d.get("waitingFor"), str) else None,
-            since=upd / 1000 if _number(upd) is not None else None,
+            since=since,
             source=source, lines=lines, subagents=subs,
             doing=doing_line(dig, pending), asked=dig.asked, waiting_on=waiting_on, did=dig.did,
             job=d["jobId"] if isinstance(d.get("jobId"), str) and JOB_ID.match(d["jobId"]) else "",
+            moved=moved, agents_moved=agents_moved,
         )
     home.forget({s.sid for s in out.values()})
     return out

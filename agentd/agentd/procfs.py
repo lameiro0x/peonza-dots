@@ -58,6 +58,10 @@ class Proc:
         except OSError:
             return []
 
+    def running(self, comm: str) -> bool:
+        """Whether any process has this comm (15 bytes at most, as the kernel keeps it)."""
+        return any(self.comm(pid) == comm for pid in self.pids())
+
     def age(self, pid: int) -> float | None:
         """Seconds since the process started (uptime − starttime / CLK_TCK)."""
         start, up = self.start_time(pid), (self._read("uptime") or "").split()

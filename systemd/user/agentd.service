@@ -33,7 +33,9 @@ Restart=always
 RestartSec=2
 
 # Reads /proc, ~/.claude and Hyprland's unix sockets; writes one directory under
-# $XDG_RUNTIME_DIR. Nothing here needs more than that.
+# $XDG_RUNTIME_DIR. While a Claude session works, a child `systemd-inhibit` asks
+# logind (system bus, AF_UNIX) for an idle lock; polkit allows that to anyone and
+# the lock dies with this cgroup. Nothing here needs more than that.
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
