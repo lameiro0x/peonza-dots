@@ -41,14 +41,14 @@ Column {
         on: stats.shown
         order: 0
         label: "procesador"
-        value: pc.cpu < 0 ? "…" : Math.round(pc.cpu) + " %"
+        value: pc.cpu < 0 ? "…" : Math.round(pc.cpu) + DeskUi.unit + "%"
         trailing: Sparkline { values: stats.cpuHist; capacity: stats.history }
     }
     StatRow {
         on: stats.shown
         order: 1
         label: "memoria"
-        value: pc.memTotal > 0 ? pc.gb(pc.memUsed) + " de " + Math.round(pc.memTotal) + " GB" : "…"
+        value: pc.memTotal > 0 ? pc.gb(pc.memUsed) + " de " + Math.round(pc.memTotal) + DeskUi.unit + "GB" : "…"
         trailing: Sparkline { values: stats.memHist; hi: pc.memTotal; capacity: stats.history }
     }
     StatRow {
@@ -57,7 +57,7 @@ Column {
         label: "gráfica"
         available: pc.prev === null || pc.prev.gpu !== undefined
         value: pc.gpuBusy < 0 ? "…"
-            : Math.round(pc.gpuBusy) + " % ocupada" + (pc.gpuMhz > 0 ? "  ·  " + pc.gpuMhz + " MHz" : "")
+            : Math.round(pc.gpuBusy) + DeskUi.unit + "% ocupada" + (pc.gpuMhz > 0 ? "  ·  " + pc.gpuMhz + DeskUi.unit + "MHz" : "")
         trailing: Sparkline { values: stats.gpuHist; capacity: stats.history }
     }
     StatRow {
@@ -65,14 +65,14 @@ Column {
         order: 3
         label: "temperatura"
         available: pc.prev === null || pc.prev.temp !== undefined
-        value: pc.temp < 0 ? "…" : Math.round(pc.temp) + " °C"
+        value: pc.temp < 0 ? "…" : Math.round(pc.temp) + DeskUi.unit + "°C"
         trailing: Sparkline { values: stats.tempHist; lo: 30; hi: 100; capacity: stats.history }
     }
     StatRow {
         on: stats.shown
         order: 4
         label: "disco"
-        value: pc.diskTotal > 0 ? pc.gb(pc.diskUsed) + " de " + Math.round(pc.diskTotal) + " GB" : "…"
+        value: pc.diskTotal > 0 ? pc.gb(pc.diskUsed) + " de " + Math.round(pc.diskTotal) + DeskUi.unit + "GB" : "…"
 
         // Usage of /, a bar rather than a line: it moves too slowly to draw a history.
         trailing: Item {

@@ -42,16 +42,21 @@ Singleton {
     // The blur darkens only where the theme blurs its desk (blur.desk; Tinta's glass stands
     // on the sharp picture, so the sheet shows through the black).
     readonly property real brightest: peak * (blurOn && Ryce.Palette.blurDesk ? blurBrightness : 1)
-    readonly property real darkest: ({ papel: 0.5 })[Ryce.Palette.themeId] ?? 0
+    readonly property real darkest: 0
     readonly property color fill: light ? Ryce.Palette.bg2 : Ryce.Palette.bg0
     readonly property bool glass: Ryce.Palette.themeId === "tinta"
+    // Papel's cards are folios: the baize-dark ground edged in one rule, the text set as a
+    // book sets it (DeskClock, StatRow, HitoCard), every figure in the card's one ink.
+    readonly property bool folio: BarUi.folio
+    readonly property string unit: BarUi.unit       // between a figure and its unit («7 %»)
     // Tinta's glass: on a sheet, 0.45 black over the sharp grid (the sheet reads through, the
     // text stays far above 4.5:1); on the photo, the terminal's alpha or the floor over white.
     readonly property real alpha: glass ? (sheet ? Math.max(0.45, seeThrough()) : Math.max(Ryce.Palette.alphaTerm, seeThrough())) : 1
     readonly property color ground: Ryce.Palette.rgba(fill, alpha)
-    readonly property bool outlined: light || BarUi.skin === "box" || BarUi.skin === "bare"
-    // Faint: it only has to say where a card ends, not frame it.
-    readonly property color hairline: Ryce.Palette.rgba(Ryce.Palette.line, 0.4)
+    readonly property bool outlined: light || folio || BarUi.skin === "box" || BarUi.skin === "bare"
+    // Faint: it only has to say where a card ends, not frame it. A folio's rule is the
+    // page's border: the line itself.
+    readonly property color hairline: Ryce.Palette.rgba(Ryce.Palette.line, folio ? 1 : 0.4)
     // A dark theme's own shadow; on paper a bg0 shadow is a cream glow, so it is fg0. Not
     // under glass: the RectangularShadow fills the whole card too, and stacked under a 0.62
     // ground it made Tinta's glass a 0.8 slab (measured on the stage: the sheet showed at 18 %).

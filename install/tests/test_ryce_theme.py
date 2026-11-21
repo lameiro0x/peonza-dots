@@ -527,6 +527,91 @@ class RyceTheme(unittest.TestCase):
         self.assertEqual(conf.stat().st_mode & 0o777, 0o640)
         self.assertEqual(sorted(p.name for p in conf.parent.iterdir()), ["qt6ct.conf"])
 
+    # --- Obsidian: a real snippet file per vault, the list enabled once while it is closed --
+
+    def vault(self, name="notas", appearance=None):
+        v = self.tmp / name
+        (v / ".obsidian").mkdir(parents=True)
+        if appearance is not None:
+            (v / ".obsidian/appearance.json").write_text(json.dumps(appearance, indent=2) + "\n")
+        conf = self.home / ".config/obsidian/obsidian.json"
+        conf.parent.mkdir(parents=True, exist_ok=True)
+        known = json.loads(conf.read_text())["vaults"] if conf.exists() else {}
+        known[name] = {"path": str(v), "ts": 1, "open": True}
+        conf.write_text(json.dumps({"vaults": known}))
+        return v / ".obsidian"
+
+    def test_obsidian_gets_the_themes_snippet_as_a_real_file_in_every_vault(self):
+        a, b = self.vault("a", {"theme": "obsidian"}), self.vault("b")
+        self.theme("set", "papel", env={"FAKE_PROCS": ""})
+        for dot in (a, b):
+            css = dot / "snippets/ryce.css"
+            self.assertFalse(css.is_symlink())
+            self.assertEqual(css.read_text(), "papel obsidian/ryce.css\n")
+        self.assertEqual(list((a / "snippets").iterdir()), [a / "snippets/ryce.css"])   # no tmp left
+        self.theme("set", "ola", env={"FAKE_PROCS": ""})
+        self.assertEqual((a / "snippets/ryce.css").read_text(), "ola obsidian/ryce.css\n")
+
+    def test_obsidian_snippet_is_not_rewritten_when_unchanged(self):
+        dot = self.vault("a", {})
+        self.theme("set", "papel", env={"FAKE_PROCS": ""})
+        inode = (dot / "snippets/ryce.css").stat().st_ino
+        self.theme("apply", env={"FAKE_PROCS": ""})
+        self.assertEqual((dot / "snippets/ryce.css").stat().st_ino, inode)
+
+    def test_obsidian_snippet_is_enabled_once_and_only_while_obsidian_is_closed(self):
+        dot = self.vault("a", {"theme": "obsidian", "cssTheme": "", "enabledCssSnippets": ["mine"]})
+        # Open: the list is left alone, and the switch says what to do (exit 3, one line).
+        r = self.theme("set", "papel", rc=3, env={"FAKE_PROCS": "obsidian"})
+        self.assertIn("cierra Obsidian", r.stderr)
+        self.assertEqual(json.loads((dot / "appearance.json").read_text())["enabledCssSnippets"], ["mine"])
+        self.theme("set", "ola", env={"FAKE_PROCS": ""})
+        conf = json.loads((dot / "appearance.json").read_text())
+        self.assertEqual(conf, {"theme": "obsidian", "cssTheme": "", "enabledCssSnippets": ["mine", "ryce"]})
+        self.assertFalse((dot / "appearance.json").read_text().endswith("\n"))   # Obsidian's own layout
+        inode = (dot / "appearance.json").stat().st_ino
+        self.theme("set", "papel", env={"FAKE_PROCS": ""})
+        self.assertEqual((dot / "appearance.json").stat().st_ino, inode)
+
+    def test_obsidian_snippet_the_user_turned_off_stays_off(self):
+        dot = self.vault("a", {"enabledCssSnippets": []})
+        self.theme("set", "papel", env={"FAKE_PROCS": ""})
+        (dot / "appearance.json").write_text(json.dumps({"enabledCssSnippets": []}))   # off in Obsidian
+        self.theme("set", "ola", env={"FAKE_PROCS": "obsidian"})                       # no nagging either
+        self.theme("set", "papel", env={"FAKE_PROCS": ""})
+        self.assertEqual(json.loads((dot / "appearance.json").read_text())["enabledCssSnippets"], [])
+        self.assertEqual((dot / "snippets/ryce.css").read_text(), "papel obsidian/ryce.css\n")
+
+    def test_obsidian_vault_without_settings_gets_them_and_others_are_not_obsidian(self):
+        dot = self.vault("a")                                  # never changed a setting
+        self.theme("set", "papel", env={"FAKE_PROCS": "nvim less"})
+        self.assertEqual(json.loads((dot / "appearance.json").read_text()), {"enabledCssSnippets": ["ryce"]})
+
+    def test_obsidian_absent_unknown_or_odd_vaults_are_skipped_silently(self):
+        r = self.theme("set", "papel")                               # Obsidian never ran
+        self.assertEqual(r.stderr, "")
+        conf = self.home / ".config/obsidian/obsidian.json"
+        conf.parent.mkdir(parents=True, exist_ok=True)
+        for bad in ("{", "[]", json.dumps({"vaults": {"x": {"path": str(self.tmp / "gone")}, "y": 3}})):
+            conf.write_text(bad)
+            r = self.theme("set", "ola")
+            self.assertEqual(r.stderr, "")
+        dot = self.vault("a", {})
+        link = dot / "snippets/ryce.css"
+        link.parent.mkdir()
+        link.symlink_to(self.tmp / "theirs.css")
+        r = self.theme("set", "papel", env={"FAKE_PROCS": ""})
+        self.assertEqual(r.stderr, "")
+        self.assertTrue(link.is_symlink())
+        self.assertFalse((self.tmp / "theirs.css").exists())
+        # A linked snippets folder is followed by nobody either.
+        shared = self.tmp / "shared"
+        shared.mkdir()
+        dot2 = self.vault("b", {})
+        (dot2 / "snippets").symlink_to(shared)
+        self.theme("set", "ola", env={"FAKE_PROCS": ""})
+        self.assertEqual(list(shared.iterdir()), [])
+
 
 if __name__ == "__main__":
     unittest.main()

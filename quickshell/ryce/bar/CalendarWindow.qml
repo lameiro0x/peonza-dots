@@ -22,10 +22,10 @@ PanelWindow {
     readonly property int shade: BarUi.edge     // room for the plate's shadow; the right one lines up with the clock's plate
     readonly property int pad: 14
     readonly property int cell: Math.round(BarUi.textPx * 2.2)
-    // Ola's capsules title the month in its display serif, larger; a theme whose display
-    // face is its UI face (Papel's Space Mono) keeps the readouts' size, or the title
-    // crowds the chevrons.
-    readonly property bool serif: BarUi.skin === "capsule" && Ryce.Palette.fontDisplay !== Ryce.Palette.fontUi
+    // Ola's capsules and Papel's running head title the month in their display serif,
+    // larger; a theme whose display face is its UI face keeps the readouts' size, or the
+    // title crowds the chevrons.
+    readonly property bool serif: (BarUi.skin === "capsule" || BarUi.folio) && Ryce.Palette.fontDisplay !== Ryce.Palette.fontUi
     readonly property var today: new Date()     // a fresh window per opening
     property int month: today.getMonth()        // 0-11, as MonthGrid counts
     property int year: today.getFullYear()

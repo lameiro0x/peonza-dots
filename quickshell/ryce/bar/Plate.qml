@@ -5,9 +5,9 @@ import qs as Ryce
 
 // One floating ground on the bar: bg0 at the theme's plate alpha (alpha.bar, chosen for
 // text contrast over the brightest wallpaper pixel) on a soft shadow, the wallpaper
-// showing all around it. Tinta's boxes and Grafito's instrument plates carry a 1 px
-// outline (on Grafito's black dot plate a black plate alone would vanish). `lit` fades a
-// hover ground in.
+// showing all around it. Tinta's boxes, Grafito's instrument plates and Papel's square
+// running-head plates carry a 1 px outline (on Grafito's black dot plate a black plate
+// alone would vanish). `lit` fades a hover ground in.
 // The shadow is RectangularShadow, a signed-distance shader with no blur pass, never a
 // MultiEffect over live content: resizing a plate only moves its uniforms.
 Item {
@@ -42,7 +42,7 @@ Item {
     // The outline: a stroke-only Shape, never a bordered transparent Rectangle, which
     // erases what lies beneath it (QTBUG-137166).
     Shape {
-        visible: plate.ground && (BarUi.skin === "box" || BarUi.skin === "bare")
+        visible: plate.ground && (BarUi.skin === "box" || BarUi.skin === "bare" || BarUi.folio)
         anchors.fill: parent
         preferredRendererType: Shape.CurveRenderer
 

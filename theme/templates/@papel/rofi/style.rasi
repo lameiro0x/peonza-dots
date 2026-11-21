@@ -1,9 +1,9 @@
-/* rofi 2.x (native Wayland), theme «{{theme.name}}». A book's contents page: the
-   list on the left set like an index (no fills, hairline rules, the chosen entry
-   inked as a filled dot would be, names only: no icons), and on the right a narrow strip of the
-   wallpaper's dots (panel.png) with a paper label on it: greeting, the time in
-   Space Mono Bold as on the Wittgenstein covers, the date; the readout and the
-   peonza signature at its foot. Dark ink on paper.
+/* rofi 2.x (native Wayland), theme «{{theme.name}}». A book's contents page read at
+   the reading room's green desk: the list on the left set like an index (no fills,
+   hairline rules, the chosen entry gilded like the bar's page, names only: no icons),
+   and on the right a narrow strip of the theme's art (panel.png) with a label on it:
+   greeting, the time in EB Garamond's italic, the date; the readout and the peonza
+   signature at its foot. Vellum letters on the desk's green.
 
    bin/ryce-launcher fills the panel's text at each open (-theme-str) and turns
    the face and the readout on. The clipboard picker (rofi -dmenu, same theme)
@@ -19,6 +19,9 @@
     text:    {{fg0}};
     muted:   {{fg1}};
     mark:    {{fg2}};
+    /* Printed on the pale bookplate (panel.png): the baize's green as ink. */
+    plate-ink:   {{bg0}};
+    plate-muted: {{line}};
 
     background-color: transparent;
     text-color:       @muted;
@@ -58,7 +61,7 @@ window {
 mainbox {
     orientation: horizontal;
     spacing:     0px;
-    children:    [ column, still ];
+    children:    [ column, side ];
 }
 
 /* ---- the index ------------------------------------------------------------ */
@@ -74,7 +77,7 @@ column {
 textbox-heading {
     expand:     false;
     content:    "Índice";
-    font:       "{{font.display}} Bold 20";
+    font:       "{{font.display}} Italic 24";
     text-color: @text;
 }
 
@@ -93,7 +96,7 @@ button {
     horizontal-align: 0.0;
 }
 
-/* The open section is underlined in ink, the way a pencil marks the chapter. */
+/* The open section is underlined in vellum, the way a reader marks the chapter. */
 button selected {
     border:       0px 0px 2px 0px;
     border-color: @text;
@@ -106,7 +109,7 @@ body {
     children:    [ inputbar, message, listview ];
 }
 
-/* Search: an em dash and the words, as the cover sets «—». */
+/* Search: a fleuron (EB Garamond's ❧, in gilt) before the words. */
 inputbar {
     padding:  2px 0px 6px 0px;
     spacing:  12px;
@@ -115,9 +118,9 @@ inputbar {
 
 textbox-search {
     expand:         false;
-    content:        "—";
-    font:           "{{font.display}} Bold 14";
-    text-color:     @text;
+    content:        "❧";
+    font:           "{{font.display}} Italic 16";
+    text-color:     @pick;
     vertical-align: 0.5;
 }
 
@@ -173,81 +176,122 @@ element-text {
     highlight:      bold;
 }
 
-/* ---- the strip of dots ------------------------------------------------------
-   panel.png is 360x600; the strip is 3:5 too, so `both` scales without
-   distortion. bin/ryce-launcher points the url at the stage's or the session's
-   theme; this one is the deployed link (the clipboard picker). */
-still {
+/* ---- the bookplate ------------------------------------------------------------
+   The strip is the plate (`still`, panel.png) over a foot in the desk's green that
+   holds the readout and the signature. The plate box alone carries the picture, so it
+   is about as tall as the picture's 3:5 and rofi draws it once: on the whole strip
+   (taller than 3:5) rofi repeats it, and a second «EX LIBRIS» showed between the labels.
+   bin/ryce-launcher points the url at the stage's or the session's theme; this one is
+   the deployed link (the clipboard picker). */
+side {
     orientation:      vertical;
     expand:           false;
     width:            264px;
+    spacing:          0px;
+    background-color: @still;
+    border:           0px 0px 0px 1px;
+    border-color:     @rule;
+    border-radius:    0px {{geometry.rounding}}px {{geometry.rounding}}px 0px;
+    children:         [ still, foot ];
+}
+
+still {
+    orientation:      vertical;
+    expand:           true;
     padding:          14px;
     spacing:          10px;
     background-color: @still;
     background-image: url("~/.local/state/ryce/theme/current/wallpaper/panel.png", both);
-    border:           0px 0px 0px 1px;
-    border-color:     @rule;
-    border-radius:    0px {{geometry.rounding}}px {{geometry.rounding}}px 0px;
-    children:         [ face, still-air, readout, signature ];
+    children:         [ face, still-air ];
+}
+
+foot {
+    orientation:      vertical;
+    expand:           false;
+    padding:          10px 14px 14px 14px;
+    spacing:          10px;
+    background-color: @still;
+    children:         [ readout, signature ];
 }
 
 /* bin/ryce-launcher turns the face and the readout on and the blank off, so the
-   face takes the strip's free space (rofi 2.0.0 lays out nothing in a box whose
-   children ask for more height than it got). The label sits at its top. */
+   face takes the plate's free space (rofi 2.0.0 lays out nothing in a box whose
+   children ask for more height than it got). */
 still-air {
     expand: true;
 }
 
+/* The face is the bookplate's inscription, printed on the plate under the peonza and its
+   fleuron (panels.py INSCRIPTION), where an ex libris carries its owner's name: no card
+   over the art, so «EX LIBRIS» at the top stays whole. Centred, in the baize's green. */
 face {
     enabled:     false;
     orientation: vertical;
     expand:      true;
-    children:    [ card ];
+    children:    [ face-air, card ];
+}
+
+face-air {
+    expand: true;
 }
 
 card {
     orientation:      vertical;
     expand:           false;
-    padding:          12px 14px 14px 14px;
-    spacing:          2px;
-    background-color: @label;
-    border:           1px;
-    border-color:     @rule;
-    border-radius:    {{geometry.frame_radius}}px;
-    children:         [ textbox-greet, clock, textbox-date ];
+    padding:          0px 14px 18px 14px;
+    spacing:          4px;
+    background-color: transparent;
+    border:           0px;
+    children:         [ greet-row, clock, date-row ];
 }
 
-textbox-greet {
-    expand:     false;
-    font:       "{{font.ui}} 10";
-    text-color: @muted;
+/* Each small line sits in a row of its own, centred between two blanks like the clock.
+   Straight in the vertical card, rofi 2.0.0 measured Literata's and EB Garamond's
+   textboxes (both variable fonts) as no taller than nothing and set the greeting, the
+   hour and the date on one spot; inside a horizontal row they measure right (seen on
+   the stage, 2026-11-21; static fonts such as DejaVu stack either way). */
+greet-row {
+    orientation: horizontal;
+    expand:      false;
+    children:    [ greet-left, textbox-greet, greet-right ];
+}
+
+date-row {
+    orientation: horizontal;
+    expand:      false;
+    children:    [ date-left, textbox-date, date-right ];
+}
+
+greet-left, greet-right, date-left, date-right {
+    expand: true;
+}
+
+textbox-greet, textbox-date {
+    expand:           false;
+    font:             "{{font.ui}} Italic 10";
+    text-color:       @plate-muted;
+    horizontal-align: 0.5;
 }
 
 clock {
     orientation: horizontal;
     expand:      false;
     spacing:     0px;
-    children:    [ textbox-hh, textbox-sep, textbox-mm, clock-air ];
+    children:    [ clock-left, textbox-hh, textbox-sep, textbox-mm, clock-air ];
 }
 
 textbox-hh, textbox-sep, textbox-mm {
     expand:     false;
-    font:       "{{font.display}} Bold 34";
-    text-color: @text;
+    font:       "{{font.display}} Italic 30";
+    text-color: @plate-ink;
 }
 
 textbox-sep {
     content: "{{clock.sep}}";
 }
 
-clock-air {
+clock-left, clock-air {
     expand: true;
-}
-
-textbox-date {
-    expand:     false;
-    font:       "{{font.ui}} 10";
-    text-color: @muted;
 }
 
 readout {
@@ -310,7 +354,7 @@ textbox-peonza {
 textbox-theme {
     expand:         true;
     content:        "{{theme.name}}";
-    font:           "{{font.display}} Bold 10";
+    font:           "{{font.display}} Italic 12";
     text-color:     @text;
     vertical-align: 0.5;
 }

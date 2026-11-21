@@ -7,56 +7,56 @@
    GTK3 CSS has no #rrggbbaa: translucency is rgba(). One unknown property voids
    the whole sheet, so theme/tests/test_gui.py parses it with GTK3 itself. */
 
-@define-color accent_color            #282623;
-@define-color accent_bg_color         #282623;
-@define-color accent_fg_color         #dbc6ae;
-@define-color destructive_color       #842543;
-@define-color destructive_bg_color    #842543;
-@define-color destructive_fg_color    #dbc6ae;
-@define-color success_color           #1c5422;
-@define-color success_bg_color        #1c5422;
-@define-color success_fg_color        #dbc6ae;
-@define-color warning_color           #684100;
-@define-color warning_bg_color        #684100;
-@define-color warning_fg_color        #dbc6ae;
-@define-color error_color             #842543;
-@define-color error_bg_color          #842543;
-@define-color error_fg_color          #dbc6ae;
+@define-color accent_color            #f0dbcb;
+@define-color accent_bg_color         #e2bf76;
+@define-color accent_fg_color         #182b23;
+@define-color destructive_color       #ea86af;
+@define-color destructive_bg_color    #ea86af;
+@define-color destructive_fg_color    #182b23;
+@define-color success_color           #a2d496;
+@define-color success_bg_color        #a2d496;
+@define-color success_fg_color        #182b23;
+@define-color warning_color           #e6d271;
+@define-color warning_bg_color        #e6d271;
+@define-color warning_fg_color        #182b23;
+@define-color error_color             #ea86af;
+@define-color error_bg_color          #ea86af;
+@define-color error_fg_color          #182b23;
 
-@define-color window_bg_color         #d4bfa8;
-@define-color window_fg_color         #282623;
-@define-color view_bg_color           #dbc6ae;
-@define-color view_fg_color           #282623;
-@define-color headerbar_bg_color      #d4bfa8;
-@define-color headerbar_fg_color      #282623;
-@define-color headerbar_border_color  #aa9885;
-@define-color headerbar_backdrop_color #d4bfa8;
-@define-color headerbar_shade_color   #aa9885;
-@define-color headerbar_darker_shade_color #dbc6ae;
-@define-color sidebar_bg_color        #d4bfa8;
-@define-color sidebar_fg_color        #413d38;
-@define-color sidebar_backdrop_color  #d4bfa8;
-@define-color sidebar_border_color    #aa9885;
-@define-color sidebar_shade_color     #aa9885;
-@define-color card_bg_color           #cbb79f;
-@define-color card_fg_color           #282623;
-@define-color card_shade_color        #aa9885;
-@define-color dialog_bg_color         #cbb79f;
-@define-color dialog_fg_color         #282623;
-@define-color popover_bg_color        #cbb79f;
-@define-color popover_fg_color        #282623;
+@define-color window_bg_color         #23382f;
+@define-color window_fg_color         #f0dbcb;
+@define-color view_bg_color           #1d3229;
+@define-color view_fg_color           #f0dbcb;
+@define-color headerbar_bg_color      #23382f;
+@define-color headerbar_fg_color      #f0dbcb;
+@define-color headerbar_border_color  #485e54;
+@define-color headerbar_backdrop_color #23382f;
+@define-color headerbar_shade_color   #485e54;
+@define-color headerbar_darker_shade_color #1d3229;
+@define-color sidebar_bg_color        #23382f;
+@define-color sidebar_fg_color        #dbc4b3;
+@define-color sidebar_backdrop_color  #23382f;
+@define-color sidebar_border_color    #485e54;
+@define-color sidebar_shade_color     #485e54;
+@define-color card_bg_color           #293f35;
+@define-color card_fg_color           #f0dbcb;
+@define-color card_shade_color        #485e54;
+@define-color dialog_bg_color         #293f35;
+@define-color dialog_fg_color         #f0dbcb;
+@define-color popover_bg_color        #293f35;
+@define-color popover_fg_color        #f0dbcb;
 @define-color popover_shade_color     rgba(0, 0, 0, 0.4);
-@define-color thumbnail_bg_color      #cbb79f;
-@define-color thumbnail_fg_color      #282623;
+@define-color thumbnail_bg_color      #293f35;
+@define-color thumbnail_fg_color      #f0dbcb;
 @define-color shade_color             rgba(0, 0, 0, 0.3);
-@define-color scrollbar_outline_color #dbc6ae;
-@define-color borders                 #aa9885;
-@define-color unfocused_borders       #aa9885;
+@define-color scrollbar_outline_color #1d3229;
+@define-color borders                 #485e54;
+@define-color unfocused_borders       #485e54;
 
-@define-color theme_selected_bg_color rgba(65, 61, 56, 0.26);
-@define-color theme_selected_fg_color #282623;
-@define-color theme_unfocused_selected_bg_color rgba(65, 61, 56, 0.16);
-@define-color theme_unfocused_selected_fg_color #282623;
+@define-color theme_selected_bg_color rgba(155, 196, 225, 0.26);
+@define-color theme_selected_fg_color #f0dbcb;
+@define-color theme_unfocused_selected_bg_color rgba(155, 196, 225, 0.16);
+@define-color theme_unfocused_selected_fg_color #f0dbcb;
 
 /* ---- everywhere ------------------------------------------------------------ */
 
@@ -68,8 +68,8 @@ selection,
 .view:selected,
 treeview.view:selected,
 row:selected {
-  background-color: rgba(65, 61, 56, 0.26);
-  color: #282623;
+  background-color: rgba(155, 196, 225, 0.26);
+  color: #f0dbcb;
 }
 
 .rubberband,
@@ -77,31 +77,31 @@ rubberband,
 treeview.view rubberband,
 .view .rubberband,
 flowbox rubberband {
-  border: 1px solid #413d38;
+  border: 1px solid #9bc4e1;
   border-radius: 2px;
-  background-color: rgba(65, 61, 56, 0.12);
+  background-color: rgba(155, 196, 225, 0.12);
 }
 
 tooltip.background {
-  background-color: #cbb79f;
-  border: 1px solid #aa9885;
+  background-color: #293f35;
+  border: 1px solid #485e54;
   border-radius: 2px;
 }
 
-tooltip label { color: #282623; }
+tooltip label { color: #f0dbcb; }
 
 menu,
 .menu,
 .context-menu,
 popover.background > contents {
-  border: 1px solid #aa9885;
+  border: 1px solid #485e54;
 }
 
 menu menuitem:hover,
 .menu menuitem:hover,
 popover modelbutton:hover {
-  background-color: #c2ad96;
-  color: #282623;
+  background-color: #31473d;
+  color: #f0dbcb;
 }
 
 scrollbar,
@@ -111,25 +111,25 @@ scrollbar trough {
 }
 
 scrollbar slider {
-  background-color: #aa9885;
+  background-color: #485e54;
   border: none;
   border-radius: 2px;
   min-width: 4px;
   min-height: 4px;
 }
 
-scrollbar slider:hover { background-color: #534e49; }
-scrollbar slider:active { background-color: #413d38; }
+scrollbar slider:hover { background-color: #c0a999; }
+scrollbar slider:active { background-color: #dbc4b3; }
 
 entry {
-  background-color: #dbc6ae;
-  border: 1px solid #aa9885;
+  background-color: #1d3229;
+  border: 1px solid #485e54;
   border-radius: 2px;
   box-shadow: none;
 }
 
 entry:focus {
-  border-color: #413d38;
+  border-color: #9bc4e1;
   box-shadow: none;
 }
 
@@ -144,7 +144,7 @@ entry:focus {
 
 .thunar,
 .thunar.background {
-  background-color: rgba(212, 191, 168, 0.96);
+  background-color: rgba(35, 56, 47, 0.96);
 }
 
 .thunar menubar,
@@ -169,7 +169,7 @@ entry:focus {
 }
 
 .thunar toolbar button {
-  color: #413d38;
+  color: #dbc4b3;
   border: none;
   border-radius: 2px;
   box-shadow: none;
@@ -178,8 +178,8 @@ entry:focus {
 }
 
 .thunar toolbar button:hover {
-  background-color: rgba(40, 38, 35, 0.08);
-  color: #282623;
+  background-color: rgba(240, 219, 203, 0.08);
+  color: #f0dbcb;
 }
 
 .thunar toolbar entry { border-radius: 2px; }
@@ -197,42 +197,42 @@ entry:focus {
 }
 
 .thunar .path-bar > button.location-button {
-  background-color: rgba(40, 38, 35, 0.05);
-  border: 1px solid #aa9885;
+  background-color: rgba(240, 219, 203, 0.05);
+  border: 1px solid #485e54;
   border-radius: 2px;
-  color: #413d38;
+  color: #dbc4b3;
   margin: 0 2px;
   padding: 2px 10px;
 }
 
 .thunar .path-bar > button.location-button:hover {
-  background-color: rgba(40, 38, 35, 0.1);
-  border-color: #534e49;
-  color: #282623;
+  background-color: rgba(240, 219, 203, 0.1);
+  border-color: #c0a999;
+  color: #f0dbcb;
 }
 
 .thunar .path-bar > button.location-button:checked {
-  background-color: #282623;
-  border-color: #282623;
-  color: #dbc6ae;
+  background-color: #e2bf76;
+  border-color: #e2bf76;
+  color: #182b23;
 }
 
-.thunar .path-bar > button.location-button:checked image { color: #dbc6ae; }
+.thunar .path-bar > button.location-button:checked image { color: #182b23; }
 
 /* Places: an index on the chrome; the place you stand in is marked in the warm hue. */
 .thunar .sidebar treeview.view {
-  color: #413d38;
+  color: #dbc4b3;
   padding: 3px 5px;
 }
 
-.thunar .sidebar treeview.view:hover { color: #282623; }
+.thunar .sidebar treeview.view:hover { color: #f0dbcb; }
 
 .thunar .sidebar treeview.view:selected {
-  background-color: rgba(65, 61, 56, 0.16);
-  color: #413d38;
+  background-color: rgba(229, 185, 117, 0.16);
+  color: #e5b975;
 }
 
-.thunar .sidebar treeview.view.expander { color: #534e49; }
+.thunar .sidebar treeview.view.expander { color: #c0a999; }
 
 .thunar paned > separator {
   background-color: transparent;
@@ -245,18 +245,18 @@ entry:focus {
    stay transparent and the frame's own background is what shows. */
 .thunar .standard-view,
 .thunar .standard-view.frame {
-  background-color: rgba(219, 198, 174, 1.0);
-  border: 1px solid #aa9885;
+  background-color: rgba(29, 50, 41, 1.0);
+  border: 1px solid #485e54;
   border-radius: 2px;
   margin: 0 5px 0 0;
 }
 
 /* A selected file is a frame of the selection hue; list rows stay square. */
 .thunar .standard-view .view:selected {
-  background-color: rgba(65, 61, 56, 0.26);
-  color: #282623;
+  background-color: rgba(155, 196, 225, 0.26);
+  color: #f0dbcb;
   border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgba(65, 61, 56, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(155, 196, 225, 0.6);
 }
 
 .thunar .standard-view treeview.view:selected {
@@ -264,23 +264,23 @@ entry:focus {
   box-shadow: none;
 }
 
-.thunar .standard-view treeview.view:hover { background-color: rgba(40, 38, 35, 0.04); }
+.thunar .standard-view treeview.view:hover { background-color: rgba(240, 219, 203, 0.04); }
 
 .thunar .standard-view treeview.view header button {
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid #aa9885;
+  border-bottom: 1px solid #485e54;
   box-shadow: none;
-  color: #413d38;
+  color: #dbc4b3;
 }
 
 /* Split view: the pane you are not in falls back a step. */
 .thunar .split-view-inactive-pane .standard-view {
-  background-color: rgba(212, 191, 168, 1.0);
-  border-color: #c2ad96;
+  background-color: rgba(35, 56, 47, 1.0);
+  border-color: #31473d;
 }
 
-.thunar .split-view-inactive-pane .view { color: #413d38; }
+.thunar .split-view-inactive-pane .view { color: #dbc4b3; }
 
 /* Tabs: words on the chrome; the open one is underlined in fg0. */
 .thunar notebook > header {
@@ -291,23 +291,23 @@ entry:focus {
 }
 
 .thunar notebook > header tab {
-  color: #413d38;
+  color: #dbc4b3;
   border-radius: 2px 2px 0 0;
   padding: 4px 12px;
 }
 
-.thunar notebook > header tab:hover { color: #282623; }
+.thunar notebook > header tab:hover { color: #f0dbcb; }
 
 .thunar notebook > header tab:checked {
-  color: #282623;
-  background-color: rgba(40, 38, 35, 0.05);
-  box-shadow: inset 0 -2px #282623;
+  color: #f0dbcb;
+  background-color: rgba(240, 219, 203, 0.05);
+  box-shadow: inset 0 -2px #f0dbcb;
 }
 
 /* Status line: a readout under the gate, in the mono face. */
 .thunar statusbar {
   background-color: transparent;
-  color: #413d38;
+  color: #dbc4b3;
   font-family: "JetBrainsMono Nerd Font";
   font-size: 0.85em;
   letter-spacing: 0.04em;
@@ -318,18 +318,18 @@ entry:focus {
 
 filechooser placessidebar,
 filechooser placessidebar list {
-  background-color: #d4bfa8;
+  background-color: #23382f;
 }
 
 filechooser placessidebar row {
-  color: #413d38;
+  color: #dbc4b3;
   border-radius: 2px;
   margin: 0 6px;
 }
 
 filechooser placessidebar row:selected {
-  background-color: rgba(65, 61, 56, 0.16);
-  color: #413d38;
+  background-color: rgba(229, 185, 117, 0.16);
+  color: #e5b975;
 }
 
 filechooser .path-bar.linked > button {
@@ -338,24 +338,24 @@ filechooser .path-bar.linked > button {
   border: none;
   box-shadow: none;
   border-radius: 2px;
-  color: #413d38;
+  color: #dbc4b3;
   margin: 0 1px;
 }
 
 filechooser .path-bar.linked > button:hover {
-  background-color: #cbb79f;
-  color: #282623;
+  background-color: #293f35;
+  color: #f0dbcb;
 }
 
 filechooser .path-bar.linked > button:checked {
-  background-color: #282623;
-  color: #dbc6ae;
+  background-color: #e2bf76;
+  color: #182b23;
 }
 
 filechooser stack.view,
 filechooser scrolledwindow.frame {
-  background-color: #dbc6ae;
-  border: 1px solid #aa9885;
+  background-color: #1d3229;
+  border: 1px solid #485e54;
   border-radius: 2px;
 }
 
@@ -364,7 +364,7 @@ filechooser treeview.view { background-color: transparent; }
 filechooser treeview.view header button {
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid #aa9885;
+  border-bottom: 1px solid #485e54;
   box-shadow: none;
-  color: #413d38;
+  color: #dbc4b3;
 }

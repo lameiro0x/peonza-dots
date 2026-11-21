@@ -14,20 +14,20 @@
 -- shows code through it. Never the signal colour.
 
 local c = {
-  bg1 = "#d4bfa8", bg2 = "#cbb79f", bg3 = "#c2ad96", line = "#aa9885",
-  fg0 = "#282623", fg1 = "#413d38", fg2 = "#534e49",
-  pill = "#282623", ink = "#dbc6ae",
-  ok = "#1c5422", warn = "#684100", err = "#842543",
-  red = "#8b2c49", green = "#235a28", yellow = "#6e4700", blue = "#215085",
-  magenta = "#733970", cyan = "#00585c", grey = "#514e4b",
+  bg1 = "#23382f", bg2 = "#293f35", bg3 = "#31473d", line = "#485e54",
+  fg0 = "#f0dbcb", fg1 = "#dbc4b3", fg2 = "#c0a999",
+  pill = "#e2bf76", ink = "#182b23",
+  ok = "#a2d496", warn = "#e6d271", err = "#ea86af",
+  red = "#e783ac", green = "#98cb8d", yellow = "#e4c973", blue = "#8bbbdd",
+  magenta = "#c89cd2", cyan = "#84c9c4", grey = "#8fa598",
   -- Text: slot 7 on a dark ground; on paper slot 7 is a mid grey, so prose takes the ink.
-  white = ("light" == "light") and "#282623" or "#514e4a",
-  aqua = "#00585d", violet = "#70306c",
+  white = ("dark" == "light") and "#f0dbcb" or "#dbc4b3",
+  aqua = "#a0dbd6", violet = "#d8b1e1",
 }
 
 local ansi = {
-  "#282623", "#8b2c49", "#235a28", "#6e4700", "#215085", "#733970", "#00585c", "#514e4a",
-  "#514e4b", "#7e2a3c", "#225a27", "#6f460b", "#1d4d87", "#70306c", "#00585d", "#171614",
+  "#13261e", "#e783ac", "#98cb8d", "#e4c973", "#8bbbdd", "#c89cd2", "#84c9c4", "#dbc4b3",
+  "#8fa598", "#f799be", "#afdda5", "#f0da8d", "#a5cdeb", "#d8b1e1", "#a0dbd6", "#f8ece0",
 }
 
 -- `a` at opacity `t` over the theme's ground, for tinted backgrounds (diffs,
@@ -45,7 +45,7 @@ vim.cmd("highlight clear")
 if vim.fn.exists("syntax_on") == 1 then
   vim.cmd("syntax reset")
 end
-vim.o.background = "light"
+vim.o.background = "dark"
 vim.g.colors_name = "ryce"
 
 for i, v in ipairs(ansi) do

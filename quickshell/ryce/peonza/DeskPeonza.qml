@@ -17,10 +17,10 @@ import qs.desk
 // turn at the same speed and no frame waits on a timer out of step with the display. A
 // step only moves the clipped strip (no decode, no texture upload).
 // RYCE_PERF_PROBE=1 logs the spin's frames every 10 s: ticks, steps, mean and worst.
-// Where: the corner the theme's desk leaves free. Bottom right in Origen, Grafito and
-// Ola (their stats are bottom left); Papel's bottom right is the cover's caption, so
-// there it hangs mid-height on the right edge, between the Hito card and the corner.
-// Tinta's corners are the binary clock's and the HUD's: there it stands bottom centre,
+// Where: the corner the theme's desk leaves free. Bottom right in Origen, Grafito, Ola
+// and Papel (their stats are bottom left; Papel's Hito card, top right, grows down
+// toward the right edge's middle, where it hung while the cover's caption held the
+// corner). Tinta's corners are the binary clock's and the HUD's: there it stands bottom centre,
 // in the layer box (890,896)–(1030,1036) at 1920×1080 the sheet's drawings keep clear of
 // (theme/wallpaper/ink.py). Every theme's layer box is that 140 px square.
 Scope {
@@ -42,7 +42,7 @@ Scope {
         return o.at[0] < box.x1 && o.at[0] + o.size[0] > box.x0 && o.at[1] < box.y1 && o.at[1] + o.size[1] > box.y0;
     })
     readonly property bool live: on && bare && !Ryce.Ui.deskCovered
-    readonly property string spot: ({ papel: "edge", tinta: "centre" })[Ryce.Palette.themeId] ?? "corner"
+    readonly property string spot: ({ tinta: "centre" })[Ryce.Palette.themeId] ?? "corner"
 
     Connections {
         target: desk.hyprland ? Hyprland : null
@@ -97,16 +97,15 @@ Scope {
         shown: desk.on
         covered: Ryce.Ui.deskCovered
         lines: 1
-        // Papel: only `right`, the layer shell centres it vertically; Tinta: only
-        // `bottom`, centred horizontally.
-        anchors { right: desk.spot !== "centre"; bottom: desk.spot !== "edge" }
+        // Tinta: only `bottom`, the layer shell centres it horizontally.
+        anchors { right: desk.spot !== "centre"; bottom: true }
         margins { right: 52; bottom: 44 }
 
         // The layer box in the monitor's layout coordinates, as Hyprland reports windows.
         function box() {
             const m = desk.monitor, w = m?.width ?? 0, h = m?.height ?? 0, s = implicitWidth;
             const x = desk.spot === "centre" ? (w - s) / 2 : w - margins.right - s;
-            const y = desk.spot === "edge" ? (h - s) / 2 : h - margins.bottom - s;
+            const y = h - margins.bottom - s;
             return { x0: (m?.x ?? 0) + x, y0: (m?.y ?? 0) + y, x1: (m?.x ?? 0) + x + s, y1: (m?.y ?? 0) + y + s };
         }
 
@@ -152,6 +151,9 @@ Scope {
                         width: size
                         height: size
                         clip: true
+                        // Papel's vellum peonza would outshine the hour: dimmed, it stays an
+                        // object on the desk and the written hour stays its brightest thing.
+                        opacity: DeskUi.folio ? 0.55 : 1
 
                         Image {
                             id: strip

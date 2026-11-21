@@ -1,25 +1,25 @@
 {
-  "mode": "light",
+  "mode": "dark",
   "colors": {
-    "background": "#d4bfa8",
-    "background-alternate": "#dbc6ae",
-    "surface": "#cbb79f",
-    "surface-foreground": "#282623",
-    "foreground": "#282623",
-    "foreground-muted": "#413d38",
-    "primary": "#413d38",
-    "state-error": "#842543",
-    "state-info": "#3d4b59",
-    "state-success": "#1c5422",
-    "state-warning": "#684100"
+    "background": "#23382f",
+    "background-alternate": "#1d3229",
+    "surface": "#293f35",
+    "surface-foreground": "#f0dbcb",
+    "foreground": "#f0dbcb",
+    "foreground-muted": "#dbc4b3",
+    "primary": "#d5a5d0",
+    "state-error": "#ea86af",
+    "state-info": "#e2bf76",
+    "state-success": "#a2d496",
+    "state-warning": "#e6d271"
   },
   "app": {
-    "overlay-header": "linear-gradient(transparent 0%, rgba(219, 198, 174, 0.85) 100%)",
-    "overlay-subheader": "linear-gradient(180deg, rgba(219, 198, 174, 0.05) 0%, var(--theme-colors-background) 100%)",
+    "overlay-header": "linear-gradient(transparent 0%, rgba(29, 50, 41, 0.85) 100%)",
+    "overlay-subheader": "linear-gradient(180deg, rgba(29, 50, 41, 0.05) 0%, var(--theme-colors-background) 100%)",
     "scrollbar-size": "8px",
-    "scrollbar-handle-background": "rgba(83, 78, 73, 0.3)",
-    "scrollbar-handle-hover-background": "rgba(83, 78, 73, 0.55)",
-    "scrollbar-handle-active-background": "rgba(83, 78, 73, 0.75)",
+    "scrollbar-handle-background": "rgba(192, 169, 153, 0.3)",
+    "scrollbar-handle-hover-background": "rgba(192, 169, 153, 0.55)",
+    "scrollbar-handle-active-background": "rgba(192, 169, 153, 0.75)",
     "scrollbar-handle-border-radius": "2px"
   },
   "mantineOverride": {

@@ -6,19 +6,19 @@
 
 [mgr]
 cwd          = { fg = "cyan" }
-border_style = { fg = "#aa9885" }
+border_style = { fg = "#485e54" }
 
 [tabs]
-active   = { fg = "#dbc6ae", bg = "yellow", bold = true }
-inactive = { fg = "yellow", bg = "#c2ad96" }
+active   = { fg = "#182b23", bg = "yellow", bold = true }
+inactive = { fg = "yellow", bg = "#31473d" }
 
 [mode]
-normal_main = { fg = "#dbc6ae", bg = "yellow", bold = true }
-normal_alt  = { fg = "yellow", bg = "#c2ad96" }
-select_main = { fg = "#dbc6ae", bg = "magenta", bold = true }
-select_alt  = { fg = "magenta", bg = "#c2ad96" }
-unset_main  = { fg = "#dbc6ae", bg = "red", bold = true }
-unset_alt   = { fg = "red", bg = "#c2ad96" }
+normal_main = { fg = "#182b23", bg = "yellow", bold = true }
+normal_alt  = { fg = "yellow", bg = "#31473d" }
+select_main = { fg = "#182b23", bg = "magenta", bold = true }
+select_alt  = { fg = "magenta", bg = "#31473d" }
+unset_main  = { fg = "#182b23", bg = "red", bold = true }
+unset_alt   = { fg = "red", bg = "#31473d" }
 
 [status]
 perm_sep   = { fg = "darkgray" }
@@ -28,33 +28,33 @@ perm_write = { fg = "red" }
 perm_exec  = { fg = "cyan" }
 
 [which]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 cand   = { fg = "cyan" }
 desc   = { fg = "magenta" }
 
 [confirm]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 title  = { fg = "yellow" }
 
 [spot]
-border  = { fg = "#aa9885" }
+border  = { fg = "#485e54" }
 title   = { fg = "yellow" }
 tbl_col = { fg = "yellow" }
 
 [pick]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 
 [input]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 
 [cmp]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 
 [tasks]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 
 [help]
-border = { fg = "#aa9885" }
+border = { fg = "#485e54" }
 
 # The same families as LS_COLORS in fish/colors.fish.
 [filetype]
@@ -74,6 +74,6 @@ rules = [
 
 [icon]
 prepend_conds = [
-	{ if = "dir", text = "󰉋", fg = "#6e4700" },
-	{ if = "exec & !link", text = "󰞷", fg = "#235a28" },
+	{ if = "dir", text = "󰉋", fg = "#e4c973" },
+	{ if = "exec & !link", text = "󰞷", fg = "#98cb8d" },
 ]

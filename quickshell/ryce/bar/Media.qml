@@ -10,6 +10,8 @@ import qs as Ryce
 // on every bar, in every theme, while any player exists, not only after something
 // played in this shell's lifetime. Everything else (queue, search, volume) lives in
 // Aria's drawer. The level monitor captures only while something plays.
+// Papel drops the note (a page names the piece, it draws no icon beside it), turns the
+// skip buttons into Literata's single guillemets and sets the level in the one ink.
 Module {
     id: media
     property real maxText: 260
@@ -28,7 +30,8 @@ Module {
     // squeezed under 60 px says nothing: it steps aside and the controls stay (a theme
     // with a wide clock, or two screens' slots in the centre, left none). Only a bar
     // without room for the controls themselves loses the module.
-    readonly property real chrome: 2 * BarUi.padX + BarUi.gap + prev.width + note.width + meter.width + next.width + 4 * spacing
+    readonly property real chrome: 2 * BarUi.padX + BarUi.gap + prev.width + (note.visible ? note.width + spacing : 0)
+        + meter.width + next.width + 3 * spacing
     shown: player !== null && maxText >= 0
     interactive: player?.canTogglePlaying ?? false      // a stopped player with nothing queued: no dead click
     lit: hovered && !prev.hot && !next.hot
@@ -47,12 +50,14 @@ Module {
     Skip {
         id: prev
         glyph: Ryce.Ui.prev
+        page: "‹"
         can: media.player?.canGoPrevious ?? false
         Accessible.name: "Pista anterior"
         onHit: media.player.previous()
     }
     BarText {
         id: note
+        visible: !BarUi.folio
         text: media.paused ? Ryce.Ui.pause : Ryce.Ui.music
         ink: Ryce.Ui.music
         color: media.playing ? Ryce.Palette.hueMedia : Ryce.Palette.fg2
@@ -87,7 +92,7 @@ Module {
                     width: parent.width
                     height: Math.max(2, Math.round(parent.level * parent.height))
                     radius: Math.min(1, Ryce.Palette.pillRadius)
-                    color: Ryce.Palette.hueMedia
+                    color: BarUi.folio ? Ryce.Palette.fg1 : Ryce.Palette.hueMedia
                 }
             }
         }
@@ -110,6 +115,7 @@ Module {
     Skip {
         id: next
         glyph: Ryce.Ui.next
+        page: "›"
         can: media.player?.canGoNext ?? false
         Accessible.name: "Pista siguiente"
         onHit: media.player.next()
@@ -120,6 +126,7 @@ Module {
     component Skip: Item {
         id: skip
         property string glyph
+        property string page            // Papel's mark, set in the bar's face
         property bool can: false
         readonly property bool hot: area.containsMouse && can
         signal hit()
@@ -138,12 +145,12 @@ Module {
         }
         BarText {
             x: Math.round((parent.width - width) / 2)
-            text: skip.glyph
+            text: BarUi.folio ? skip.page : skip.glyph
             ink: text
             color: Ryce.Palette.fg1
             opacity: skip.can ? 1 : 0.35
-            font.family: Ryce.Palette.fontIcon
-            font.pixelSize: BarUi.iconPx
+            font.family: BarUi.folio ? BarUi.face : Ryce.Palette.fontIcon
+            font.pixelSize: BarUi.folio ? BarUi.textPx + 4 : BarUi.iconPx
             font.weight: Font.Normal
             scale: area.pressed && skip.can ? 0.88 : 1
             Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }

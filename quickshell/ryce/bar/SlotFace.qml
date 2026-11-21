@@ -6,6 +6,7 @@ import qs as Ryce
 // pill, so nothing reflows when it passes. `onPill` swaps every colour for the
 // pill's ink; Slot.qml draws one of each and clips the second to the pill. An app the
 // icon theme does not know shows agentd's glyph for the workspace instead.
+// Papel shows no app at all: an occupied page's numeral is in fg0, an empty one's in fg2.
 Item {
     id: face
     required property var info
@@ -22,13 +23,14 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         text: face.info.key
         tabular: true
-        color: face.onPill ? Ryce.Palette.inkOnPill : face.info.occupied ? Ryce.Palette.fg1 : Ryce.Palette.fg2
+        color: face.onPill ? Ryce.Palette.inkOnPill : !face.info.occupied ? Ryce.Palette.fg2 : BarUi.folio ? Ryce.Palette.fg0 : Ryce.Palette.fg1
         font.pixelSize: face.metrics.textPx
+        font.italic: BarUi.folio        // Papel's roman numerals (Workspaces.numeral)
     }
     // Delegates follow the count, not the array, so a recomputed model rebinds the
     // sources in place instead of recreating every icon.
     Repeater {
-        model: face.info.kind === "app" ? Math.max(1, face.info.icons.length) : 0
+        model: face.info.kind === "app" && !BarUi.folio ? Math.max(1, face.info.icons.length) : 0
 
         Item {
             id: app

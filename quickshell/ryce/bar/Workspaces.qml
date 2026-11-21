@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Hyprland
 import qs as Ryce
 import qs.agents
+import "../prose.js" as Prose
 
 // The ten workspace slots, centred in the bar, each labelled with its number. Fixed slots
 // 1..10, never a Repeater over Hyprland's workspace objects (Quickshell 0.3.2 can keep
@@ -27,14 +28,30 @@ Item {
 
     readonly property int count: 10     // constants workspace_keys: CTRL + 1..9, 0
 
-    // Slot 10's numeral takes two digits: its slot has its own, wider metrics.
-    readonly property var metrics: shape(1)
-    readonly property var metricsWide: shape(2)
-    function metricsFor(id) {
-        return id >= 10 ? metricsWide : metrics;
+    // Slot 10's numeral takes two digits: its slot has its own, wider metrics. Papel numbers
+    // its workspaces as a book numbers its front matter, lowercase roman in italic, from a
+    // narrow «i» to a wide «viii»: each slot fits its own numeral. It shows no app icons
+    // (SlotFace), so an app slot keeps the empty one's width: opening a window, or moving
+    // the focus, never moves a numeral.
+    readonly property var metrics: {
+        void numeralFont.font;                      // re-measure when the theme changes the font
+        return shape("0");
     }
-    function shape(digits) {
-        const padX = 12, numeralWidth = Math.ceil(labelFont.advanceWidth("0".repeat(digits))), gap = 9, glyphWidth = BarUi.iconPx, iconGap = 4;
+    readonly property var metricsById: {
+        void numeralFont.font;
+        const out = [];
+        for (let id = 1; id <= count; id++)
+            out.push(BarUi.folio ? shape(numeral(id)) : id >= 10 ? shape("00") : metrics);
+        return out;
+    }
+    function metricsFor(id) {
+        return metricsById[id - 1] ?? metrics;
+    }
+    function numeral(id) {
+        return BarUi.folio ? Prose.roman(id) : String(id);
+    }
+    function shape(widest) {
+        const padX = 12, numeralWidth = Math.ceil(numeralFont.advanceWidth(widest)), gap = 9, glyphWidth = BarUi.iconPx, iconGap = 4;
         const contentX = padX + numeralWidth + gap;
         return {
             textPx: BarUi.textPx,
@@ -72,6 +89,16 @@ Item {
         font.family: BarUi.face
         font.pixelSize: BarUi.textPx
         font.weight: BarUi.weight
+    }
+    // The numerals as SlotFace sets them in Papel (italic, its figures); every other theme
+    // measures its digits in the labels' font, as it always has.
+    FontMetrics {
+        id: numeralFont
+        font.family: BarUi.face
+        font.pixelSize: BarUi.textPx
+        font.weight: BarUi.weight
+        font.italic: BarUi.folio
+        font.features: BarUi.folio ? BarUi.figures(true) : ({})
     }
     function labelWidth(label) {
         return Math.min(metrics.labelMax, Math.ceil(labelFont.advanceWidth(label)));
@@ -146,12 +173,12 @@ Item {
             const m = metricsFor(id);
             const labelWidth = label === "" ? 0 : row.labelWidth(label);
             // App slots: one icon per distinct app; no window reported yet keeps one glyph.
-            const icons = kind !== "app" ? [] : (apps[id] ?? []).slice(0, m.maxApps).map(a => row.iconFor(a));
-            const full = kind === "empty" ? m.widths.empty
+            const icons = kind !== "app" || BarUi.folio ? [] : (apps[id] ?? []).slice(0, m.maxApps).map(a => row.iconFor(a));
+            const full = kind === "empty" || kind === "app" && BarUi.folio ? m.widths.empty
                 : kind === "app" ? m.widths.app(Math.max(1, icons.length))
                 : m.contentX + labelWidth + (state === "waiting" ? m.dotGap + m.dot : 0) + m.padX;
             // `key` is what SlotFace prints: the workspace's number, never the key's name.
-            list[id - 1] = { id: id, key: String(id), occupied: has, kind: kind, label: label, labelWidth: labelWidth,
+            list[id - 1] = { id: id, key: row.numeral(id), occupied: has, kind: kind, label: label, labelWidth: labelWidth,
                              icon: r.icon, icons: icons, state: state, shown: true, width: full, full: full,
                              group: groupOf(id),
                              // Shown on a screen that does not have the focus: the faint ground.

@@ -3,18 +3,18 @@
    names). bin/ryce-chromium-theme copies it beside newtab.html: a new tab opened after
    a theme switch already wears the new one. */
 :root {
-  color-scheme: light;
-  --bg0: #dbc6ae;
-  --bg1: #d4bfa8;
-  --bg2: #cbb79f;
-  --bg3: #c2ad96;
-  --line: #aa9885;
-  --fg0: #282623;
-  --fg1: #413d38;
-  --fg2: #534e49;
-  --tint: #3d4b59;
-  --font-ui: "Space Mono", system-ui, sans-serif;
-  --font-display: "Space Mono", "Space Mono", sans-serif;
+  color-scheme: dark;
+  --bg0: #1d3229;
+  --bg1: #23382f;
+  --bg2: #293f35;
+  --bg3: #31473d;
+  --line: #485e54;
+  --fg0: #f0dbcb;
+  --fg1: #dbc4b3;
+  --fg2: #c0a999;
+  --tint: #e2bf76;
+  --font-ui: "Literata", system-ui, sans-serif;
+  --font-display: "EB Garamond", "Literata", sans-serif;
   --radius: 2px;
   --clock-sep: ":";
   --theme-name: "Papel";

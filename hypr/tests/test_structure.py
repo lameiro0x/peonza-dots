@@ -29,11 +29,12 @@ THEMES = {p.stem: json.loads(p.read_text(encoding="utf-8"))
           for p in sorted((ROOT / "contracts" / "themes").glob("*.json"))}
 
 
-def light(theme: str) -> bool:
-    """tools/tokens.py scheme(): paper ground, dark ink (relative luminance of bg0 > 0.5)."""
-    rgb = [int(THEMES[theme]["colors"]["bg0"][i:i + 2], 16) / 255 for i in (1, 3, 5)]
-    lin = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
-    return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2] > 0.5
+def page(theme: str) -> bool:
+    """A lock picture drawn as a page around the lock's text (theme/wallpaper/paper.py: Papel's
+    title page, its frame and printer's device in the art itself), not a photo the lock
+    softens. Papel's alone since 2026-11-19, when it went from cream paper to the green
+    reading room; before, the rule was «a light theme»."""
+    return THEMES[theme]["wallpaper"]["lock_source"] == "assets/wallpapers/papel-lock.jpg"
 LOCK_TEMPLATE = ROOT / "theme" / "templates" / "hypr" / "hyprlock.conf"
 MODULES = ["binds", "env", "monitors", "look", "rules", "despejar", "autostart"]
 LUA = shutil.which("lua") or shutil.which("lua5.4") or shutil.which("luajit")
@@ -421,8 +422,15 @@ class Files(unittest.TestCase):
     def test_every_module_is_loaded_by_hyprland_lua(self):
         text = (HYPR / "hyprland.lua").read_text(encoding="utf-8")
         code = re.sub(r"--[^\n]*", "", text)
-        used = re.findall(r'^use\("(\w+)"', text, re.M)
-        self.assertEqual(used, [*MODULES, "local"], "load order: binds first, local last")
+        used = re.findall(r'^use\("(\w+)"(, true)?\)', text, re.M)
+        # Required modules are this repo's, in order; `use(name, true)` loads an optional one
+        # that lives outside it (local.lua per machine, a private tool's own file), so the
+        # public tree may lack it. local stays last.
+        self.assertEqual([n for n, opt in used if not opt], list(MODULES), "load order: binds first")
+        self.assertEqual(used[-1], ("local", ", true"), "local.lua loads last, and optionally")
+        outside = {n for n, opt in used if opt} - {"local"}
+        self.assertEqual(outside & {p.stem for p in HYPR.glob("*.lua")}, set(),
+                         "an optional module is someone else's file, never one of the repo's")
         self.assertEqual(re.findall(r"\brequire\(", code), [],
                          "hyprland.lua loads modules only through pcall(require, ...)")
         on_disk = {p.stem for p in HYPR.glob("*.lua")} - {"hyprland", "palette", "local"}
@@ -489,9 +497,9 @@ class Files(unittest.TestCase):
                 (bg,) = [b for b in blocks(text) if b.startswith("background {")]
                 self.assertIn("path = ~/.local/state/ryce/theme/current/wallpaper/lock.jpg", bg)
                 self.assertNotRegex(text, r"path\s*=\s*screenshot")
-                if light(theme):
-                    # A paper theme's lock art carves a window for the text (paper.py):
-                    # sharp and undimmed, or the window and the ink around it go grey.
+                if page(theme):
+                    # A page drawn around the text (paper.py): sharp and undimmed, or its
+                    # gilt frame and the device go to mud.
                     self.assertRegex(bg, r"blur_passes\s*=\s*0\b")
                     self.assertNotRegex(bg, r"brightness\s*=")
                 else:
@@ -517,13 +525,17 @@ class Files(unittest.TestCase):
             with self.subTest(theme=theme):
                 text = lock_conf(theme)
                 images = [b for b in blocks(text) if b.startswith("image {")]
-                (mark,) = [b for b in images if "peonza/logo.png" in b]
-                self.assertIn("path = ~/.local/state/ryce/theme/current/peonza/logo.png", mark)
-                # Shown big and with no box of its own: the «square» the user saw.
-                self.assertRegex(mark, r"border_size\s*=\s*0")
-                # Big on a dark lock; a small lockup in the corner of a paper cover.
-                size = r"size\s*=\s*(4[0-8])\b" if light(theme) else r"size\s*=\s*(9[6-9]|1[0-9]{2})\b"
-                self.assertRegex(mark, size)
+                marks = [b for b in images if "peonza/logo.png" in b]
+                if page(theme):
+                    # The title page draws the peonza itself, as its printer's device in
+                    # gilt (paper.py): a second one from logo.png would sit on top of it.
+                    self.assertEqual(marks, [])
+                else:
+                    (mark,) = marks
+                    self.assertIn("path = ~/.local/state/ryce/theme/current/peonza/logo.png", mark)
+                    # Shown big and with no box of its own: the «square» the user saw.
+                    self.assertRegex(mark, r"border_size\s*=\s*0")
+                    self.assertRegex(mark, r"size\s*=\s*(9[6-9]|1[0-9]{2})\b")
                 (field,) = [b for b in blocks(text) if b.startswith("input-field {")]
                 self.assertRegex(field, r"rounding\s*=\s*\d+")
                 self.assertIn("$LAYOUT", field)

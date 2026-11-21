@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""The hour in Spanish words, for Papel's lock (theme/templates/@papel/hypr/hyprlock.conf).
+
+    ryce-hora                  «Las diez y cuarto» (now)
+    ryce-hora --parte          «de la noche», the phrase's second line («» at 00:00 and 12:00)
+    ryce-hora --pango          the phrase with a swash capital on its first letter only
+    ryce-hora --pango --color '#e2bf76'   ... that capital in this colour (the lock's gilt)
+    ryce-hora --fecha          «jueves, diecinueve de noviembre» (today; the desk's date line)
+    ryce-hora --at HH:MM ...   at that time instead of now (tests)
+    ryce-hora --fecha --dia AAAA-MM-DD   that day instead of today (tests)
+
+The Python mirror of quickshell/ryce/prose.js (the desk clock): both answer every case of
+quickshell/tests/prose_es.json (install/tests/test_ryce_hora.py), so the lock and the desk
+never say the same minute two ways. The rule: a 12-hour face. :00 «en punto», :15 «y
+cuarto», :30 «y media», 1-39 «y» the minutes, 40-59 «menos» what is left to the next
+hour, :45 «menos cuarto». 00:00 and 12:00 have names of their own, Medianoche and
+Mediodía. The hour is feminine (la una), the minutes masculine (y uno).
+
+Exit: 0 done · 2 bad --at or --color.
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime
+import re
+import sys
+import time
+
+UNITS = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve",
+         "diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete",
+         "dieciocho", "diecinueve", "veinte", "veintiuno", "veintidós", "veintitrés",
+         "veinticuatro", "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve"]
+TENS = ["", "", "", "treinta", "cuarenta", "cincuenta"]
+
+
+def number(n: int, feminine: bool = False) -> str:
+    """0-59 in words; `feminine` turns a trailing «uno» into «una» (la una)."""
+    words = UNITS[n] if n < 30 else TENS[n // 10] + ("" if n % 10 == 0 else " y " + UNITS[n % 10])
+    return words[:-1] + "a" if feminine and words.endswith("uno") else words
+
+
+def hour(h: int, m: int) -> str:
+    """The hour h (0-23) and minute m (0-59) in words, capitalised."""
+    if m == 0 and h % 12 == 0:
+        return "Medianoche" if h == 0 else "Mediodía"
+    ahead = m >= 40
+    twelve = ((h + 1 if ahead else h) % 12) or 12
+    head = ("La " if twelve == 1 else "Las ") + number(twelve, feminine=True)
+    tail = ("en punto" if m == 0 else "y cuarto" if m == 15 else "y media" if m == 30
+            else "menos cuarto" if m == 45 else "menos " + number(60 - m) if ahead
+            else "y " + number(m))
+    return f"{head} {tail}"
+
+
+def part_of_day(h: int, m: int) -> str:
+    """The part of the day the hour h belongs to; nothing at midnight and noon, whose names
+    already say it."""
+    if m == 0 and h % 12 == 0:
+        return ""
+    return ("de la madrugada" if 1 <= h <= 5 else "de la mañana" if 6 <= h <= 11
+            else "del mediodía" if h == 12 else "de la tarde" if 13 <= h <= 20 else "de la noche")
+
+
+def pango(phrase: str, color: str | None = None) -> str:
+    """EB Garamond Italic's swash on the first capital only: on a whole line every capital
+    turns florid. The phrase is ours (letters and spaces) and color a checked #rrggbb, so
+    nothing here needs escaping."""
+    paint = f' foreground="{color}"' if color else ""
+    return f'<span font_features="swsh"{paint}>{phrase[0]}</span>{phrase[1:]}'
+
+
+WEEKDAYS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+          "septiembre", "octubre", "noviembre", "diciembre"]
+
+
+def date_words(day: datetime.date) -> str:
+    """The date the desk writes under the hour, without a locale (the lock runs `date` with
+    whatever LANG the session has): «jueves, diecinueve de noviembre»."""
+    return f"{WEEKDAYS[day.weekday()]}, {number(day.day)} de {MONTHS[day.month - 1]}"
+
+
+def clock(at: str | None) -> tuple[int, int]:
+    if at is None:
+        now = time.localtime()
+        return now.tm_hour, now.tm_min
+    # ASCII digits only: str.isdigit() also takes «٠٩:٠٥».
+    if not re.fullmatch(r"([01][0-9]|2[0-3]):[0-5][0-9]", at):
+        raise ValueError(f"ryce-hora: --at {at!r} no es una hora HH:MM (00:00 a 23:59)")
+    return int(at[:2]), int(at[3:])
+
+
+def calendar_day(dia: str | None) -> datetime.date:
+    if dia is None:
+        return datetime.date.today()
+    try:
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", dia):
+            raise ValueError
+        return datetime.date.fromisoformat(dia)
+    except ValueError:
+        raise ValueError(f"ryce-hora: --dia {dia!r} no es una fecha AAAA-MM-DD") from None
+
+
+def main(argv: list[str]) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--at", metavar="HH:MM", help="at this time instead of now")
+    ap.add_argument("--parte", action="store_true", help="the part of the day («de la noche»)")
+    ap.add_argument("--pango", action="store_true", help="Pango markup: a swash first capital")
+    ap.add_argument("--color", metavar="#RRGGBB", help="with --pango: that capital's colour")
+    ap.add_argument("--fecha", action="store_true", help="today's date in words")
+    ap.add_argument("--dia", metavar="AAAA-MM-DD", help="with --fecha: that day instead of today")
+    a = ap.parse_args(argv)
+    if a.color is not None and not re.fullmatch(r"#[0-9a-fA-F]{6}", a.color):
+        print(f"ryce-hora: --color {a.color!r} no es un color #rrggbb", file=sys.stderr)
+        return 2
+    try:
+        h, m = clock(a.at)
+        day = calendar_day(a.dia)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        return 2
+    if a.fecha:
+        print(date_words(day))
+    elif a.parte:
+        print(part_of_day(h, m))
+    else:
+        print(pango(hour(h, m), a.color) if a.pango else hour(h, m))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

@@ -38,7 +38,7 @@ if skip_unless theme/render.py "theme"; then
     step "peonza ink wallpaper (Tinta alternate)" python3 theme/wallpaper/ink.py --check
   fi
   if skip_unless theme/wallpaper/paper.py "papel covers"; then
-    step "Papel's Tractatus covers" python3 theme/wallpaper/paper.py --check
+    step "Papel's reading room (desktop and lock)" python3 theme/wallpaper/paper.py --check
   fi
   if skip_unless theme/wallpaper/dots.py "dot plates"; then
     step "Grafito dot plates" python3 theme/wallpaper/dots.py --check

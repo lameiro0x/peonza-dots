@@ -10,7 +10,7 @@
 
 # Transparent (#rrggbb00 paints the terminal's default background): kitty's
 # translucency stays.
-background: "#dbc6ae00"
+background: "#1d322900"
 
 rain:
   collision: true
@@ -18,9 +18,9 @@ rain:
   intensity: 45
   character: ["│", "╎", "┆"]
   colors:
-    - [0.50, "#534e49"]
-    - [0.30, "#413d38"]
-    - [0.20, "#413d38"]
+    - [0.50, "#c0a999"]
+    - [0.30, "#9bc4e1"]
+    - [0.20, "#dbc4b3"]
   speeds:
     - [0.25, 30]
     - [0.25, 45]
@@ -34,9 +34,9 @@ rain:
 
 boxes:
   border: titled_single
-  border_color: "#534e49"
-  text_color: "#282623"
-  accent_color: "#413d38"
+  border_color: "#c0a999"
+  text_color: "#f0dbcb"
+  accent_color: "#e5b975"
   padding: {horizontal: 2, vertical: 0}
   items:
     # The peonza: one ink, its grooves left in the ground colour.

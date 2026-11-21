@@ -314,7 +314,7 @@ class SettingsEdit(unittest.TestCase):
 class Gsettings(unittest.TestCase):
     """gsettings.sh against fake gsettings/xfconf-query that log their argv."""
 
-    def run_script(self, *args, xfconf_has=""):
+    def run_script(self, *args, xfconf_has="", paper=None):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
             bin_ = d / "bin"
@@ -330,8 +330,14 @@ class Gsettings(unittest.TestCase):
             state = d / "state"
             for tid in THEMES:
                 (state / tid).mkdir(parents=True)
-                (state / tid / "theme.json").write_text(
-                    (ROOT / "themes" / tid / "theme.json").read_text(encoding="utf-8"))
+                text = (ROOT / "themes" / tid / "theme.json").read_text(encoding="utf-8")
+                if tid == paper:
+                    # A theme on paper, as the contract would render it (none ships one since
+                    # Papel moved to a green reading-room desk on 2026-11-19).
+                    t = json.loads(text)
+                    t["scheme"], t["desktop"]["gtk_theme"] = "light", "adw-gtk3"
+                    text = json.dumps(t)
+                (state / tid / "theme.json").write_text(text)
             (state / "current").symlink_to("ola")
             env = {"PATH": f"{bin_}:/usr/bin:/bin", "HOME": str(d), "RYCE_THEME_STATE": str(state),
                    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/dev/null"}
@@ -360,7 +366,7 @@ class Gsettings(unittest.TestCase):
         self.assertIn("gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true", calls)
 
     def test_a_paper_theme_asks_for_light(self):
-        r, calls = self.run_script("papel")
+        r, calls = self.run_script("papel", paper="papel")
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn("gsettings set org.gnome.desktop.interface color-scheme prefer-light", calls)
         self.assertIn("gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3", calls)

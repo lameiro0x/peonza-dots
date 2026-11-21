@@ -13,7 +13,8 @@ Text {
     property string ink: "0"
     property string reserve: ""
     // Tabular figures for values that change. Never for names: Inter's tnum also sets
-    // punctuation tabular, which widens a «-» past the measured label width.
+    // punctuation tabular, which widens a «-» past the measured label width. Papel sets
+    // old-style figures instead (BarUi.figures).
     property bool tabular: reserve !== ""
     property real centre: parent ? parent.height / 2 : 0
     readonly property real inkHeight: inkBox.tightBoundingRect.height
@@ -25,7 +26,7 @@ Text {
     font.family: BarUi.face
     font.pixelSize: BarUi.textPx
     font.weight: BarUi.weight
-    font.features: tabular ? { "tnum": 1 } : ({})
+    font.features: BarUi.figures(tabular)
 
     TextMetrics {
         id: inkBox

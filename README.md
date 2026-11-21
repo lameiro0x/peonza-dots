@@ -23,7 +23,7 @@
 <br>
 
 <p align="center">
-  <img src=".github/readme/hero.webp" width="100%" alt="The same desk cycling through its five themes: Origen's painted dusk, Ola's great wave, Grafito's dot plate, Papel's cream page and Tinta's engineering sheet, each arriving with its own wallpaper transition">
+  <img src=".github/readme/hero.webp" width="100%" alt="The same desk cycling through its five themes: Origen's painted dusk, Ola's great wave, Grafito's dot plate, Papel's reading room and Tinta's engineering sheet, each arriving with its own wallpaper transition">
 </p>
 
 > *Peonza* is Spanish for spinning top. This one is the author's mark, and every surface of
@@ -91,9 +91,9 @@ Black-and-white ink, smoked glass and drawing sheets. JetBrains Mono · 1 px edg
 <img src=".github/readme/desk-tinta.jpg" width="100%" alt="Tinta's desk over the RY-PZ-002 sheet: clock, parts list, tasks, the HUD and the binary clock">
 
 ### Papel
-The only light one, for reading: warm ink on cream. Space Mono · a sheet, nearly square · a page settling · ![accent #ad3a24](https://img.shields.io/badge/accent-ad3a24-ad3a24?style=flat-square&labelColor=e8dcc8)
+A reading room at night: green baize, vellum letters, gilt for ornament, the hour written in words. Literata and EB Garamond Italic · roman numerals and small capitals · a page settling · Obsidian dressed as a book · ![accent #fd6940](https://img.shields.io/badge/accent-fd6940-fd6940?style=flat-square&labelColor=1d3229)
 
-<img src=".github/readme/desk-papel.jpg" width="100%" alt="Papel's desk: the Tractatus as dots inside the top's silhouette, the widgets in windows cut out of the dots">
+<img src=".github/readme/desk-papel.jpg" width="100%" alt="Papel's desk: an open copy of Don Quijote on green baize, the hour written in words with a gilt swash capital, the stats as a table of contents">
 
 <details>
 <summary><b>The same five at work</b></summary>
@@ -101,7 +101,7 @@ The only light one, for reading: warm ink on cream. Space Mono · a sheet, nearl
 <table>
 <tr><td width="50%"><img src=".github/readme/theme-origen.jpg" alt="Origen at work: fastfetch, Neovim and cava in gruvbox colours"></td><td width="50%"><img src=".github/readme/theme-grafito.jpg" alt="Grafito at work: grey terminals, a terminal palette without blue"></td></tr>
 <tr><td><img src=".github/readme/theme-ola.jpg" alt="Ola at work: kanagawa-coloured terminals"></td><td><img src=".github/readme/theme-tinta.jpg" alt="Tinta at work: smoked-glass terminals"></td></tr>
-<tr><td><img src=".github/readme/theme-papel.jpg" alt="Papel at work: dark inks legible on cream"></td><td></td></tr>
+<tr><td><img src=".github/readme/theme-papel.jpg" alt="Papel at work: vellum terminals on the reading room's green"></td><td></td></tr>
 </table>
 </details>
 
@@ -254,7 +254,7 @@ Kanagawa*, *Fine Wind, Clear Morning* and *Kajikazawa in Kai Province*; Utagawa 
 Whirlpools of Awa*; Frederic Edwin Church, *Twilight in the Wilderness*; Jasper Francis Cropsey,
 *Autumn – On the Hudson River*. Sources are in
 [`assets/wallpapers/README.md`](assets/wallpapers/README.md). Fonts: Martian Mono, Space Grotesk,
-Doto, Instrument Serif and Space Mono, under the SIL OFL.
+Doto, Instrument Serif, Literata and EB Garamond, under the SIL OFL.
 
 ## Licence
 

@@ -12,11 +12,11 @@ format = """[┌─ ](rule)$hostname$directory$git_branch$git_status$cmd_duratio
 palette = "ryce"
 
 [palettes.ryce]
-text = "#282623"
-muted = "#413d38"
-rule = "#534e49"
-peonza = "#282623"
-err = "#842543"
+text = "#f0dbcb"
+muted = "#dbc4b3"
+rule = "#c0a999"
+peonza = "#f0dbcb"
+err = "#ea86af"
 
 [hostname]
 style = "muted"

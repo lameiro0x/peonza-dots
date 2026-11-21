@@ -53,6 +53,7 @@ SIGNAL_ALLOW = [
     "agentd/*",                     # agentd/tests and render may name the state
     "*/tests/*", "*/test_*.py",     # tests assert the budget
     "docs/*", "GUIA.md", "README.md",
+    "README.es.md",                 # the public tree's Spanish README: each theme's accent badge
     "theme/render.py",              # the app-theme generator refuses it
 ]
 

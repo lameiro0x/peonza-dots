@@ -23,7 +23,7 @@
 <br>
 
 <p align="center">
-  <img src=".github/readme/hero.webp" width="100%" alt="El mismo escritorio pasando por sus cinco temas: el ocaso pintado de Origen, la gran ola de Ola, la placa de puntos de Grafito, la página crema de Papel y la lámina técnica de Tinta, cada uno con su propia transición de fondo">
+  <img src=".github/readme/hero.webp" width="100%" alt="El mismo escritorio pasando por sus cinco temas: el ocaso pintado de Origen, la gran ola de Ola, la placa de puntos de Grafito, la sala de lectura de Papel y la lámina técnica de Tinta, cada uno con su propia transición de fondo">
 </p>
 
 > La peonza es la marca del autor, y cada superficie del escritorio la dibuja con la misma
@@ -91,9 +91,9 @@ Tinta en blanco y negro, cristal ahumado y láminas técnicas. JetBrains Mono ·
 <img src=".github/readme/desk-tinta.jpg" width="100%" alt="El escritorio de Tinta sobre la lámina RY-PZ-002: reloj, lista de piezas, tareas, el HUD y el reloj binario">
 
 ### Papel
-El único claro, para leer: tinta cálida sobre crema. Space Mono · una hoja de esquinas casi vivas · una página que se asienta · ![acento #ad3a24](https://img.shields.io/badge/acento-ad3a24-ad3a24?style=flat-square&labelColor=e8dcc8)
+Una sala de lectura de noche: tapete verde, letra de vitela, oro para los adornos y la hora escrita en palabras. Literata y EB Garamond en cursiva · números romanos y versalitas · una página que se asienta · Obsidian vestido de libro · ![acento #fd6940](https://img.shields.io/badge/acento-fd6940-fd6940?style=flat-square&labelColor=1d3229)
 
-<img src=".github/readme/desk-papel.jpg" width="100%" alt="El escritorio de Papel: el Tractatus en puntos dentro de la silueta de la peonza, los widgets en ventanas recortadas entre los puntos">
+<img src=".github/readme/desk-papel.jpg" width="100%" alt="El escritorio de Papel: un Quijote abierto sobre tapete verde, la hora escrita en palabras con una mayúscula dorada y los datos como un índice">
 
 <details>
 <summary><b>Los mismos cinco, trabajando</b></summary>
@@ -101,7 +101,7 @@ El único claro, para leer: tinta cálida sobre crema. Space Mono · una hoja de
 <table>
 <tr><td width="50%"><img src=".github/readme/theme-origen.jpg" alt="Origen trabajando: fastfetch, Neovim y cava en colores gruvbox"></td><td width="50%"><img src=".github/readme/theme-grafito.jpg" alt="Grafito trabajando: terminales grises, una paleta de terminal sin azul"></td></tr>
 <tr><td><img src=".github/readme/theme-ola.jpg" alt="Ola trabajando: terminales en colores kanagawa"></td><td><img src=".github/readme/theme-tinta.jpg" alt="Tinta trabajando: terminales de cristal ahumado"></td></tr>
-<tr><td><img src=".github/readme/theme-papel.jpg" alt="Papel trabajando: tintas oscuras legibles sobre crema"></td><td></td></tr>
+<tr><td><img src=".github/readme/theme-papel.jpg" alt="Papel trabajando: terminales en letra de vitela sobre el verde de la sala"></td><td></td></tr>
 </table>
 </details>
 
@@ -254,7 +254,7 @@ ola de Kanagawa*, *Viento del sur, cielo despejado* y *Kajikazawa en la provinci
 Hiroshige, *Los remolinos de Awa*; Frederic Edwin Church, *Twilight in the Wilderness*; Jasper
 Francis Cropsey, *Autumn – On the Hudson River*. Las fuentes están en
 [`assets/wallpapers/README.md`](assets/wallpapers/README.md). Tipografías: Martian Mono, Space
-Grotesk, Doto, Instrument Serif y Space Mono, con licencia SIL OFL.
+Grotesk, Doto, Instrument Serif, Literata y EB Garamond, con licencia SIL OFL.
 
 ## Licencia
 

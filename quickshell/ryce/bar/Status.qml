@@ -87,6 +87,7 @@ Row {
         Head {
             glyph: status.muted || status.volume === 0 ? Ryce.Ui.volOff : status.volume < 34 ? Ryce.Ui.volLow : status.volume < 67 ? Ryce.Ui.volMid : Ryce.Ui.volHigh
             word: "vol"
+            page: "vol."
             hue: status.muted ? Ryce.Palette.fg2 : Ryce.Palette.hueVol
             terminal: BarUi.skin === "box"
         }

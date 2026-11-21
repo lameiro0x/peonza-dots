@@ -468,6 +468,113 @@ def claude_theme(d: Path) -> str | None:
     return None
 
 
+OBSIDIAN_SNIPPET = "ryce"
+# Obsidian runs inside Electron (Arch: `electron43 /usr/lib/obsidian/app.asar`), so its
+# process is not called obsidian; its command line names the app, or the command itself is
+# obsidian (an AppImage). Anchored there: `nvim notes/obsidian` or `less /usr/bin/obsidian`
+# never count as Obsidian running.
+OBSIDIAN_PROC = r"^(\S*/)?obsidian( |$)|/obsidian/app\.asar( |$)"
+# In STATE: the vaults whose snippet this tool listed once. Remembered, so a snippet the
+# user turns off in Obsidian's settings stays off.
+OBSIDIAN_MEMORY = "obsidian.json"
+
+
+def obsidian_vaults() -> list[Path]:
+    """The vaults Obsidian knows (~/.config/obsidian/obsidian.json), each with its .obsidian
+    folder; none when Obsidian never ran. Never a hard-coded path."""
+    conf = HOME / ".config" / "obsidian" / "obsidian.json"
+    try:
+        vaults = json.loads(conf.read_text(encoding="utf-8")).get("vaults")
+    except (OSError, ValueError, AttributeError):
+        return []
+    found = []
+    for v in vaults.values() if isinstance(vaults, dict) else []:
+        path = v.get("path") if isinstance(v, dict) else None
+        if isinstance(path, str) and path:
+            dot = Path(path) / ".obsidian"
+            if dot.is_dir() and not dot.is_symlink():
+                found.append(dot)
+    return found
+
+
+def obsidian_running() -> bool:
+    if not shutil.which("pgrep"):
+        return True  # cannot tell: leave its settings alone
+    # Only «no such process» (1) means closed; a timeout or pgrep's own error cannot tell.
+    return run(["pgrep", "-u", UID, "-f", OBSIDIAN_PROC], timeout=1, ok=(1,)) is not None
+
+
+def obsidian_remembered() -> set[str]:
+    try:
+        listed = json.loads((STATE / OBSIDIAN_MEMORY).read_text(encoding="utf-8")).get("enabled")
+    except (OSError, ValueError, AttributeError):
+        return set()
+    return {p for p in listed if isinstance(p, str)} if isinstance(listed, list) else set()
+
+
+def obsidian_remember(vault: Path) -> None:
+    known = obsidian_remembered() | {str(vault)}
+    write_atomic(STATE / OBSIDIAN_MEMORY,
+                 (json.dumps({"enabled": sorted(known)}, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+
+
+def obsidian_enable(dot: Path) -> str | None:
+    """List the snippet in the vault's appearance.json, once per vault (remembered in STATE)
+    and only while Obsidian is closed: it reads the list at start and saves its own copy over
+    an outside edit. A missing snippet costs Obsidian nothing, so the list may travel with
+    the vault to a machine without it. Returns what the user must do when it could not."""
+    vault = dot.parent
+    if str(vault) in obsidian_remembered():
+        return None
+    f = dot / "appearance.json"
+    try:
+        conf = json.loads(f.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        conf = {}                             # a vault whose settings were never changed
+    except (OSError, ValueError):
+        return None                           # the user's file, unreadable: leave it be
+    if not isinstance(conf, dict) or f.is_symlink():
+        return None
+    listed = conf.get("enabledCssSnippets")
+    if not isinstance(listed, list):
+        listed = []
+    if OBSIDIAN_SNIPPET not in listed:
+        if obsidian_running():
+            return f"cierra Obsidian y ejecuta «ryce-theme apply» para activar su estilo en «{vault.name}»"
+        conf["enabledCssSnippets"] = listed + [OBSIDIAN_SNIPPET]
+        # Obsidian's own layout (JSON.stringify(…, null, 2), no final newline): its next save
+        # then changes nothing in a vault kept in git.
+        write_atomic(f, json.dumps(conf, indent=2, ensure_ascii=False).encode("utf-8"))
+    obsidian_remember(vault)
+    return None
+
+
+def obsidian(d: Path) -> str | None:
+    """Obsidian reloads an enabled CSS snippet as soon as its file changes (its vault
+    watcher); a symlink whose target flips wakes nothing. So every vault gets the theme's
+    ryce.css as a real file, written by rename and only when it differs (Papel's sheet is
+    the literary one; the other themes write an empty one and Obsidian looks as shipped).
+    The temporary name starts with a dot and does not end in .css: Obsidian skips it."""
+    src = d / "obsidian" / "ryce.css"
+    if not src.is_file():
+        return None
+    data = src.read_bytes()
+    errors = []
+    for dot in obsidian_vaults():
+        dst = dot / "snippets" / f"{OBSIDIAN_SNIPPET}.css"
+        try:
+            if dst.is_symlink() or dst.parent.is_symlink():
+                continue                      # someone's own link: never written through
+            dst.parent.mkdir(exist_ok=True)
+            if not (dst.is_file() and dst.read_bytes() == data):
+                write_atomic(dst, data)
+            if why := obsidian_enable(dot):
+                errors.append(why)
+        except OSError as e:
+            errors.append(f"{dst}: {e}")
+    return "; ".join(errors) or None
+
+
 def fan_out(tid: str, d: Path, info: dict) -> int:
     """Tell every app to reload, in order; return how many failed (one stderr line each)."""
     qs = C.get("qs_config", "ryce")
@@ -492,6 +599,7 @@ def fan_out(tid: str, d: Path, info: dict) -> int:
         ("Feishin", feishin),
         ("VS Code", lambda: vscode(info.get("name", tid))),
         ("Chromium", chromium),
+        ("Obsidian", lambda: obsidian(d)),
         ("waybar", lambda: signal("waybar", "USR2")),
         ("agentd", agentd),
     ]

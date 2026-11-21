@@ -11,33 +11,33 @@
 
 # Command line: commands in the aqua slot, options gold, strings green, keywords
 # and pipes violet. Arguments stay the plain text colour.
-set -g fish_color_normal 282623
-set -g fish_color_command 00585d
-set -g fish_color_keyword 733970
-set -g fish_color_param 282623
-set -g fish_color_option 6e4700
-set -g fish_color_quote 235a28
-set -g fish_color_escape 70306c
-set -g fish_color_redirection 70306c
-set -g fish_color_operator 6f460b
-set -g fish_color_end 733970
-set -g fish_color_comment 534e49 --italics
-set -g fish_color_error 842543
+set -g fish_color_normal f0dbcb
+set -g fish_color_command a0dbd6
+set -g fish_color_keyword c89cd2
+set -g fish_color_param f0dbcb
+set -g fish_color_option e4c973
+set -g fish_color_quote 98cb8d
+set -g fish_color_escape d8b1e1
+set -g fish_color_redirection d8b1e1
+set -g fish_color_operator f0da8d
+set -g fish_color_end c89cd2
+set -g fish_color_comment c0a999 --italics
+set -g fish_color_error ea86af
 set -g fish_color_valid_path --underline
-set -g fish_color_autosuggestion 534e49
-set -g fish_color_selection --background=c3bd92
-set -g fish_color_search_match --background=c3bd92
-set -g fish_color_history_current 282623 --bold
-set -g fish_color_cancel 534e49
+set -g fish_color_autosuggestion c0a999
+set -g fish_color_selection --background=655637
+set -g fish_color_search_match --background=655637
+set -g fish_color_history_current f0dbcb --bold
+set -g fish_color_cancel c0a999
 
-set -g fish_pager_color_progress 534e49
-set -g fish_pager_color_prefix 00585d --bold
-set -g fish_pager_color_completion 282623
-set -g fish_pager_color_description 6e4700
-set -g fish_pager_color_selected_background --background=c3bd92
-set -g fish_pager_color_selected_prefix 00585d --bold
-set -g fish_pager_color_selected_completion 282623
-set -g fish_pager_color_selected_description 6e4700
+set -g fish_pager_color_progress c0a999
+set -g fish_pager_color_prefix a0dbd6 --bold
+set -g fish_pager_color_completion f0dbcb
+set -g fish_pager_color_description e4c973
+set -g fish_pager_color_selected_background --background=655637
+set -g fish_pager_color_selected_prefix a0dbd6 --bold
+set -g fish_pager_color_selected_completion f0dbcb
+set -g fish_pager_color_selected_description e4c973
 
 # ls and lsd names (lsd reads LS_COLORS too). Directories bold in the gold slot,
 # never blue; links aqua, executables green, archives red, images and media
@@ -60,7 +60,7 @@ set -gx GREP_COLORS 'ms=01;33:mc=01;33:sl=:cx=:fn=35:ln=32:bn=32:se=90'
 
 # fzf: base 16 makes every slot not named here a palette colour, never Dark256's
 # blues; the current line sits on the theme's selection ground.
-set -gx FZF_DEFAULT_OPTS "--color=16,fg:-1,bg:-1,hl:3,fg+:15,bg+:#c3bd92,hl+:11,gutter:-1,info:8,border:8,separator:8,scrollbar:8,label:7,prompt:14,query:15,pointer:3,marker:2,spinner:5,header:6"
+set -gx FZF_DEFAULT_OPTS "--color=16,fg:-1,bg:-1,hl:3,fg+:15,bg+:#655637,hl+:11,gutter:-1,info:8,border:8,separator:8,scrollbar:8,label:7,prompt:14,query:15,pointer:3,marker:2,spinner:5,header:6"
 
 # man pages: bold (headings, options) in gold, underlined (arguments) aqua. groff
 # keeps the old overstrike so less can colour it.
@@ -70,5 +70,5 @@ set -gx MANPAGER 'less -R --use-color -Dd+y -Du+c'
 # git diff, log -p, show: delta on the theme's diff grounds, syntax in the ANSI
 # palette (BAT_THEME=ansi), file names in the gold slot, hunks by line number.
 if command -q delta
-    set -gx GIT_PAGER "delta --plus-style='syntax #b4bfaa' --minus-style='syntax #c7b1aa' --plus-emph-style='syntax #9eb292' --minus-emph-style='syntax #bf9a91' --file-style='bold yellow' --file-decoration-style='#aa9885 ul' --hunk-header-style='line-number syntax' --hunk-header-decoration-style='#aa9885 ul' --hunk-header-line-number-style=green --line-numbers --line-numbers-minus-style=red --line-numbers-plus-style=green --line-numbers-zero-style='#534e49' --line-numbers-left-style='#aa9885' --line-numbers-right-style='#aa9885'"
+    set -gx GIT_PAGER "delta --plus-style='syntax #394f2d' --minus-style='syntax #5c332f' --plus-emph-style='syntax #446233' --minus-emph-style='syntax #79403c' --file-style='bold yellow' --file-decoration-style='#485e54 ul' --hunk-header-style='line-number syntax' --hunk-header-decoration-style='#485e54 ul' --hunk-header-line-number-style=green --line-numbers --line-numbers-minus-style=red --line-numbers-plus-style=green --line-numbers-zero-style='#c0a999' --line-numbers-left-style='#485e54' --line-numbers-right-style='#485e54'"
 end

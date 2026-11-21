@@ -48,8 +48,14 @@ class Contracts(unittest.TestCase):
 
     def test_scheme_follows_the_ground(self):
         self.assertEqual({tid: tokens.scheme(t) for tid, t in THEMES.items()},
-                         {"origen": "dark", "grafito": "dark", "ola": "dark", "tinta": "dark", "papel": "light"})
-        self.assertEqual(render.render_text("{{theme.scheme}}", THEMES["papel"], "t.conf"), "light")
+                         {"origen": "dark", "grafito": "dark", "ola": "dark", "tinta": "dark", "papel": "dark"})
+        # Papel moved from cream paper to a green reading-room desk (2026-11-19); the light
+        # path stays for a theme on paper, and bg0 alone decides it.
+        paper = copy.deepcopy(THEMES["papel"])
+        paper["colors"]["bg0"] = "#f7f3eb"
+        self.assertEqual(tokens.scheme(paper), "light")
+        self.assertEqual(render.render_text("{{theme.scheme}}", paper, "t.conf"), "light")
+        self.assertEqual(render.render_text("{{theme.scheme}}", THEMES["papel"], "t.conf"), "dark")
 
     def test_tokens_check_is_clean(self):
         r = subprocess.run([sys.executable, str(ROOT / "tools" / "tokens.py"), "--check"],
@@ -77,7 +83,7 @@ class Contracts(unittest.TestCase):
     def test_dim_text_is_refused(self):
         for key in ("fg2", "claude"):
             t = copy.deepcopy(THEMES["papel"])
-            t["colors"][key] = "#7b7670"     # Papel's old fg2: 3.4:1 on its cream
+            t["colors"][key] = "#4d5e55"     # a baize grey: 2.0:1 on Papel's green desk
             with self.subTest(key=key), self.assertRaises(tokens.ThemeError):
                 tokens.validate(t)
 

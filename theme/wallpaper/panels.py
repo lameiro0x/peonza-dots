@@ -9,8 +9,8 @@ of the peonza, a nice one, with a little more white" instead of the old crop.
   ola      the mark in Prussian blue on washi, spinning on seigaiha waves.
   tinta    a pale technical plate: the half-section elevation of ink.py's Plano (the
            brand's fitted profile, cut half hatched) inside a degree ring, on a grid.
-  papel    the Tractatus cover's dots on cream: the peonza's silhouette as propositions
-           (paper.py's Sheet on a 15 px grid), axis rings around it.
+  papel    an ex libris on laid paper: «EX LIBRIS» over the peonza in the baize's green,
+           a double rule and a gilt fleuron (paper.py's type and mark).
 
 rofi's face covers the top ~135 px and the readout and signature the bottom ~140, so
 every mark sits in the band between (TOP..FOOT). The signal colour never appears.
@@ -33,6 +33,7 @@ from scenes import PANEL, blur, finish, grid, hexrgb, mark, mix, smoothstep, val
 
 W, H = PANEL
 TOP, FOOT = 150, 460            # the band rofi leaves bare, in px of the 600 tall panel
+INSCRIPTION = (330, 460)        # Papel's plate: where its rofi face prints the hour
 NEEDS = ("peonza.svg", "peonza-silhouette.svg", "peonza-64.svg")
 
 
@@ -194,22 +195,30 @@ def tinta(t: dict) -> Image.Image:
 
 # ── papel ─────────────────────────────────────────────────────────────────────
 def papel(t: dict) -> Image.Image:
+    """An ex libris: a bookplate on laid paper (vellum lightened, its chain lines faint),
+    a double rule in the baize's green, «EX LIBRIS» in spaced semibold capitals at the top
+    over the peonza in the same green, its engraving left as paper, and a gilt fleuron
+    under it. Unlike the other panels the top is not hidden: Papel's rofi face prints the
+    greeting, the hour and the date on the plate itself, in the lower band (INSCRIPTION),
+    where a bookplate carries its owner's name; the readout and signature cover the foot."""
     import paper
-    cell = 15
-    rows, cols = H // cell, W // cell
-    box, x0, y0 = 21, 1, TOP // cell + 1
-    sil = paper.coverage("peonza-silhouette.svg", box=box)[..., 3]
-    full = paper.coverage("peonza.svg", box=box)
-    dark = full[..., 3] * (1 - full[..., :3].mean(axis=-1))
-    inside = np.zeros((rows, cols), dtype=bool)
-    cut = np.zeros((rows, cols), dtype=bool)
-    inside[y0:y0 + box, x0:x0 + box] = sil >= 0.5
-    cut[y0:y0 + box, x0:x0 + box] = dark >= 0.3
-    pad = np.pad(inside, 1)
-    edge = inside & ~(pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:])
-    sheet = paper.Sheet(rows, cols)
-    sheet.write([tuple(q) for q in np.argwhere(inside & ~(cut & ~edge))], edge.astype(np.float64))
-    return finish(paper.raster(sheet, W, H, paper.palette(t)))
+    c = {k: hexrgb(v) for k, v in t["colors"].items()}
+    sheet = lighten(c["fg0"], 0.3)
+    x, _ = grid(W, H)
+    chain = np.abs(((x * W) % 24) - 12) > 11.4                     # a chain line every 24 px
+    rgb = np.broadcast_to(sheet, (H, W, 3)) - chain[..., None] * 0.10 * (sheet - c["fg2"])
+    rgb = rgb - (value_noise(W, H, 6, 6, np.random.default_rng(17))[..., None] - 0.5) * 0.02
+    green, gd = paper.blank(W, H)
+    gilt, ld = paper.blank(W, H)
+    for inset, width in ((14, 2), (20, 1)):
+        gd.rectangle((inset, inset, W - 1 - inset, H - 1 - inset), outline=255, width=width)
+    paper.spaced(gd, "EX LIBRIS", paper.face(paper.LITERATA, 24, 600), W / 2, 82, 5.0, [])
+    size = 150
+    paper.stamp(green, paper.peonza(size), W / 2, 108)
+    ld.text((W / 2, 108 + size + 50), "\u2766", font=paper.face(paper.GARAMOND_ITALIC, 28), fill=255, anchor="ms")
+    # Nothing is drawn in INSCRIPTION: rofi sets the hour there (@papel/rofi/style.rasi).
+    ink = [(c["bg0"], 1.0, green), (hexrgb(t["desktop"]["folder_dark"]), 1.0, gilt)]
+    return finish(paper.lay(rgb, ink))
 
 
 PANELS = {"origen": origen, "grafito": grafito, "ola": ola, "tinta": tinta, "papel": papel}

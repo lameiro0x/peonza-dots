@@ -196,45 +196,78 @@ class Generator(unittest.TestCase):
 
 
 class Paper(unittest.TestCase):
-    """Papel's covers (theme/wallpaper/paper.py): the text, the rule, the budget."""
+    """Papel's reading room (theme/wallpaper/paper.py): the text, where the spread lies, the
+    lock's rows against its hyprlock template, and a budget that can fail."""
 
     @classmethod
     def setUpClass(cls):
         import paper
         cls.paper = paper
 
-    def test_the_text_is_the_whole_tractatus(self):
-        props = self.paper.propositions()
-        self.assertEqual(len(props), 526)
-        self.assertEqual((props[0][0], props[-1][0]), ("1", "7"))
-        self.assertEqual(len({p[0] for p in props}), 526, "a proposition repeats")
+    def test_the_text_opens_the_quijote_in_modern_accents(self):
+        text = " ".join(self.paper.QUIJOTE)
+        self.assertTrue(text.startswith("En un lugar de la Mancha, de cuyo nombre no quiero acordarme"))
+        for old in (" á ", " ó ", "fué", "vió"):                # the 1905 source's accents, modernised
+            self.assertNotIn(old, text)
 
-    def test_filled_is_up_to_three_decimals(self):
-        self.assertTrue(all(self.paper.spine(n) for n in ("1", "1.1", "2.01", "4.024")))
-        self.assertFalse(any(self.paper.spine(n) for n in ("4.0031", "6.36311")))
+    def test_the_spread_clears_the_bar_and_every_card(self):
+        s, m = self.paper.SPREAD, self.paper.CARD_MARGIN
+        top = s["head"] - 20                                    # the running heads' capitals
+        bottom = s["first"] + (s["lines"] - 1) * s["lead"] + 8  # the last line's descenders
+        self.assertGreater(top, self.paper.BAR)
+        for page in ("verso", "recto"):
+            x0, x1 = s[page]
+            for name, (c0, r0, c1, r1) in self.paper.CARDS.items():
+                with self.subTest(page=page, card=name):
+                    apart = x1 <= c0 - m or x0 >= c1 + m or bottom <= r0 - m or top >= r1 + m
+                    self.assertTrue(apart, f"the {page} reaches the {name} card")
 
-    def test_radius_grows_with_length_inside_its_cell(self):
-        r = self.paper.radii([("1", 10, 0), ("2", 100, 0), ("3", 1000, 0)])
-        self.assertEqual(list(r), sorted(r))
-        self.assertLessEqual(r.max() * (1 + self.paper.EDGE), 0.5 + 1e-9, "a disc would spill into its neighbour")
+    def test_the_lock_template_sits_on_the_pictures_rows(self):
+        conf = (ROOT / "theme" / "templates" / "@papel" / "hypr" / "hyprlock.conf").read_text(encoding="utf-8")
+        blocks = [b for b in conf.split("\n}") if "position" in b]
 
-    def test_lock_window_is_inside_the_block(self):
-        b, w = self.paper.BLOCK, self.paper.WINDOW
-        self.assertTrue(b[0] < w[0] and b[1] < w[1] and w[2] < b[2] and w[3] < b[3])
-        self.assertEqual(self.paper.window_px(), (510, 300, 990, 750))   # @papel/hypr/hyprlock.conf
+        def at(block: str) -> tuple[int, int]:
+            x, y = (int(v) for v in block.split("position = ", 1)[1].split("\n", 1)[0].split(","))
+            return x, y
+
+        field = next(b for b in blocks if "input-field {" in b)
+        w, h = (int(v) for v in field.split("size = ", 1)[1].split("\n", 1)[0].split(","))
+        cx, cy = at(field)
+        rows = self.paper.LOCK_ROWS
+        self.assertEqual((cx, w), (0, rows["field_width"]), "the field is the hairline's width, centred")
+        self.assertAlmostEqual(540 - cy + h / 2, rows["field_rule"], delta=2, msg="the field stands on its hairline")
+        # The hour and its second line are centred labels inside the picture's quiet band.
+        x0, y0, x1, y1 = self.paper.LOCK_QUIET
+        for key in ("ryce-hora\"; {", "--parte"):
+            block = next(b for b in blocks if key in b)
+            with self.subTest(label=key):
+                self.assertEqual(at(block)[0], 0)
+                self.assertTrue(y0 < 540 - at(block)[1] < y1)
+
+    def test_banding_measure_sees_an_undithered_gradient(self):
+        light = np.linspace(30.0, 40.0, 600)
+        self.assertGreater(self.paper.band_step(np.round(light), light), 0.95)
+        dithered = np.round(light + np.random.default_rng(1).normal(0, 1.1, light.size))
+        self.assertLess(self.paper.band_step(dithered, light), self.paper.BUDGET["band_step_max"])
+
+    def test_budget_refuses_ghosts_that_read_and_a_lit_room(self):
+        t = THEMES["papel"]
+        lamp = self.paper.LAMP["desk"]
+        ground = self.paper.baize(192, 108, t, lamp, felt=False)
+        mask = Image.new("L", (192, 108), 0)
+        mask.paste(255, (80, 60, 120, 70))
+        loud = (ground, [(self.paper.palette(t)["vellum"], 0.6, mask)], lamp)
+        img = scenes.finish(self.paper.lay(*loud[:2]))
+        self.assertTrue(any("ghost letters" in b for b in self.paper.over_budget(img, t, loud)))
+        lit = Image.new("RGB", (192, 108), t["colors"]["fg0"])
+        self.assertTrue(any("dim room" in b for b in self.paper.over_budget(lit, t)))
 
     @unittest.skipUnless((scenes.BRAND / "peonza-silhouette.svg").exists(), "no logo-peonza brand")
-    def test_masters_are_fresh_and_within_the_paper_budget(self):
+    def test_masters_are_fresh_and_within_the_budget(self):
         import subprocess
         r = subprocess.run([sys.executable, str(ROOT / "theme" / "wallpaper" / "paper.py"), "--check"],
                            capture_output=True, text=True, timeout=300)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-
-    @unittest.skipUnless((scenes.BRAND / "peonza-silhouette.svg").exists(), "no logo-peonza brand")
-    def test_budget_refuses_an_inked_page(self):
-        t = THEMES["papel"]
-        ink = Image.new("RGB", (640, 360), t["colors"]["fg0"])
-        self.assertTrue(self.paper.over_budget(ink, t, quiet=True))
 
 
 if __name__ == "__main__":

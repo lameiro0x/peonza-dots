@@ -106,13 +106,14 @@ exit 0`
 
     function rate(bps) {
         if (bps < 0) return "…";
-        if (bps < 1e6) return Math.round(bps / 1e3) + " kB/s";
-        return (bps / 1e6).toLocaleString(es, "f", bps < 1e8 ? 1 : 0) + " MB/s";
+        if (bps < 1e6) return Math.round(bps / 1e3) + DeskUi.unit + "kB/s";
+        return (bps / 1e6).toLocaleString(es, "f", bps < 1e8 ? 1 : 0) + DeskUi.unit + "MB/s";
     }
     function since(s) {
         if (s < 0) return "…";
         const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
-        return d > 0 ? `${d} d ${h} h` : h > 0 ? `${h} h ${m} min` : `${m} min`;
+        const u = DeskUi.unit;
+        return d > 0 ? `${d}${u}d ${h}${u}h` : h > 0 ? `${h}${u}h ${m}${u}min` : `${m}${u}min`;
     }
     function gb(v) { return v.toLocaleString(es, "f", v < 100 ? 1 : 0); }
 

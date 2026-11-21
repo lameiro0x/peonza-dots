@@ -6,8 +6,8 @@
 
 window#osd {
     border-radius: 2px;
-    border: 1px solid #aa9885;
-    background: alpha(#d4bfa8, 0.96);
+    border: 1px solid #485e54;
+    background: alpha(#23382f, 0.96);
 }
 
 window#osd #container {
@@ -16,7 +16,7 @@ window#osd #container {
 
 window#osd image,
 window#osd label {
-    color: #282623;
+    color: #f0dbcb;
 }
 
 window#osd image {
@@ -48,7 +48,7 @@ window#osd segment {
     min-height: 8px;
     border-radius: 2px;
     border: none;
-    background: #c2ad96;
+    background: #31473d;
 }
 
 window#osd progress,
@@ -56,7 +56,7 @@ window#osd segment.active {
     min-height: 8px;
     border-radius: 2px;
     border: none;
-    background: #413d38;
+    background: #e4d27b;
 }
 
 window#osd segment {

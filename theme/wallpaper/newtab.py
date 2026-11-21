@@ -23,15 +23,15 @@ picture keeps that side calm and puts its drawing on the other one:
   tinta    a study in revolution: the peonza's fitted profile turned about its axis as a
            wireframe through the sheets' camera (20° over the table), hidden lines
            dashed, on a degree ring laid on the table.
-  papel    the book as a tree: each Tractatus proposition one dot (Papel's radius,
-           filled/hollow rule and question halo), read clockwise from the top, on the
-           ring of its depth in the numbering, a hairline in to the one it comments on.
+  papel    the title page of the 1605 Quijote on green baize under the lamp, set in
+           Literata in its own spelling, in a gilt double rule, with Juan de la Cuesta's
+           device redrawn round the peonza (paper.py's baize, inks and type).
 
 COLUMN is the column's width at 1920 plus a margin; --check measures fg1 (the dimmest
 text there) against the worst 16 px block under it in each picture, with no scrim (the
 page darkens it further), and refuses under 4.5:1. Each size is drawn at its own
 resolution, not resized. Deterministic: seeded noise only; --check compares decoded
-pixels with scenes.py's tolerance. Needs rsvg-convert (Tinta) and Papel's tractatus.json.
+pixels with scenes.py's tolerance. Needs rsvg-convert (Tinta) and, for Papel, the brand's mark/ folder (paper.py).
 """
 
 from __future__ import annotations
@@ -313,59 +313,71 @@ def tinta(w: int, h: int, left: bool) -> Image.Image:
 
 
 # ── papel ─────────────────────────────────────────────────────────────────────
+# The 1605 title page, in its own spelling, centred on the far side (1920x1080 units):
+# (text, face, px, tracking, baseline). Faces: caps (spaced capitals) or italic.
+TITLE_PAGE = [("EL INGENIOSO", "caps", 26, 6.0, 236),
+              ("HIDALGO DON QVI-", "caps", 44, 3.0, 306),
+              ("XOTE DE LA MANCHA,", "caps", 44, 3.0, 362),
+              ("Compuesto por Miguel de Ceruantes", "italic", 24, 0, 420),
+              ("Saauedra.", "italic", 24, 0, 452),
+              ("EN MADRID,", "caps", 18, 4.0, 846),
+              ("Por Iuan de la Cuesta.", "italic", 22, 0, 878),
+              ("Año 1605.", "italic", 22, 0, 914)]
+DEVICE = {"cy": 650, "ring": 128, "motto": 104, "peonza": 128}   # Cuesta's device, the peonza in it
+MOTTO = "POST TENEBRAS SPERO LVCEM"
+TITLE_INK = 0.44                # vellum: a page lit by the lamp, calm beside the column
+
+
 def papel(w: int, h: int, left: bool) -> Image.Image:
+    """The title page of the 1605 Quijote on the baize under the lamp: its lines in vellum,
+    a gilt double rule round it, and Juan de la Cuesta's device redrawn with the peonza
+    inside its ring and the device's own motto, «post tenebras spero lucem», round it."""
     import paper
-    t, c, a = colours("papel")
-    g = {k: hx(v) for k, v in paper.palette(t).items()}
-    props = paper.propositions()
-    nums = {p[0]: i for i, p in enumerate(props)}
-
-    def parent(num: str) -> str | None:
-        """The proposition `num` comments on: its number with the last digit dropped,
-        until one exists (2.0121 -> 2.012, 2.01 -> 2)."""
-        while "." in num:
-            num = num[:-1].rstrip(".")
-            if num in nums:
-                return num
-        return None
-
-    depth: dict[str, int] = {}
-    for num, _, _ in props:
-        up = parent(num)
-        depth[num] = 0 if up is None else depth[up] + 1
-    # A radial tree, read clockwise from the top: a proposition's angle is its place in
-    # the book (a gap closes the circle after 7), its ring the depth of its number.
-    cx, cy = (0.735 if left else 0.265) * 1920, 548
-    r0, r1, gap = 52, 420, np.deg2rad(18)
-    rings = max(depth.values())
-
-    def where(i: int, num: str) -> tuple[float, float]:
-        th = gap / 2 + (2 * np.pi - gap) * i / (len(props) - 1)
-        r = r0 + (r1 - r0) * depth[num] / rings
-        return cx + r * np.sin(th), cy - r * np.cos(th)
-
-    unit = 12                                        # px of a cell at 1080: radius scale
-    rad = paper.radii(props) * unit
-    halos, lines, marks = [], [], []
-    for k in range(rings + 1):
-        lines.append(f'<circle cx="{cx}" cy="{cy}" r="{r0 + (r1 - r0) * k / rings:.2f}" fill="none" '
-                     f'stroke="{g["axis"]}" stroke-width="0.6" stroke-dasharray="1 5"/>')
-    for i, (num, _, q) in enumerate(props):
-        x, y = where(i, num)
-        if (up := parent(num)) is not None:
-            px, py = where(nums[up], up)
-            lines.append(f'<path d="M{x:.2f} {y:.2f}L{px:.2f} {py:.2f}" stroke="{g["axis"]}" stroke-width="0.8"/>')
-        if q:
-            halos.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{min(rad[i] * 2 + 0.1 * unit, 0.62 * unit):.2f}" fill="{g["halo"]}"/>')
-        if paper.spine(num):
-            marks.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{rad[i]:.2f}" fill="{g["ink"]}" '
-                         f'stroke="{g["paper"]}" stroke-width="1"/>')
+    t = tokens.load("papel")
+    pal = paper.palette(t)
+    u = w / 1920
+    cx = (0.735 if left else 0.265) * w
+    words, wd = paper.blank(w, h)
+    gilt, gd = paper.blank(w, h)
+    faces = {"caps": paper.LITERATA, "italic": paper.LITERATA_ITALIC}
+    for text, kind, px, track, base in TITLE_PAGE:
+        f = paper.face(faces[kind], px * u)
+        if kind == "caps":
+            paper.spaced(wd, text, f, cx, base * u, track * u, [])
         else:
-            sw = paper.RING * unit
-            marks.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{rad[i] - sw / 2:.2f}" fill="{g["paper"]}" '
-                         f'stroke="{g["ink"]}" stroke-width="{sw:.2f}"/>')
-    body = f'<rect width="1920" height="1080" fill="{g["paper"]}"/>' + "".join(halos + lines + marks)
-    return svg_raster(body, w, h)
+            wd.text((cx, base * u), text, font=f, fill=255, anchor="ms", features=["onum"])
+    # The frame: thick and thin rules; a short rule under the author.
+    for inset, width in ((0, 2), (8, 1)):
+        x0, y0, x1, y1 = cx - (330 - inset) * u, (150 + inset) * u, cx + (330 - inset) * u, (960 - inset) * u
+        gd.rectangle((x0, y0, x1, y1), outline=255, width=max(1, round(width * u)))
+    gd.line((cx - 40 * u, 490 * u, cx + 40 * u, 490 * u), fill=255, width=max(1, round(u)))
+    # The device: a double ring, the motto along its upper arc, the peonza in the middle.
+    d = DEVICE
+    cy = d["cy"] * u
+    for r, width in ((d["ring"], 2), (d["ring"] - 7, 1)):
+        gd.ellipse((cx - r * u, cy - r * u, cx + r * u, cy + r * u), outline=255, width=max(1, round(width * u)))
+    arc(gilt, MOTTO, paper.face(paper.LITERATA, 13 * u), cx, cy, d["motto"] * u, 2.2 * u)
+    paper.stamp(gilt, paper.peonza(round(d["peonza"] * u)), cx, cy - d["peonza"] * u / 2)
+    ground = paper.baize(w, h, t, ((0.735 if left else 0.265), 0.55, 0.30, 0.62), seed=13)
+    return finish(paper.lay(ground, [(pal["vellum"], TITLE_INK, words), (pal["gilt"], paper.GILT, gilt)]))
+
+
+def arc(mask: Image.Image, text: str, font, cx: float, cy: float, r: float, track: float) -> None:
+    """Capitals set clockwise along the top of a circle of radius r (their baseline on it),
+    centred on the top, each glyph turned to the circle's tangent."""
+    widths = [font.getlength(ch) for ch in text]
+    total = (sum(widths) + track * (len(text) - 1)) / r          # the arc's angle
+    phi = -total / 2
+    box = int(font.size * 3)
+    for ch, wd in zip(text, widths):
+        mid = phi + wd / 2 / r
+        g = Image.new("L", (box, box), 0)
+        ImageDraw.Draw(g).text((box / 2, box / 2), ch, font=font, fill=255, anchor="ms")
+        g = g.rotate(-np.degrees(mid), resample=Image.BICUBIC, center=(box / 2, box / 2))
+        x, y = round(cx + r * np.sin(mid) - box / 2), round(cy - r * np.cos(mid) - box / 2)
+        under = mask.crop((x, y, x + box, y + box))
+        mask.paste(Image.fromarray(np.maximum(np.asarray(under), np.asarray(g))), (x, y))
+        phi += (wd + track) / r
 
 
 PICTURES = {"origen": origen, "grafito": grafito, "ola": ola, "tinta": tinta, "papel": papel}

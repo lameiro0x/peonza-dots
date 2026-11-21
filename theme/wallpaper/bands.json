@@ -110,34 +110,34 @@
       "1920x1080": {
         "top": {
           "y": 0,
-          "average": "#dbc7ae",
-          "luminance": 0.58963
+          "average": "#1d3128",
+          "luminance": 0.02611
         },
         "lightest": {
-          "y": 0,
-          "average": "#dbc7ae",
-          "luminance": 0.58963
+          "y": 830,
+          "average": "#2d3e30",
+          "luminance": 0.04217
         }
       },
       "2560x1440": {
         "top": {
           "y": 0,
-          "average": "#dbc7ae",
-          "luminance": 0.58963
+          "average": "#1d3128",
+          "luminance": 0.02611
         },
         "lightest": {
-          "y": 0,
-          "average": "#dbc7ae",
-          "luminance": 0.58963
+          "y": 1127,
+          "average": "#2d3e30",
+          "luminance": 0.04217
         }
       }
     }
   },
   "floor": {
-    "theme": "papel",
+    "theme": "ola",
     "size": "1920x1080",
-    "y": 0,
-    "average": "#dbc7ae",
-    "luminance": 0.58963
+    "y": 18,
+    "average": "#c1bda0",
+    "luminance": 0.50271
   }
 }

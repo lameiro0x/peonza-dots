@@ -6,150 +6,150 @@
    GTK4 apps pick this up when they start; a theme switch does not restyle them live. */
 
 :root {
-    --accent-color:              #282623;
-    --accent-bg-color:           #282623;
-    --accent-fg-color:           #dbc6ae;
-    --destructive-color:         #842543;
-    --destructive-bg-color:      #842543;
-    --destructive-fg-color:      #dbc6ae;
-    --success-color:             #1c5422;
-    --success-bg-color:          #1c5422;
-    --success-fg-color:          #dbc6ae;
-    --warning-color:             #684100;
-    --warning-bg-color:          #684100;
-    --warning-fg-color:          #dbc6ae;
-    --error-color:               #842543;
-    --error-bg-color:            #842543;
-    --error-fg-color:            #dbc6ae;
-    --window-bg-color:           #d4bfa8;
-    --window-fg-color:           #282623;
-    --view-bg-color:             #dbc6ae;
-    --view-fg-color:             #282623;
-    --headerbar-bg-color:        #d4bfa8;
-    --headerbar-fg-color:        #282623;
-    --headerbar-border-color:    #aa9885;
-    --headerbar-backdrop-color:  #d4bfa8;
-    --headerbar-shade-color:     #aa9885;
-    --headerbar-darker-shade-color: #dbc6ae;
-    --sidebar-bg-color:          #d4bfa8;
-    --sidebar-fg-color:          #413d38;
-    --sidebar-backdrop-color:    #d4bfa8;
-    --sidebar-border-color:      #aa9885;
-    --sidebar-shade-color:       #aa9885;
-    --secondary-sidebar-bg-color: #d4bfa8;
-    --secondary-sidebar-fg-color: #413d38;
-    --secondary-sidebar-backdrop-color: #d4bfa8;
-    --secondary-sidebar-border-color: #aa9885;
-    --secondary-sidebar-shade-color: #aa9885;
-    --card-bg-color:             #cbb79f;
-    --card-fg-color:             #282623;
-    --card-shade-color:          #aa9885;
-    --dialog-bg-color:           #cbb79f;
-    --dialog-fg-color:           #282623;
-    --popover-bg-color:          #cbb79f;
-    --popover-fg-color:          #282623;
+    --accent-color:              #f0dbcb;
+    --accent-bg-color:           #e2bf76;
+    --accent-fg-color:           #182b23;
+    --destructive-color:         #ea86af;
+    --destructive-bg-color:      #ea86af;
+    --destructive-fg-color:      #182b23;
+    --success-color:             #a2d496;
+    --success-bg-color:          #a2d496;
+    --success-fg-color:          #182b23;
+    --warning-color:             #e6d271;
+    --warning-bg-color:          #e6d271;
+    --warning-fg-color:          #182b23;
+    --error-color:               #ea86af;
+    --error-bg-color:            #ea86af;
+    --error-fg-color:            #182b23;
+    --window-bg-color:           #23382f;
+    --window-fg-color:           #f0dbcb;
+    --view-bg-color:             #1d3229;
+    --view-fg-color:             #f0dbcb;
+    --headerbar-bg-color:        #23382f;
+    --headerbar-fg-color:        #f0dbcb;
+    --headerbar-border-color:    #485e54;
+    --headerbar-backdrop-color:  #23382f;
+    --headerbar-shade-color:     #485e54;
+    --headerbar-darker-shade-color: #1d3229;
+    --sidebar-bg-color:          #23382f;
+    --sidebar-fg-color:          #dbc4b3;
+    --sidebar-backdrop-color:    #23382f;
+    --sidebar-border-color:      #485e54;
+    --sidebar-shade-color:       #485e54;
+    --secondary-sidebar-bg-color: #23382f;
+    --secondary-sidebar-fg-color: #dbc4b3;
+    --secondary-sidebar-backdrop-color: #23382f;
+    --secondary-sidebar-border-color: #485e54;
+    --secondary-sidebar-shade-color: #485e54;
+    --card-bg-color:             #293f35;
+    --card-fg-color:             #f0dbcb;
+    --card-shade-color:          #485e54;
+    --dialog-bg-color:           #293f35;
+    --dialog-fg-color:           #f0dbcb;
+    --popover-bg-color:          #293f35;
+    --popover-fg-color:          #f0dbcb;
     --popover-shade-color:       rgba(0, 0, 0, 0.4);
-    --thumbnail-bg-color:        #cbb79f;
-    --thumbnail-fg-color:        #282623;
+    --thumbnail-bg-color:        #293f35;
+    --thumbnail-fg-color:        #f0dbcb;
     --shade-color:               rgba(0, 0, 0, 0.3);
-    --scrollbar-outline-color:   #dbc6ae;
-    --border-color:              #aa9885;
+    --scrollbar-outline-color:   #1d3229;
+    --border-color:              #485e54;
 }
 
-@define-color accent_color          #282623;
-@define-color accent_bg_color       #282623;
-@define-color accent_fg_color       #dbc6ae;
-@define-color window_bg_color       #d4bfa8;
-@define-color window_fg_color       #282623;
-@define-color view_bg_color         #dbc6ae;
-@define-color view_fg_color         #282623;
-@define-color headerbar_bg_color    #d4bfa8;
-@define-color headerbar_fg_color    #282623;
-@define-color headerbar_border_color #aa9885;
-@define-color sidebar_bg_color      #d4bfa8;
-@define-color sidebar_fg_color      #413d38;
-@define-color card_bg_color         #cbb79f;
-@define-color card_fg_color         #282623;
-@define-color dialog_bg_color       #cbb79f;
-@define-color dialog_fg_color       #282623;
-@define-color popover_bg_color      #cbb79f;
-@define-color popover_fg_color      #282623;
-@define-color borders               #aa9885;
+@define-color accent_color          #f0dbcb;
+@define-color accent_bg_color       #e2bf76;
+@define-color accent_fg_color       #182b23;
+@define-color window_bg_color       #23382f;
+@define-color window_fg_color       #f0dbcb;
+@define-color view_bg_color         #1d3229;
+@define-color view_fg_color         #f0dbcb;
+@define-color headerbar_bg_color    #23382f;
+@define-color headerbar_fg_color    #f0dbcb;
+@define-color headerbar_border_color #485e54;
+@define-color sidebar_bg_color      #23382f;
+@define-color sidebar_fg_color      #dbc4b3;
+@define-color card_bg_color         #293f35;
+@define-color card_fg_color         #f0dbcb;
+@define-color dialog_bg_color       #293f35;
+@define-color dialog_fg_color       #f0dbcb;
+@define-color popover_bg_color      #293f35;
+@define-color popover_fg_color      #f0dbcb;
+@define-color borders               #485e54;
 
 /* ---- everywhere ------------------------------------------------------------ */
 
 row:selected,
 columnview > listview > row:selected,
 gridview > child:selected {
-  background-color: rgba(65, 61, 56, 0.26);
-  color: #282623;
+  background-color: rgba(155, 196, 225, 0.26);
+  color: #f0dbcb;
 }
 
 rubberband {
-  border: 1px solid #413d38;
+  border: 1px solid #9bc4e1;
   border-radius: 2px;
-  background-color: rgba(65, 61, 56, 0.12);
+  background-color: rgba(155, 196, 225, 0.12);
 }
 
 .navigation-sidebar > row:selected {
-  background-color: rgba(65, 61, 56, 0.16);
-  color: #413d38;
+  background-color: rgba(229, 185, 117, 0.16);
+  color: #e5b975;
 }
 
 tooltip.background {
-  background-color: #cbb79f;
-  border: 1px solid #aa9885;
+  background-color: #293f35;
+  border: 1px solid #485e54;
   border-radius: 2px;
 }
 
-popover > contents { border: 1px solid #aa9885; }
+popover > contents { border: 1px solid #485e54; }
 
 /* ---- File chooser: a framed gate of film black, breadcrumbs, the folder as pill */
 
 filechooser placessidebar,
 filechooser placessidebar list {
-  background-color: #d4bfa8;
+  background-color: #23382f;
 }
 
 filechooser placessidebar row {
-  color: #413d38;
+  color: #dbc4b3;
   border-radius: 2px;
 }
 
 filechooser placessidebar row:selected {
-  background-color: rgba(65, 61, 56, 0.16);
-  color: #413d38;
+  background-color: rgba(229, 185, 117, 0.16);
+  color: #e5b975;
 }
 
 filechooser pathbar button {
-  background: rgba(40, 38, 35, 0.05);
-  border: 1px solid #aa9885;
+  background: rgba(240, 219, 203, 0.05);
+  border: 1px solid #485e54;
   box-shadow: none;
   border-radius: 2px;
-  color: #413d38;
+  color: #dbc4b3;
 }
 
 filechooser pathbar button:hover {
-  background-color: #cbb79f;
-  color: #282623;
+  background-color: #293f35;
+  color: #f0dbcb;
 }
 
 filechooser pathbar button:checked {
-  background-color: #282623;
-  color: #dbc6ae;
+  background-color: #e2bf76;
+  color: #182b23;
 }
 
 filechooser stack.view,
 filechooser .browser {
-  background-color: #dbc6ae;
+  background-color: #1d3229;
 }
 
 filechooser columnview,
 filechooser gridview {
-  background-color: #dbc6ae;
+  background-color: #1d3229;
 }
 
 filechooser columnview > header > button {
-  color: #413d38;
-  border-bottom: 1px solid #aa9885;
+  color: #dbc4b3;
+  border-bottom: 1px solid #485e54;
 }

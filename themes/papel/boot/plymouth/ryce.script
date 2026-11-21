@@ -19,9 +19,9 @@ fun rgb(r, g, b)
     return c;
   }
 
-bg = rgb(219, 198, 174);
-ink = rgb(65, 61, 56);
-FONT = "Space Mono";
+bg = rgb(29, 50, 41);
+ink = rgb(219, 196, 179);
+FONT = "Literata";
 
 Window.SetBackgroundTopColor(bg.r, bg.g, bg.b);
 Window.SetBackgroundBottomColor(bg.r, bg.g, bg.b);

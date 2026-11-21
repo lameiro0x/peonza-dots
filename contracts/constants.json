@@ -81,7 +81,8 @@
     "qt6ct/colors/ryce.conf",
     "swayosd/style.css",
     "yazi/theme.toml",
-    "claude/ryce.json"
+    "claude/ryce.json",
+    "obsidian/ryce.css"
   ],
   "ipc": {
     "sidebar": [

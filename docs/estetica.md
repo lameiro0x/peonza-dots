@@ -23,18 +23,18 @@ con estadísticas sobre el escritorio (el KDE monocromo). Ninguna configuración
 
 | | **Origen** | **Grafito** | **Ola** | **Tinta** | **Papel** |
 |---|---|---|---|---|---|
-| Idea | Taller gruvbox: madera, crema y un naranja que solo avisa | Un instrumento: grises puros, números de puntos | La gran ola de Hokusai: tinta índigo y papel de arroz | Manga en blanco y negro, como el post r/unixporn 1tg82cr | Papel de lectura: las portadas del Ludwig Wittgenstein Project hechas escritorio; el único tema claro |
+| Idea | Taller gruvbox: madera, crema y un naranja que solo avisa | Un instrumento: grises puros, números de puntos | La gran ola de Hokusai: tinta índigo y papel de arroz | Manga en blanco y negro, como el post r/unixporn 1tg82cr | Sala de lectura de noche: un libro abierto sobre tapete verde, a la luz de una lámpara; letra de libro y cursiva escrita, también en Obsidian |
 | Temperatura | cálida | neutra | fría | neutra | cálida |
-| Letra de la interfaz | Martian Mono (la de la marca) | Space Grotesk | Inter | JetBrains Mono | Space Mono (la de las portadas) |
-| Letra grande (reloj) | Martian Mono | Doto, de puntos (a 26 px o más) | Instrument Serif | JetBrains Mono | Space Mono Bold |
-| Forma | fichas redondeadas (12–16 px) | casi recta (2–6 px) | cápsulas y squircles (16–22 px) | cajas con filo de 1 px, sin marco lateral | hoja casi recta (2–4 px), píldoras redondas como los puntos |
-| Barra | fichas flotantes con iconos de colores | tres placas negras con separadores de punto, **todo en la letra de puntos del reloj** (Doto) | cápsulas flotantes, reloj con serifa | cajitas ahumadas flotantes, hora sobre fecha | tinta sobre papel; el workspace activo es un punto lleno |
-| Color | colores gruvbox en barra, terminal y prompt | gris; la terminal sin azul | colores kanagawa | gris con un susurro de tono | tinta cálida y grises; la terminal en tintas oscuras legibles sobre crema |
+| Letra de la interfaz | Martian Mono (la de la marca) | Space Grotesk | Inter | JetBrains Mono | Literata (letra de libro hecha para pantallas) |
+| Letra grande (reloj) | Martian Mono | Doto, de puntos (a 26 px o más) | Instrument Serif | JetBrains Mono | EB Garamond en cursiva: la hora escrita en palabras |
+| Forma | fichas redondeadas (12–16 px) | casi recta (2–6 px) | cápsulas y squircles (16–22 px) | cajas con filo de 1 px, sin marco lateral | hoja casi recta (2 px), filetes finos como los de un libro |
+| Barra | fichas flotantes con iconos de colores | tres placas negras con separadores de punto, **todo en la letra de puntos del reloj** (Doto) | cápsulas flotantes, reloj con serifa | cajitas ahumadas flotantes, hora sobre fecha | un titulillo de libro: escritorios en números romanos en cursiva, la página activa dorada |
+| Color | colores gruvbox en barra, terminal y prompt | gris; la terminal sin azul | colores kanagawa | gris con un susurro de tono | verde de tapete, letra de vitela, oro de lámpara solo para adornos y los pigmentos de un códice (ocre, verdigrís, azurita, oropimente) en la barra |
 | Movimiento | de cine, con un pequeño rebote al abrir | mecánico: corto y seco | fluido: muelles | seco, de terminal: fundidos cortos | pausado: una página que se asienta, sin rebote |
-| Fondo | *Twilight in the Wilderness* (Church) | placa de puntos que dibuja la peonza (generada) | *La gran ola* | la lámina RY-PZ-002, el despiece de la peonza | el Tractatus, un punto por proposición, dibujando la peonza (generado) |
-| Bloqueo y acceso | *Autumn – On the Hudson River* (Cropsey) | la placa de puntos | *Fuji rojo* | la peonza en semicorte, tan cerca que el borde se sale de la pantalla | una portada: el libro en puntos con una ventana donde va la hora |
-| Escritorio | — | — | — | panel de datos estilo YoRHa, reloj binario de círculos y visualizador de puntos en el borde | reloj, datos y Hito en ventanas recortadas en los puntos |
-| El acento («te espera») | naranja `#fe8019` | rojo `#e62d33` | rosa sakura `#d27e99` | ámbar `#ffb000` | lápiz rojo `#ad3a24` |
+| Fondo | *Twilight in the Wilderness* (Church) | placa de puntos que dibuja la peonza (generada) | *La gran ola* | la lámina RY-PZ-002, el despiece de la peonza | un libro abierto sobre el tapete: el comienzo del Quijote apenas visible, una inicial dorada y la peonza de colofón (generado) |
+| Bloqueo y acceso | *Autumn – On the Hudson River* (Cropsey) | la placa de puntos | *Fuji rojo* | la peonza en semicorte, tan cerca que el borde se sale de la pantalla | una portadilla con filetes dorados; la hora escrita en palabras |
+| Escritorio | — | — | — | panel de datos estilo YoRHa, reloj binario de círculos y visualizador de puntos en el borde | la hora en palabras que se escribe al aparecer, los datos como un índice con puntos guía y Hito con florones |
+| El acento («te espera») | naranja `#fe8019` | rojo `#e62d33` | rosa sakura `#d27e99` | ámbar `#ffb000` | bermellón de rúbrica `#fd6940` |
 
 Los fondos son imágenes reales buscadas en internet (salvo Grafito y Papel, generados); de dónde sale cada una
 y su licencia está en `assets/wallpapers/README.md`. La terminal y los editores usan siempre

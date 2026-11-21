@@ -83,8 +83,9 @@ ColumnLayout {
                 Layout.fillWidth: true
                 text: now.song?.title ?? now.entry?.title ?? "Nada en la cola"
                 color: Ryce.Palette.fg0
-                font.family: now.skin === "capsule" ? Ryce.Palette.fontDisplay : Ryce.Palette.fontUi
-                font.pixelSize: now.skin === "capsule" ? 24 : Ui.project + 2
+                // Ola's capsules and Papel's page title the song in their display serif.
+                font.family: now.skin === "capsule" || BarUi.folio ? Ryce.Palette.fontDisplay : Ryce.Palette.fontUi
+                font.pixelSize: now.skin === "capsule" || BarUi.folio ? 24 : Ui.project + 2
                 font.weight: now.skin === "bare" ? Font.Medium : Font.Normal
                 wrapMode: Text.Wrap
                 maximumLineCount: 2

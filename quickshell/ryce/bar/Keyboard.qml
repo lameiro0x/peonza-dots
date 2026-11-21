@@ -57,17 +57,17 @@ Module {
         }
     }
 
-    BarText {
-        text: String.fromCodePoint(0xf030c)      // md-keyboard
-        ink: text
+    Head {
         visible: BarUi.skin !== "box"
-        color: Ryce.Palette.fg2
-        font.family: Ryce.Palette.fontIcon
-        font.pixelSize: BarUi.iconPx
-        font.weight: Font.Normal
+        glyph: String.fromCodePoint(0xf030c)     // md-keyboard
+        page: "teclado"
+        hue: Ryce.Palette.fg2
     }
+    // Papel sets the code in small capitals too («teclado us»), in the figures' one ink.
     BarText {
         text: kb.code
-        color: Ryce.Palette.fg1
+        color: BarUi.folio ? Ryce.Palette.fg0 : Ryce.Palette.fg1
+        font.features: BarUi.folio ? { "c2sc": 1 } : ({})
+        font.letterSpacing: BarUi.folio ? 0.6 : 0
     }
 }

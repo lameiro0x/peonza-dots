@@ -1,40 +1,39 @@
 #!/usr/bin/env python3
-"""Papel's pictures: the Tractatus as dots on cream paper, after the Ludwig Wittgenstein
-Project's book covers (Frederic Kettelhoit's generator, markdown_to_book_covers.py).
+"""Papel's pictures: a reading room at night. A book lies open on green baize under a
+brass lamp; its letters are vellum, its ornaments gilt.
 
     python3 theme/wallpaper/paper.py            write assets/wallpapers/papel.jpg (2560x1440)
                                                 and papel-lock.jpg (1920x1080)
     python3 theme/wallpaper/paper.py --check    exit 1 if a committed master is stale or
-                                                breaks the paper budget below
+                                                breaks the budget below
     python3 theme/wallpaper/paper.py --out DIR  render both into DIR (for looking)
 
-The recipe is the cover's: a grid of cells, one circle per paragraph in reading order,
-its radius from the paragraph's length (ln(len+1)^2), filled or hollow by a rule, a pale
-halo behind the questions, and small hollow «axis» rings on every cell that carries no
-text. The text is the Tractatus (German, 1921; public domain): tractatus.json holds only
-each proposition's number, length and question marks, measured once from
-wittgensteinproject.org. Filled = a proposition numbered to at most three decimals
-(1, 1.1, 2.012, ...); hollow = the remarks on remarks (4.0031, 6.3631, ...): about three
-in four filled, the cover's balance.
+The ground is the theme's bg0 as baize: a felt of fine seeded noise (it also dithers the
+lamp's gradient against banding) and a warm pool of lamplight, bg0 lifted a little
+towards the gilt. On it, only two inks: vellum (fg0) and gilt (tint). The signal colour
+never appears; it belongs to «an AI session waits» alone.
 
-  desktop  the 526 propositions in reading order inside the peonza's silhouette
-           (peonza-silhouette.svg), its engraving (peonza.svg) left as paper, the edge
-           cells a little heavier, so the mark emerges from density alone; the left
-           third carries only the axis rings, the bar's rows are bare paper, and the
-           title sits in a window cut out of the rings at the bottom right. The desk's
-           widgets stand on the rings like the rest of the page (solid cards since
-           2026-11-15): a window cut for them read as a missing patch when they hid.
-  lock     the cover itself: the book as a block of dots with a window carved out of
-           it on the left, where hyprlock (@papel/hypr/hyprlock.conf) sets the time, the
-           date and the field. WINDOW is that window in px; the template's positions are
-           measured against it.
+  desktop  the opening of Don Quijote (Cervantes, 1605; the 1905 Barcelona edition's text
+           on Wikisource, accents modernised) set as a spread in Literata at book size:
+           justified, old-style figures, running heads in small capitals with their
+           folios, the chapter's head, a peonza (the user's mark) for a fleuron and a
+           swash E from EB Garamond Italic dropped four lines for the initial. The
+           letters are ghosts, vellum at ~1.5:1 on the baize, a texture and not a read;
+           only the initial and the fleuron are gilt at fuller strength. The spread lies
+           where the desk's cards are not (SPREAD, clear of CARDS: the clock, the stats, Hito
+           and the desk's peonza), under the lamp; the bar's band and the cards' places
+           stay bare baize, so a card never cuts a letter in half.
+  lock     a title page: a gilt double rule framing the screen, a fleuron breaking it at
+           the head, a short rule under the title, the peonza as the printer's device and
+           a hairline for the password. hyprlock (@papel/hypr/hyprlock.conf) writes the
+           title, the hour in words (bin/ryce-hora), and every other line; LOCK holds the
+           rows it is measured against.
 
-Ink only (fg0, a warm grey for the rings, the selection's pale yellow for halos): the
-signal colour never appears. Discs and rings are drawn analytically (signed distance,
-1 px anti-aliasing) at each master's own size, never resized from a bigger render.
-Deterministic: no randomness, no wall-clock input; --check compares decoded pixels with
-scenes.py's tolerance. Reads ~/Repos/logo-peonza (or $PEONZA_BRAND) for the desktop's
-silhouette; without it, it skips with a message.
+Everything is set in 1920x1080 units and drawn at each master's own size (u = w / 1920),
+never resized from a bigger render. panels.py (the launcher's ex libris) and newtab.py
+(the 1605 title page) draw with the helpers here. Deterministic: seeded noise only, no
+wall-clock input; --check compares decoded pixels with scenes.py's tolerance. Reads
+~/Repos/logo-peonza (or $PEONZA_BRAND) for the peonza; without it, it skips with a message.
 """
 
 from __future__ import annotations
@@ -49,244 +48,363 @@ from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from scenes import BRAND, ROOT, colormath, differs, finish, hexrgb, mark, save, tokens  # noqa: E402
+from scenes import BRAND, ROOT, colormath, differs, fbm, finish, grain, grid, hexrgb, mark, save, tokens  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-TEXT = HERE / "tractatus.json"
 OUT = ROOT / "assets" / "wallpapers" / "papel.jpg"
 LOCK = ROOT / "assets" / "wallpapers" / "papel-lock.jpg"
-FONT = ROOT / "assets" / "fonts" / "SpaceMono-Bold.ttf"
-FONT_REGULAR = ROOT / "assets" / "fonts" / "SpaceMono-Regular.ttf"
+FONTS = ROOT / "assets" / "fonts"
+LITERATA = FONTS / "Literata-Variable.ttf"
+LITERATA_ITALIC = FONTS / "Literata-Italic-Variable.ttf"
+GARAMOND_ITALIC = FONTS / "EBGaramond-Italic-Variable.ttf"   # the swash capitals and ❦ ❧ ☙
 
-CELL = 30                       # px at 1920 wide: a 64 x 36 grid (40 px at 2560, the cover's own cell)
-COLS, ROWS = 64, 36
-R_MIN, R_MAX = 0.17, 0.42       # a proposition's radius, in cells, shortest to longest
-RING = 0.12                     # a hollow proposition's stroke, in cells
-AXIS_R, AXIS_W = 0.10, 0.05     # the empty cells' rings (the cover: r 4, stroke 2 at cell 40)
-EDGE = 0.19                     # how much heavier a silhouette's outermost cells are (R_MAX stays in its cell)
+# The text: chapter one, one string per paragraph, more than the two pages hold.
+CHAPTER = ("Capítulo primero", "Que trata de la condición y ejercicio del famoso",
+           "hidalgo don Quijote de la Mancha")
+QUIJOTE = (
+    "En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que "
+    "vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo "
+    "corredor. Una olla de algo más vaca que carnero, salpicón las más noches, duelos y "
+    "quebrantos los sábados, lantejas los viernes, algún palomino de añadidura los domingos, "
+    "consumían las tres partes de su hacienda. El resto della concluían sayo de velarte, "
+    "calzas de velludo para las fiestas, con sus pantuflos de lo mismo, y los días de entre "
+    "semana se honraba con su vellorí de lo más fino. Tenía en su casa una ama que pasaba de "
+    "los cuarenta, y una sobrina que no llegaba a los veinte, y un mozo de campo y plaza, que "
+    "así ensillaba el rocín como tomaba la podadera. Frisaba la edad de nuestro hidalgo con "
+    "los cincuenta años: era de complexión recia, seco de carnes, enjuto de rostro, gran "
+    "madrugador y amigo de la caza. Quieren decir que tenía el sobrenombre de Quijada o "
+    "Quesada (que en esto hay alguna diferencia en los autores que deste caso escriben), "
+    "aunque por conjeturas verosímiles se deja entender que se llamaba Quijano. Pero esto "
+    "importa poco a nuestro cuento; basta que en la narración dél no se salga un punto de la "
+    "verdad.",
+    "Es, pues, de saber que este sobredicho hidalgo, los ratos que estaba ocioso (que eran "
+    "los más del año), se daba a leer libros de caballerías, con tanta afición y gusto, que "
+    "olvidó casi de todo punto el ejercicio de la caza, y aun la administración de su "
+    "hacienda; y llegó a tanto su curiosidad y desatino en esto, que vendió muchas hanegas de "
+    "tierra de sembradura para comprar libros de caballerías en que leer, y así llevó a su "
+    "casa todos cuantos pudo haber dellos; y de todos, ningunos le parecían tan bien como los "
+    "que compuso el famoso Feliciano de Silva, porque la claridad de su prosa y aquellas "
+    "entricadas razones suyas le parecían de perlas; y más cuando llegaba a leer aquellos "
+    "requiebros y cartas de amoríos, donde en muchas partes hallaba escrito: «La razón de la "
+    "sinrazón que a mi razón se hace, de tal manera mi razón enflaquece, que con razón me "
+    "quejo de la vuestra fermosura». Y también cuando leía: «Los altos cielos, que de vuestra "
+    "divinidad divinamente con las estrellas os fortifican, os hacen merecedora del "
+    "merecimiento que merece la vuestra grandeza».",
+    "Con estas y semejantes razones perdía el pobre caballero el juicio, y desvelábase por "
+    "entenderlas y desentrañarles el sentido, que no se lo sacara ni las entendiera el mismo "
+    "Aristóteles, si resucitara para solo ello.",
+)
+HEADS = ("Don Quijote de la Mancha", "Capítulo primero")
+FOLIOS = (32, 33)               # a modern edition's: the preliminaries fill the first thirty
 
-# Desktop: the peonza's 100-unit box in cells, and where its top-left corner sits.
-BOX, AT = 37, (22, 1)        # the stem stays left of Hito's layer (x >= 1360, «hoy» + 5 tasks)
-TITLE = ("Tractatus logico-philosophicus", "526 proposiciones · un punto cada una")
-# Lock: the book's block and the window carved out of it, in cells (col0, row0, col1, row1).
-BLOCK = (16, 6, 50, 30)
-WINDOW = (17, 10, 33, 25)
-# Cells left as bare paper under text that sits on the lock picture, the cover's own way
-# of setting a title: (col0, row0, col1, row1): the lockup and the two ends of the foot
-# line in @papel/hypr/hyprlock.conf.
-LOCK_QUIET = ((1, 1, 7, 3), (1, 34, 10, 35), (52, 34, 63, 35))
+# ── layout, in 1920x1080 units ────────────────────────────────────────────────
+BAR = 48                        # the bar's band: bare baize
+# The desk's cards at their largest, measured on the stage at 1920x1080 (2026-11-19) with
+# a little slack: the clock top left (DeskScreen.qml: left 52, top frameTop + 40), the
+# stats bottom left (bottom 44), Hito top right (HitoDesk.qml, ten lines) and the desk's
+# peonza bottom right (peonza/DeskPeonza.qml: 116 px, right 52, bottom 44). Nothing of
+# the book sits under one or within CARD_MARGIN of it, or its edge would cut a letter.
+CARDS = {"reloj": (52, 88, 860, 330), "estado": (52, 760, 450, 1036), "hito": (1360, 88, 1880, 560),
+         "peonza": (1752, 920, 1868, 1036)}
+CARD_MARGIN = 24
+# The spread: verso and recto text blocks (x0, x1), the running heads' baseline, the body's
+# first baseline, its leading and lines per page. Between the stats and the peonza, under
+# Hito's card.
+SPREAD = {"verso": (500, 1010), "recto": (1150, 1660), "head": 622, "first": 664, "lead": 25,
+          "lines": 15, "size": 16.5}
+LAMP = {"desk": (0.56, 0.80, 0.42, 0.50), "lock": (0.50, 0.44, 0.40, 0.46)}  # cx, cy, rx, ry (fractions)
+# Lock: the frame's insets, and the rows hyprlock's lines are measured against.
+LOCK_FRAME = (48, 58)           # outer rule (2 px) and inner rule (1 px), from every edge
+LOCK_ROWS = {"title_rule": 548, "device": (590, 672), "field_rule": 778, "field_width": 360}
+# Where the lock's words go: no ink of the picture there (hour, part of day and date).
+LOCK_QUIET = (200, 300, 1720, 530)
 
-# What a paper picture may cost, measured on the 1920 render (scenes.py's own sizes):
-# mostly paper (a mean luminance at least this fraction of bg0's, so a darker paper keeps
-# the same budget), the bar's rows and the desk's left third free of text dots.
-BUDGET = {"paper_fraction_min": 0.90, "ink_fraction_max": 0.10, "quiet_rows": 2, "quiet_cols": 24}
+# Ink strengths: how far towards its colour a fully covered pixel goes.
+GHOST = 0.14                  # vellum letters, ~1.5:1 on the lit baize: a texture
+GILT = 0.62                     # the initial and the fleuron, the one warm accent
+RULE = 0.42                     # the lock's rules: present, never brighter than its words
+
+# What a picture may cost, measured on the render (the 1920 one for the desktop budget).
+BUDGET = {
+    "ghost_max": 1.6,           # the strongest ghost letter against its own ground
+    "lamp_max": "bg3",          # the lamp lights the baize at most to bg3's luminance
+    "band_step_max": 0.75,      # a flat 8-bit run may not span most of a step of the light
+    "mean_min": 0.85,           # the room stays bg0: its mean luminance between these shares
+    "mean_max": 1.5,            # of bg0's (a darker corner, a lamp, never a lit room)
+}
 
 
-def propositions() -> list[tuple[str, int, int]]:
-    return [tuple(p) for p in json.loads(TEXT.read_text(encoding="utf-8"))["propositions"]]
+# ── type ──────────────────────────────────────────────────────────────────────
+def face(path: Path, px: float, wght: int = 400) -> ImageFont.FreeTypeFont:
+    """A variable font at px, its optical size set to px (Literata's opsz 7..72)."""
+    f = ImageFont.truetype(str(path), px, layout_engine=ImageFont.Layout.RAQM)
+    f.set_variation_by_axes([min(max(px, a["minimum"]), a["maximum"]) if b"Optical" in a["name"] else wght
+                             for a in f.get_variation_axes()])
+    return f
 
 
-def spine(num: str) -> bool:
-    """The cover's filled/hollow rule for a text that is all numbered: up to three decimals."""
-    return len(num.partition(".")[2]) <= 3
+def spaced(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, x: float, base: float,
+           track: float, features: list[str], align: str = "centre") -> tuple[float, float]:
+    """Letterspaced capitals (small capitals with c2sc) one glyph at a time; x is the line's
+    centre, left or right edge by `align`. Returns the line's (left, right)."""
+    widths = [font.getlength(ch, features=features) for ch in text]
+    total = sum(widths) + track * (len(text) - 1)
+    left = {"centre": x - total / 2, "left": x, "right": x - total}[align]
+    pos = left
+    for ch, wd in zip(text, widths):
+        draw.text((pos, base), ch, font=font, fill=255, anchor="ls", features=features)
+        pos += wd + track
+    return left, left + total
 
 
-def radii(props: list[tuple[str, int, int]]) -> np.ndarray:
-    """Each proposition's radius in cells: the cover's ln(len+1)^2, stretched to R_MIN..R_MAX."""
-    v = np.log(np.array([p[1] for p in props], dtype=np.float64) + 1) ** 2
-    return R_MIN + (R_MAX - R_MIN) * (v - v.min()) / (v.max() - v.min())
+def column(draw: ImageDraw.ImageDraw, words: list[tuple[str, bool]], start: int, x0: float, x1: float,
+           base: float, lead: float, lines: int, font: ImageFont.FreeTypeFont,
+           indent: dict[int, float] | None = None, caps: int = 0) -> int:
+    """Justified lines from words[start:] (word, opens a paragraph), as many as `lines`.
+    A paragraph opens with a 1 em indent, its last line ragged; indent maps a line to its
+    extra left indent (the dropped initial); the first `caps` words of the column are set
+    in small capitals. Returns the index of the first word left over."""
+    space = font.getlength(" ")
+    i = start
+    for n in range(lines):
+        if i >= len(words):
+            break
+        left = x0 + (indent or {}).get(n, 0.0) + (font.size if words[i][1] and n else 0.0)
+        line, width = [], 0.0
+        while i < len(words):
+            word, opens = words[i]
+            if line and opens:
+                break
+            feats = ["onum", "pnum"] + (["smcp"] if i - start < caps else [])
+            wd = font.getlength(word, features=feats)
+            if line and width + space + wd > x1 - left:
+                break
+            line.append((word, wd, feats))
+            width += (space if len(line) > 1 else 0) + wd
+            i += 1
+        ragged = i >= len(words) or words[i][1]
+        gap = space if ragged or len(line) < 2 else (x1 - left - sum(w for _, w, _ in line)) / (len(line) - 1)
+        x = left
+        for word, wd, feats in line:
+            draw.text((x, base + n * lead), word, font=font, fill=255, anchor="ls", features=feats)
+            x += wd + gap
+    return i
 
 
+def tokens_of(paragraphs: tuple[str, ...]) -> list[tuple[str, bool]]:
+    return [(w, k == 0) for p in paragraphs for k, w in enumerate(p.split())]
+
+
+def peonza(height: int) -> np.ndarray:
+    """The peonza as a fleuron, height px tall: its silhouette, the engraving's lines
+    (peonza.svg's dark strokes) cut out of it so the ground shows through them."""
+    sil = mark("peonza-silhouette.svg", height=height)[..., 3]
+    full = mark("peonza.svg", height=height)
+    return sil * (1 - full[..., 3] * (1 - full[..., :3].mean(axis=-1)))
+
+
+def stamp(mask: Image.Image, cov: np.ndarray, cx: float, top: float) -> None:
+    """Paste a coverage array into an L mask, centred on cx, its top at `top`."""
+    h, w = cov.shape
+    layer = Image.fromarray(np.round(cov * 255).astype(np.uint8), mode="L")
+    x, y = round(cx - w / 2), round(top)
+    region = mask.crop((x, y, x + w, y + h))
+    mask.paste(Image.fromarray(np.maximum(np.asarray(region), np.asarray(layer))), (x, y))
+
+
+# ── ground and inks ───────────────────────────────────────────────────────────
 def palette(t: dict) -> dict[str, np.ndarray]:
     c = t["colors"]
-    return {"paper": hexrgb(c["bg0"]), "ink": hexrgb(c["fg0"]), "axis": hexrgb(c["line"]),
-            "halo": hexrgb(t["term"]["selection_bg"]), "grey": hexrgb(c["fg1"])}
+    return {"bg0": hexrgb(c["bg0"]), "vellum": hexrgb(c["fg0"]), "gilt": hexrgb(c["tint"]),
+            "lamp": hexrgb(c["bg0"]) + (hexrgb(c["tint"]) - hexrgb(c["bg0"])) * 0.10}
 
 
-# ── the grid ──────────────────────────────────────────────────────────────────
-class Sheet:
-    """Per-cell drawing orders: radius (cells), kind (0 nothing, 1 disc, 2 ring), and a
-    halo radius (cells, 0 for none). The screen's grid unless told otherwise (the
-    launcher's panel, panels.py, has its own)."""
-
-    def __init__(self, rows: int = ROWS, cols: int = COLS) -> None:
-        self.r = np.full((rows, cols), AXIS_R)
-        self.kind = np.full((rows, cols), 2, dtype=np.int8)
-        self.width = np.full((rows, cols), AXIS_W)
-        self.text = np.zeros((rows, cols), dtype=bool)
-        self.halo = np.zeros((rows, cols))
-
-    def write(self, cells: list[tuple[int, int]], weight: np.ndarray | None = None) -> None:
-        """The whole book in `cells` (row-major order): proposition k*N//len(cells) in cell k."""
-        props = propositions()
-        rad = radii(props)
-        n = len(props)
-        for k, (y, x) in enumerate(cells):
-            i = k * n // len(cells)
-            num, _, q = props[i]
-            self.r[y, x] = rad[i] * (1 + EDGE * (weight[y, x] if weight is not None else 0))
-            self.kind[y, x] = 1 if spine(num) else 2
-            self.width[y, x] = RING
-            self.text[y, x] = True
-            self.halo[y, x] = min(rad[i] * 2 + 0.1, 0.62) if q else 0.0
-
-    def clear(self, mask: np.ndarray) -> None:
-        self.kind[mask] = 0
-        self.text[mask] = False
-        self.halo[mask] = 0.0
+def baize(w: int, h: int, t: dict, lamp: tuple[float, float, float, float], seed: int = 7,
+          felt: bool = True) -> np.ndarray:
+    """bg0 as felt under a lamp: a warm pool (bg0 lifted towards the gilt) fading to a
+    room a shade darker than bg0 at the corners, a soft mottle and a fine grain (felt=False:
+    the light alone, what the banding measure compares against)."""
+    pal = palette(t)
+    x, y = grid(w, h)
+    cx, cy, rx, ry = lamp
+    aspect = w / h
+    pool = np.exp(-(((x - cx) * aspect / (rx * aspect)) ** 2 + ((y - cy) / ry) ** 2))
+    rgb = pal["bg0"] + (pal["lamp"] - pal["bg0"]) * pool[..., None]
+    rgb = rgb * (1 - 0.10 * np.clip(1 - pool / 0.12, 0, 1) ** 2)[..., None]   # the room beyond the pool
+    if not felt:
+        return rgb
+    u = w / 1920
+    rgb = rgb * (1 + 0.035 * (fbm(w, h, 9 * u, 9 * u, 3, seed) - 0.5))[..., None]
+    return rgb + grain(w, h, seed + 1, 1.1 / 255)
 
 
-def raster(sheet: Sheet, w: int, h: int, pal: dict[str, np.ndarray]) -> np.ndarray:
-    """The sheet at w x h: halos first, then each cell's disc or ring, analytically."""
-    rows, cols = sheet.r.shape
-    cell = w / cols
-    px = (np.arange(w) + 0.5) / cell
-    py = (np.arange(h) + 0.5) / cell
-    ix = np.minimum(px.astype(int), cols - 1)
-    iy = np.minimum(py.astype(int), rows - 1)
-    dx = (px - ix - 0.5) * cell
-    dy = (py - iy - 0.5) * cell
-    d = np.sqrt(dx[None, :] ** 2 + dy[:, None] ** 2)
-    rgb = np.broadcast_to(pal["paper"], (h, w, 3)).copy()
-
-    # Halos reach past their cell: each one is painted over its own square.
-    for y, x in zip(*np.nonzero(sheet.halo)):
-        rr = sheet.halo[y, x] * cell
-        cx, cy = (x + 0.5) * cell, (y + 0.5) * cell
-        x0, x1 = max(0, int(cx - rr - 2)), min(w, int(cx + rr + 3))
-        y0, y1 = max(0, int(cy - rr - 2)), min(h, int(cy + rr + 3))
-        xx = np.arange(x0, x1) + 0.5 - cx
-        yy = np.arange(y0, y1) + 0.5 - cy
-        cov = np.clip(rr - np.sqrt(xx[None, :] ** 2 + yy[:, None] ** 2) + 0.5, 0, 1)
-        rgb[y0:y1, x0:x1] += (pal["halo"] - rgb[y0:y1, x0:x1]) * cov[..., None]
-
-    r = sheet.r[iy][:, ix] * cell
-    sw = np.maximum(sheet.width[iy][:, ix] * cell, 1.0)
-    kind = sheet.kind[iy][:, ix]
-    disc = np.clip(r - d + 0.5, 0, 1)
-    ring = np.clip(sw / 2 - np.abs(d - (r - sw / 2)) + 0.5, 0, 1)
-    cov = np.where(kind == 1, disc, np.where(kind == 2, ring, 0.0))
-    ink = np.where((sheet.text[iy][:, ix])[..., None], pal["ink"], pal["axis"])
-    return rgb + (ink - rgb) * cov[..., None]
-
-
-def type_on(rgb: np.ndarray, lines: list[tuple[str, Path, float, np.ndarray, float, float]]) -> np.ndarray:
-    """Space Mono lines: (text, font file, size px, colour, left px, baseline px)."""
-    h, w = rgb.shape[:2]
-    for text, font, size, col, x, base in lines:
-        m = Image.new("L", (w, h), 0)
-        ImageDraw.Draw(m).text((x, base), text, fill=255, anchor="ls",
-                               font=ImageFont.truetype(str(font), round(size)))
-        a = np.asarray(m, dtype=np.float64)[..., None] / 255.0
+def lay(ground: np.ndarray, inks: list[tuple[np.ndarray, float, Image.Image]]) -> np.ndarray:
+    """Each ink (colour, strength, L mask) over the ground, in order."""
+    rgb = ground
+    for col, k, mask in inks:
+        a = np.asarray(mask, dtype=np.float64)[..., None] / 255.0 * k
         rgb = rgb + (col - rgb) * a
     return rgb
 
 
+def blank(w: int, h: int) -> tuple[Image.Image, ImageDraw.ImageDraw]:
+    m = Image.new("L", (w, h), 0)
+    return m, ImageDraw.Draw(m)
+
+
 # ── desktop ───────────────────────────────────────────────────────────────────
-def coverage(file: str, box: int = BOX, sub: int = 8) -> np.ndarray:
-    """A brand mark's RGBA averaged per cell over the box x box cells it is drawn into."""
-    a = mark(file, box=box * sub)
-    return a.reshape(box, sub, box, sub, 4).mean(axis=(1, 3))
+def desktop_layers(w: int, h: int, t: dict) -> tuple[np.ndarray, list, tuple]:
+    pal = palette(t)
+    u = w / 1920
+    s = SPREAD
+    ghost, gd = blank(w, h)
+    gilt, ld = blank(w, h)
+    body = face(LITERATA, s["size"] * u)
+    lead = s["lead"] * u
+    caps = face(LITERATA, 13 * u)
+    folio = face(LITERATA, s["size"] * u)
+    (v0, v1), (r0, r1) = (np.array(s["verso"]) * u), (np.array(s["recto"]) * u)
+    head, first = s["head"] * u, s["first"] * u
 
+    # Running heads in letterspaced small capitals, folios on the outer edges.
+    for (x0, x1), text, num, outer in (((v0, v1), HEADS[0], FOLIOS[0], "left"),
+                                       ((r0, r1), HEADS[1], FOLIOS[1], "right")):
+        spaced(gd, text.upper(), caps, (x0 + x1) / 2, head, 1.6 * u, ["c2sc"])
+        gd.text((x0 if outer == "left" else x1, head), str(num), font=folio, fill=255,
+                anchor="ls" if outer == "left" else "rs", features=["onum"])
 
-def peonza_cells() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """(inside, engraving, edge weight) on the screen's grid: the mark's box at AT."""
-    sil = coverage("peonza-silhouette.svg")[..., 3]
-    full = coverage("peonza.svg")
-    dark = full[..., 3] * (1 - full[..., :3].mean(axis=-1))          # the black engraving
-    inside = np.zeros((ROWS, COLS), dtype=bool)
-    cut = np.zeros((ROWS, COLS), dtype=bool)
-    x0, y0 = AT
-    win = (slice(max(0, y0), min(ROWS, y0 + BOX)), slice(max(0, x0), min(COLS, x0 + BOX)))
-    src = (slice(win[0].start - y0, win[0].stop - y0), slice(win[1].start - x0, win[1].stop - x0))
-    inside[win] = sil[src] >= 0.5
-    cut[win] = dark[src] >= 0.3
-    # Outermost cells: inside, with a 4-neighbour outside.
-    pad = np.pad(inside, 1)
-    edge = inside & ~(pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:])
-    # The engraving runs inside the outline only; on the outline it would eat the silhouette.
-    return inside, cut & inside & ~edge, edge.astype(np.float64)
+    # The chapter's head on the verso: its number in spaced small capitals, its title in
+    # italic, the peonza under them as the fleuron.
+    mid = (v0 + v1) / 2
+    spaced(gd, CHAPTER[0].upper(), face(LITERATA, 17 * u), mid, first + 6 * u, 2.4 * u, ["c2sc"])
+    ital = face(LITERATA_ITALIC, 15 * u)
+    for k, line in enumerate(CHAPTER[1:]):
+        gd.text((mid, first + (6 + 32 + 21 * k) * u), line, font=ital, fill=255, anchor="ms", features=["onum"])
+    stamp(gilt, peonza(round(40 * u)), mid, first + 72 * u)
+
+    # The body: five lines of the verso go to the head, the initial drops four.
+    words = tokens_of(QUIJOTE)
+    words[0] = (words[0][0][1:], True)               # «En» -> the initial E + «n»
+    top = first + 5 * s["lead"] * u
+    drop = 4
+    big = face(GARAMOND_ITALIC, 100)
+    l, tp, r, b = big.getbbox("E", anchor="ls", features=["swsh"])
+    # Cap top on the first line's cap height (Literata's H is 0.70 em), foot on line four's baseline.
+    span = (drop - 1) * lead + 0.70 * body.size
+    initial = face(GARAMOND_ITALIC, 100 * span / -tp)
+    l, tp, r, b = initial.getbbox("E", anchor="ls", features=["swsh"])
+    ld.text((v0 - l, top + (drop - 1) * lead), "E", font=initial, fill=255, anchor="ls", features=["swsh"])
+    # The swash's tail runs under line four's baseline: line five steps aside for it too.
+    hang = {n: r - l + 6 * u for n in range(drop + 1)}
+    nxt = column(gd, words, 0, v0, v1, top, lead, s["lines"] - 5, body, indent=hang, caps=4)
+    column(gd, words, nxt, r0, r1, first, lead, s["lines"], body)
+    return baize(w, h, t, LAMP["desk"]), [(pal["vellum"], GHOST, ghost), (pal["gilt"], GILT, gilt)], LAMP["desk"]
 
 
 def desktop(w: int, h: int, t: dict) -> Image.Image:
-    pal = palette(t)
-    sheet = Sheet()
-    inside, cut, edge = peonza_cells()
-    if inside[:BUDGET["quiet_rows"]].any() or inside[:, :BUDGET["quiet_cols"]].any():
-        raise SystemExit("paper: the peonza reaches the bar's rows or the desk's left third")
-    data = inside & ~cut
-    sheet.write([tuple(c) for c in np.argwhere(data)], edge)
-    # The engraving keeps its axis rings: a faint line drawn through the dark field.
-    # The title's window: two lines set right on the grid's last columns, rings cleared
-    # one cell around them.
-    u = w / 1920
-    size, small = 22 * u, 14 * u
-    right = (COLS - 2) * CELL * u
-    f1, f2 = ImageFont.truetype(str(FONT), round(size)), ImageFont.truetype(str(FONT_REGULAR), round(small))
-    w1, w2 = f1.getlength(TITLE[0]), f2.getlength(TITLE[1])
-    base1, base2 = (ROWS - 3.35) * CELL * u, (ROWS - 2.4) * CELL * u
-    c0 = int((right - max(w1, w2)) / (CELL * u)) - 1
-    hole = cells([(0, 0, COLS, BUDGET["quiet_rows"]),     # the bar floats on bare paper
-                  (c0, ROWS - 5, COLS - 1, ROWS - 1)])       # the title's window
-    if (hole & sheet.text).any():
-        raise SystemExit("paper: the title's window cuts into the peonza")
-    sheet.clear(hole)
-    rgb = raster(sheet, w, h, pal)
-    rgb = type_on(rgb, [(TITLE[0], FONT, size, pal["ink"], right - w1, base1),
-                        (TITLE[1], FONT_REGULAR, small, pal["grey"], right - w2, base2)])
-    return finish(rgb)
+    return finish(lay(*desktop_layers(w, h, t)[:2]))
 
 
 # ── lock ──────────────────────────────────────────────────────────────────────
-def lock(w: int, h: int, t: dict) -> Image.Image:
+def lock_layers(w: int, h: int, t: dict) -> tuple[np.ndarray, list, tuple]:
     pal = palette(t)
-    sheet = Sheet()
-    block, hole = cells([BLOCK]), cells([WINDOW])
-    sheet.write([tuple(c) for c in np.argwhere(block & ~hole)])
-    sheet.clear(hole | cells(LOCK_QUIET))
-    return finish(raster(sheet, w, h, pal))
+    u = w / 1920
+    rules, rd = blank(w, h)
+    gilt, ld = blank(w, h)
+    # The frame: a thick-thin double rule, broken at the head by a fleuron.
+    o, i = (v * u for v in LOCK_FRAME)
+    rd.rectangle((o, o, w - 1 - o, h - 1 - o), outline=255, width=max(1, round(2 * u)))
+    rd.rectangle((i, i, w - 1 - i, h - 1 - i), outline=255, width=max(1, round(1 * u)))
+    orn = face(GARAMOND_ITALIC, 40 * u)
+    cx = w / 2
+    gap = 46 * u
+    rd.rectangle((cx - gap, 0, cx + gap, i + 4 * u), fill=0)
+    ld.text((cx, (o + i) / 2 + 13 * u), "❦", font=orn, fill=255, anchor="ms")
+    # The title's rule, the device, the field's hairline.
+    rr = LOCK_ROWS
+    rd.line((cx - 60 * u, rr["title_rule"] * u, cx + 60 * u, rr["title_rule"] * u), fill=255, width=max(1, round(u)))
+    top, bottom = (v * u for v in rr["device"])
+    stamp(gilt, peonza(round(bottom - top)), cx, top)
+    half = rr["field_width"] / 2 * u
+    rd.line((cx - half, rr["field_rule"] * u, cx + half, rr["field_rule"] * u), fill=255, width=max(1, round(u)))
+    return baize(w, h, t, LAMP["lock"], seed=11), [(pal["gilt"], RULE, rules), (pal["gilt"], GILT, gilt)], LAMP["lock"]
 
 
-def cells(rects) -> np.ndarray:
-    """A grid mask of (col0, row0, col1, row1) rectangles, ends exclusive."""
-    m = np.zeros((ROWS, COLS), dtype=bool)
-    for c0, r0, c1, r1 in rects:
-        m[r0:r1, c0:c1] = True
-    return m
-
-
-def window_px(w: int = 1920) -> tuple[int, int, int, int]:
-    """The lock's window in px at width w: left, top, right, bottom."""
-    s = w / COLS
-    return tuple(round(v * s) for v in WINDOW)  # type: ignore[return-value]
+def lock(w: int, h: int, t: dict) -> Image.Image:
+    return finish(lay(*lock_layers(w, h, t)[:2]))
 
 
 # ── budget and outputs ────────────────────────────────────────────────────────
-def over_budget(img: Image.Image, t: dict, quiet: bool) -> list[str]:
-    a = np.asarray(img.convert("RGB"), dtype=np.float64) / 255.0
+def luminance(rgb: np.ndarray) -> np.ndarray:
+    a = np.clip(rgb, 0, 1)
     lin = np.where(a <= 0.04045, a / 12.92, ((a + 0.055) / 1.055) ** 2.4)
-    lum = lin @ np.array([0.2126, 0.7152, 0.0722])
-    out = []
-    floor = BUDGET["paper_fraction_min"] * colormath.luminance(t["colors"]["bg0"])
-    if lum.mean() < floor:
-        out.append(f"mean luminance {lum.mean():.3f} < {floor:.3f}, "
-                   f"{BUDGET['paper_fraction_min']:.0%} of the paper's (paper first)")
-    ink = (lum < colormath.luminance(t["colors"]["fg1"])).mean()
-    if ink > BUDGET["ink_fraction_max"]:
-        out.append(f"ink covers {ink:.1%} > {BUDGET['ink_fraction_max']:.0%}")
-    if quiet:
-        cell = img.width / COLS
-        axis = colormath.luminance(t["colors"]["line"])
-        rows = lum[: round(BUDGET["quiet_rows"] * cell)]
-        cols = lum[:, : round(BUDGET["quiet_cols"] * cell)]
-        for name, part in (("the bar's rows", rows), ("the desk's left third", cols)):
-            if part.min() < axis - 0.02:
-                out.append(f"{name} hold ink darker than the axis rings ({part.min():.3f})")
+    return lin @ np.array([0.2126, 0.7152, 0.0722])
+
+
+def band_step(row8: np.ndarray, light: np.ndarray) -> float:
+    """Banding along one row: the most the smooth light underneath (`light`, in 8-bit
+    units) changes across one run of a single 8-bit value. A run that spans a whole step
+    of the gradient (≥ 1) is a visible band; the grain keeps runs far shorter."""
+    edges = np.flatnonzero(np.diff(row8) != 0) + 1
+    starts, stops = np.concatenate([[0], edges]), np.concatenate([edges, [len(row8) - 1]])
+    return float(np.abs(light[stops] - light[starts]).max())     # from a run's start to the next one's
+
+
+def measure(layers: tuple, t: dict) -> dict:
+    """The numbers the budget reads: the ghost letters' worst contrast against their own
+    ground, the lamp's brightest pixel, and the banding across the lamp's gradient (rows
+    through the pool, green channel)."""
+    ground, inks, lamp = layers
+    h, w = ground.shape[:2]
+    ground8 = np.clip(np.round(ground * 255), 0, 255)
+    lum = luminance(ground8 / 255)
+    light = baize(w, h, t, lamp, felt=False) * 255
+    out = {"lamp_max": float(lum.max()),
+           "lamp_hex": "#%02x%02x%02x" % tuple(int(v) for v in ground8.reshape(-1, 3)[lum.argmax()]),
+           "band_step": max(band_step(ground8[y, :, 1], light[y, :, 1])
+                            for y in (round(h * f) for f in (0.3, 0.5, 0.8)))}
+    vellum = palette(t)["vellum"]
+    for col, k, mask in inks:
+        if np.array_equal(col, vellum):
+            full = np.asarray(mask) >= 250
+            ink = luminance((ground8 / 255 + (col - ground8 / 255) * k)[full])
+            out["ghost_max"] = float(((ink + 0.05) / (lum[full] + 0.05)).max())
     return out
 
 
-def outputs(t: dict) -> list[tuple[Path, Image.Image, bool]]:
-    return [(OUT, desktop(2560, 1440, t), True), (LOCK, lock(1920, 1080, t), False)]
+def over_budget(img: Image.Image, t: dict, layers: tuple | None = None, desk: bool = True) -> list[str]:
+    """What breaks the budget: the mean always; with the layers (paper.py's own renders),
+    the lamp, the banding, the ghosts and the zones that must stay bare baize."""
+    out = []
+    lum = luminance(np.asarray(img.convert("RGB"), dtype=np.float64) / 255.0)
+    bg0 = colormath.luminance(t["colors"]["bg0"])
+    if lum.mean() < BUDGET["mean_min"] * bg0:
+        out.append(f"mean luminance {lum.mean():.4f} < {BUDGET['mean_min'] * bg0:.4f}: the room is darker than its baize")
+    if lum.mean() > BUDGET["mean_max"] * bg0:
+        out.append(f"mean luminance {lum.mean():.4f} > {BUDGET['mean_max'] * bg0:.4f}: no longer a dim room")
+    if layers is None:
+        return out
+    m = measure(layers, t)
+    ceiling = colormath.luminance(t["colors"][BUDGET["lamp_max"]])
+    if m["lamp_max"] > ceiling:
+        out.append(f"the lamp lights the baize to {m['lamp_hex']} ({m['lamp_max']:.4f}), past {BUDGET['lamp_max']}")
+    if m["band_step"] >= BUDGET["band_step_max"]:
+        out.append(f"banding: one flat run spans {m['band_step']:.2f} of an 8-bit step across the lamp")
+    if m.get("ghost_max", 0) > BUDGET["ghost_max"]:
+        out.append(f"ghost letters reach {m['ghost_max']:.2f}:1 (> {BUDGET['ghost_max']}): they would read, not rest")
+    u = img.width / 1920
+    marks = sum(np.asarray(mask, dtype=np.int32) for _, _, mask in layers[1])
+    zones = [(0, 0, 1920, BAR), *CARDS.values()] if desk else [LOCK_QUIET]
+    pad = CARD_MARGIN if desk else 0
+    for x0, y0, x1, y1 in zones:
+        part = marks[max(0, round((y0 - pad) * u)):round((y1 + pad) * u), max(0, round((x0 - pad) * u)):round((x1 + pad) * u)]
+        if part.any():
+            out.append(f"ink inside {(x0, y0, x1, y1)}: the bar, a card or the lock's words would sit on it")
+    return out
+
+
+def outputs() -> list[tuple[Path, int, int, bool]]:
+    """(master, width, height, is the desktop)."""
+    return [(OUT, 2560, 1440, True), (LOCK, 1920, 1080, False)]
 
 
 def main(argv: list[str]) -> int:
@@ -300,8 +418,13 @@ def main(argv: list[str]) -> int:
     # Raw, not tokens.load(): the contract names these masters, so it validates only once they exist.
     t = json.loads((tokens.THEMES_SRC / "papel.json").read_text(encoding="utf-8"))
     bad = []
-    for path, img, quiet in outputs(t):
-        bad += [f"{path.name}: {b}" for b in over_budget(img, t, quiet)]
+    for path, w, h, desk in outputs():
+        layers = (desktop_layers if desk else lock_layers)(w, h, t)
+        img = finish(lay(*layers[:2]))
+        m = measure(layers, t)
+        print(f"paper: {path.name}: lamp {m['lamp_hex']} ({m['lamp_max']:.4f}), banding {m['band_step']:.2f} step"
+              + (f", ghost letters {m['ghost_max']:.2f}:1" if "ghost_max" in m else ""))
+        bad += [f"{path.name}: {b}" for b in over_budget(img, t, layers, desk)]
         if a.check:
             why = differs(path, img)
             if why:

@@ -2,6 +2,7 @@ import QtQuick
 import qs
 import qs as Ryce
 import qs.desk
+import "../prose.js" as Prose
 
 // The desk's Hito card. On top, which tasks it shows: hoy, atrasadas, todas, or one
 // proyecto (picked from the projects with something pending). Then how many, large in
@@ -9,6 +10,9 @@ import qs.desk
 // project's colour and its time, day or lateness, and a quiet last line. «Hoy» leaves the
 // overdue out but counts them under the headline. Ticking happens in the drawer
 // (SUPER+H). It sits on a desk Card: its inks are DeskUi's.
+// Papel heads it like a chapter: the count in words when it is twenty or fewer («Tres»)
+// and the headline in the display italic, never bold; each task under a gilt ❧ instead
+// of its project's dot, times in old-style figures, the footer in small capitals.
 Column {
     id: card
     property bool shown
@@ -35,12 +39,19 @@ Column {
         origen: { size: 56, weight: Font.Normal, caps: false, square: false, width: 480 },
         grafito: { size: 60, weight: Font.Bold, caps: false, square: true, width: 400 },
         ola: { size: 76, weight: Font.Normal, caps: false, square: false, width: 400 },
-        papel: { size: 60, weight: Font.Bold, caps: false, square: true, width: 440 },
+        papel: { size: 52, weight: Font.Normal, caps: false, square: true, width: 440 },
         tinta: { size: 44, weight: Font.Bold, caps: true, square: true, width: 460 }
     })[Ryce.Palette.themeId] ?? { size: 56, weight: Font.Normal, caps: false, square: false, width: 400 }
     readonly property color ink: DeskUi.ink
     readonly property color dim: DeskUi.dim
     readonly property color late: DeskUi.legible(Ryce.Palette.warn)
+    readonly property bool folio: DeskUi.folio
+    // The count as the headline's first word: in words up to twenty in Papel, «Una» for
+    // one task (tarea is feminine), and none at all when the list is empty.
+    readonly property string countText: !folio ? String(list.length)
+        : list.length > 20 ? String(list.length)
+        : list.length === 0 ? ""
+        : Prose.number(list.length, true).charAt(0).toUpperCase() + Prose.number(list.length, true).slice(1)
 
     function word(s) { return stance.caps ? s.toUpperCase() : s; }
     function plural(n, one, many) { return n === 1 ? one : many; }
@@ -59,7 +70,8 @@ Column {
         : list.length === 0 ? none
         : what
     readonly property string subline: !ready || !fresh || filter !== "hoy" || hito.overdue.length === 0 ? ""
-        : hito.overdue.length + plural(hito.overdue.length, " atrasada", " atrasadas")
+        : (folio && hito.overdue.length <= 20 ? Prose.number(hito.overdue.length, true) : hito.overdue.length)
+          + plural(hito.overdue.length, " atrasada", " atrasadas")
     readonly property string footer: {
         if (!ready) return "";                // the headline already says it all
         const parts = ["hito"];
@@ -135,12 +147,12 @@ Column {
 
             Ink {
                 id: count
-                visible: card.ready && card.fresh && !card.choosing
-                text: String(card.list.length)
+                visible: card.ready && card.fresh && !card.choosing && text !== ""
+                text: card.countText
                 font.family: Ryce.Palette.fontDisplay
                 font.pixelSize: Math.max(card.stance.size, Ryce.Palette.fontDisplayMinPx)
                 font.weight: card.stance.weight
-                font.features: { "tnum": 1 }
+                font.features: card.folio ? { "onum": 1 } : { "tnum": 1 }
                 elide: Text.ElideNone
             }
             // Sits on the count's baseline, or on its own line when there is no count.
@@ -152,7 +164,9 @@ Column {
                 Ink {
                     width: parent.width
                     text: card.word(card.headline)
-                    font.pixelSize: 15
+                    font.family: card.folio ? Ryce.Palette.fontDisplay : Ryce.Palette.fontUi
+                    font.italic: card.folio
+                    font.pixelSize: card.folio ? 22 : 15
                 }
                 Ink {
                     visible: text !== ""
@@ -181,11 +195,21 @@ Column {
                 height: title.implicitHeight + 2
 
                 Rectangle {
+                    visible: !card.folio
                     anchors.verticalCenter: parent.verticalCenter
                     width: 7
                     height: 7
                     radius: card.stance.square ? 1 : 3.5
                     color: card.hito.dotColor(line.modelData.hue, card.dim)
+                }
+                Label {
+                    visible: card.folio
+                    anchors.baseline: title.baseline
+                    text: "❧"
+                    color: Ryce.Palette.tint
+                    font.family: "EB Garamond"         // the fleuron is Garamond's: Literata has none
+                    font.pixelSize: 15
+                    elide: Text.ElideNone
                 }
                 Ink {
                     id: title
@@ -202,7 +226,7 @@ Column {
                     text: card.word(card.meta(line.modelData))
                     color: line.overdue ? card.late : card.dim
                     font.pixelSize: 12
-                    font.features: { "tnum": 1 }
+                    font.features: card.folio ? { "onum": 1 } : { "tnum": 1 }
                     elide: Text.ElideNone
                 }
             }
@@ -217,7 +241,8 @@ Column {
         Ink {
             text: card.footer
             color: card.dim
-            font.pixelSize: 11
+            font.pixelSize: card.folio ? 12 : 11
+            font.features: card.folio ? { "smcp": 1, "onum": 1 } : ({})
             font.letterSpacing: 0.6
             elide: Text.ElideNone
         }

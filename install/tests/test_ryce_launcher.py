@@ -171,7 +171,13 @@ class ThemeContract(unittest.TestCase):
             with self.subTest(theme=tid):
                 for w in widgets:
                     self.assertRegex(text, rf"(?m)^{re.escape(w)}\b.*\{{|[\[,] {re.escape(w)}\b", w)
-                self.assertRegex(text, r"children:\s*\[ face, still-air, readout, signature \]")
+                # The strip is one box of the four, or (Papel's bookplate) the picture box
+                # `still` with the face and its blank over a foot with the other two: the
+                # launcher sets the picture on `still` and toggles the same four either way.
+                one = re.search(r"children:\s*\[ face, still-air, readout, signature \]", text)
+                split = (re.search(r"(?ms)^still \{[^}]*children:\s*\[ face, still-air \]", text)
+                         and re.search(r"children:\s*\[ readout, signature \]", text))
+                self.assertTrue(one or split, "the strip's four widgets, in one box or still + foot")
                 for w in ("face", "readout"):
                     block = re.search(rf"(?ms)^{w} \{{(.*?)^\}}", text).group(1)
                     self.assertRegex(block, r"enabled:\s+false;", w)

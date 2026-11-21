@@ -1,0 +1,280 @@
+/* Papel in Obsidian: a reading room. The note is a page of a book read at a green baize
+   desk: vellum letters in Literata (a book face made for screens, with real italics,
+   old-style figures and small caps), chapter titles in EB Garamond's italic, gilt for
+   ornament (the caret, the selection's edge, the fleuron that replaces a rule), azurite
+   for links. Never the vermilion: on this desktop it only means «an AI session waits».
+
+   bin/ryce-theme writes this file as .obsidian/snippets/ryce.css in every vault Obsidian
+   knows; Obsidian reloads an enabled snippet the moment its file changes. Everything is
+   scoped to the dark base (Settings, Appearance, Base color scheme: dark); in light mode
+   Obsidian looks as it ships. A note with `cssclasses: libro` in its properties reads like
+   a novel in reading view: indented paragraphs without gaps and a drop cap. */
+
+body.theme-dark {
+  /* The desk, the page, the ink: Obsidian derives every surface from this scale. */
+  --color-base-00: {{bg0}};
+  --color-base-05: {{bg0}};
+  --color-base-10: {{bg1}};
+  --color-base-20: {{bg1}};
+  --color-base-25: {{bg2}};
+  --color-base-30: {{bg3}};
+  --color-base-35: {{line}};
+  --color-base-40: {{line}};
+  --color-base-50: {{fg2@0.7}};
+  --color-base-60: {{fg2}};
+  --color-base-70: {{fg1}};
+  --color-base-100: {{fg0}};
+  --color-accent: {{tint}};
+  --color-accent-1: {{tint}};
+  --color-accent-2: {{tint}};
+  --text-on-accent: {{ink_on_pill}};
+  --interactive-accent: {{tint}};
+  --interactive-accent-hover: {{fg0}};
+
+  --background-primary: {{bg0}};
+  --background-primary-alt: {{bg1}};
+  --background-secondary: {{bg1}};
+  --background-secondary-alt: {{bg0}};
+  --background-modifier-border: {{line}};
+  --background-modifier-hover: {{bg2}};
+  --background-modifier-active-hover: {{bg3}};
+  --background-modifier-form-field: {{bg1}};
+  --titlebar-background: {{bg0}};
+  --titlebar-background-focused: {{bg0}};
+  --ribbon-background: {{bg0}};
+  --tab-container-background: {{bg0}};
+  --tab-background-active: {{bg0}};
+
+  --text-normal: {{fg0}};
+  --text-muted: {{fg1}};
+  --text-faint: {{fg2}};
+  --text-accent: {{tint}};
+  --text-accent-hover: {{fg0}};
+  --text-selection: {{term.selection_bg}};
+  --text-highlight-bg: {{tint@0.28}};
+  --text-error: {{err}};
+  --text-warning: {{warn}};
+  --text-success: {{ok}};
+  --caret-color: {{tint}};
+
+  /* The type: a book face for the page and the interface, a written italic for titles. */
+  --font-text-theme: "{{font.ui}}", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-interface-theme: "{{font.ui}}", Georgia, serif;
+  --font-monospace-theme: "{{font.mono}}", monospace;
+  --font-text-size: 18px;
+  --line-height-normal: 1.65;
+  --file-line-width: 37rem;
+  --bold-weight: 600;
+  --bold-color: {{fg0}};
+  --italic-color: {{fg0}};
+
+  --inline-title-font: "{{font.display}}", var(--font-text-theme);
+  --inline-title-style: italic;
+  --inline-title-weight: 450;
+  --inline-title-size: 2.6em;
+  --inline-title-color: {{fg0}};
+  --h1-font: "{{font.display}}", var(--font-text-theme);
+  --h1-style: italic;
+  --h1-weight: 450;
+  --h1-size: 2.15em;
+  --h1-color: {{tint}};
+  --h2-variant: small-caps;
+  --h2-weight: 400;
+  --h2-size: 1.35em;
+  --h2-color: {{fg0}};
+  --h3-style: italic;
+  --h3-weight: 500;
+  --h3-size: 1.2em;
+  --h3-color: {{fg0}};
+  --h4-style: italic;
+  --h4-weight: 400;
+  --h4-color: {{fg1}};
+  --h5-variant: small-caps;
+  --h5-color: {{fg1}};
+  --h6-variant: small-caps;
+  --h6-color: {{fg2}};
+
+  /* A link is the page's own ink, marked by a gilt dotted rule under it (below). */
+  --link-color: {{fg0}};
+  --link-color-hover: {{tint}};
+  --link-external-color: {{fg0}};
+  --link-external-color-hover: {{tint}};
+  --link-unresolved-color: {{fg2}};
+  --link-decoration-thickness: 1px;
+
+  --blockquote-font-style: italic;
+  --blockquote-border-thickness: 0;
+  --blockquote-color: {{fg1}};
+  --blockquote-background-color: transparent;
+  --hr-color: {{line}};
+
+  --tag-color: {{fg1}};
+  --tag-color-hover: {{fg0}};
+  --tag-background: transparent;
+  --tag-background-hover: {{bg2}};
+  --tag-border-width: 1px;
+  --tag-border-color: {{line}};
+  --tag-radius: 2px;
+
+  --checkbox-color: {{tint}};
+  --checkbox-color-hover: {{fg0}};
+  --checkbox-border-color: {{fg2}};
+  --checkbox-marker-color: {{ink_on_pill}};
+  --checkbox-radius: 2px;
+  --checklist-done-color: {{fg2}};
+  --list-marker-color: {{tint}};
+
+  --code-background: {{bg1}};
+  --code-normal: {{fg0}};
+  --code-comment: {{ansi.8}};
+  --code-keyword: {{ansi.5}};
+  --code-function: {{ansi.4}};
+  --code-string: {{ansi.2}};
+  --code-value: {{ansi.3}};
+  --code-property: {{ansi.6}};
+  --code-tag: {{ansi.1}};
+  --code-operator: {{fg1}};
+  --code-punctuation: {{fg1}};
+}
+
+/* Written by hand, read in print: while a note is being written (the editor) the page is
+   Literata's italic, a pen's hand; reading view sets the same words upright, as a printed
+   book would. Inside the italic, emphasis turns upright, the way a book marks a word. */
+.theme-dark .markdown-source-view.mod-cm6 .cm-content,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content [class*="cm-list-"] {
+  font-style: italic;
+}
+.theme-dark .markdown-source-view.mod-cm6 .cm-content .cm-em {
+  font-style: normal;
+}
+.theme-dark .markdown-source-view.mod-cm6 .cm-content :is(.cm-inline-code, .HyperMD-codeblock),
+.theme-dark .markdown-source-view.mod-cm6 .cm-content .cm-line.HyperMD-header-2 {
+  font-style: normal;
+}
+
+/* Links: ink with a gilt dotted rule under it, never a blue word. */
+.theme-dark .markdown-rendered a,
+.theme-dark .markdown-source-view.mod-cm6 :is(.cm-hmd-internal-link, .cm-link, .cm-url) .cm-underline {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: {{tint}};
+  text-underline-offset: 0.2em;
+}
+.theme-dark .markdown-rendered a.is-unresolved {
+  text-decoration-color: {{fg2}};
+}
+
+/* Old-style figures sit in the line like letters; kerning and the common ligatures on. */
+.theme-dark .markdown-rendered,
+.theme-dark .markdown-source-view.mod-cm6 .cm-content {
+  font-feature-settings: "onum", "pnum", "kern", "liga";
+  font-kerning: normal;
+  hanging-punctuation: first allow-end;
+}
+.theme-dark .markdown-rendered table,
+.theme-dark .markdown-rendered code,
+.theme-dark .markdown-source-view.mod-cm6 .cm-inline-code {
+  font-feature-settings: "lnum", "tnum";
+}
+
+/* The note's title and a level-one heading open a chapter: centred, in the written italic. */
+.theme-dark .inline-title,
+.theme-dark .markdown-rendered h1,
+.theme-dark .markdown-source-view.mod-cm6 .cm-line.HyperMD-header-1 {
+  text-align: center;
+  letter-spacing: 0.005em;
+}
+.theme-dark .markdown-reading-view .inline-title::after {
+  content: "❦";
+  display: block;
+  margin-top: 0.15em;
+  font-size: 0.42em;
+  color: {{tint}};
+}
+
+/* A section heading in small capitals, spaced like a book's. */
+.theme-dark .markdown-rendered h2,
+.theme-dark .markdown-source-view.mod-cm6 .cm-line.HyperMD-header-2 {
+  letter-spacing: 0.06em;
+  font-variant-caps: all-small-caps;
+}
+
+/* A rule is an ornament: the fleuron in reading view, the asterism while editing. */
+.theme-dark .markdown-rendered hr {
+  border: 0;
+  height: auto;
+  overflow: visible;
+  text-align: center;
+}
+.theme-dark .markdown-rendered hr::after {
+  content: "❦";
+  font-family: "{{font.display}}", serif;
+  font-size: 1.3em;
+  color: {{tint}};
+}
+.theme-dark .markdown-source-view.mod-cm6.is-live-preview .cm-line.hr:not(.cm-active) hr {
+  display: none;
+}
+.theme-dark .markdown-source-view.mod-cm6.is-live-preview .cm-line.hr:not(.cm-active) {
+  justify-content: center;
+}
+.theme-dark .markdown-source-view.mod-cm6.is-live-preview .cm-line.hr:not(.cm-active)::after {
+  content: "⁂";
+  color: {{tint}};
+}
+
+/* A quotation is an epigraph: italic, quieter, set in from both sides. */
+.theme-dark .markdown-rendered blockquote {
+  margin-inline: 2.5em;
+  padding: 0;
+}
+.theme-dark .markdown-source-view.mod-cm6 .HyperMD-quote {
+  color: {{fg1}};
+  font-style: italic;
+}
+
+/* The markdown marks stay out of the way: the prose reads clean while it is written. */
+.theme-dark .markdown-source-view.mod-cm6 .cm-formatting,
+.theme-dark .markdown-source-view.mod-cm6 .cm-hmd-internal-link .cm-formatting-link {
+  color: {{fg2@0.8}};
+}
+
+/* The interface speaks like the page: italic tabs and status, small-capital section names. */
+.theme-dark .workspace-tab-header-inner-title,
+.theme-dark .status-bar {
+  font-style: italic;
+}
+.theme-dark .nav-folder-title,
+.theme-dark .tree-item-self.nav-folder-title {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+}
+.theme-dark .workspace-leaf-content[data-type="markdown"] .view-header-title {
+  font-family: "{{font.display}}", var(--font-text-theme);
+  font-style: italic;
+}
+
+/* A novel's page in reading view shows no form: its properties stay in the editor. */
+.theme-dark .markdown-preview-view.libro .metadata-container {
+  display: none;
+}
+
+/* cssclasses: libro (reading view): a novel's page, paragraphs indented and set close,
+   the first letter of a chapter's first paragraph dropped three lines in gilt. Reading
+   view wraps every block in its own div (.el-p, .el-h1, …), so siblings are those divs;
+   the first paragraph is the one after the chapter heading or after the note's header. */
+.theme-dark .libro.markdown-rendered .el-p + .el-p > p,
+.theme-dark .libro .markdown-rendered .el-p + .el-p > p {
+  text-indent: 1.5em;
+  margin-block-start: -0.6em;
+}
+.theme-dark .libro.markdown-rendered :is(.el-h1, .mod-header) + .el-p > p::first-letter,
+.theme-dark .libro .markdown-rendered :is(.el-h1, .mod-header) + .el-p > p::first-letter {
+  float: left;
+  font-family: "{{font.display}}", serif;
+  font-style: italic;
+  font-size: 3.4em;
+  line-height: 0.85;
+  padding: 0.04em 0.08em 0 0;
+  color: {{tint}};
+}

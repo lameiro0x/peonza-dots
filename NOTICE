@@ -24,7 +24,7 @@ That covers, wherever they appear in the tree:
 - the terminal, fetch and greeting pictures of the peonza (themes/*/fastfetch/,
   themes/*/neofetch/, themes/*/greet/);
 - the generated wallpapers and their masters: Grafito's dot plates, Tinta's drawing
-  sheets and lock picture, Papel's Tractatus covers, every theme's launcher panel
+  sheets and lock picture, Papel's reading room and title page, every theme's launcher panel
   (assets/wallpapers/grafito-*, tinta-*, papel*; the matching files in themes/*/wallpaper/);
 - the boot, login and new tab art (theme/boot/grub/, theme/boot/greeter/,
   themes/*/boot/, themes/*/chromium/newtab/);
@@ -61,9 +61,10 @@ grading: assets/wallpapers/README.md.
 - Jasper Francis Cropsey, *Autumn – On the Hudson River* (1860). National Gallery of
   Art, via Wikimedia Commons. Public domain. (origen-hudson.jpg)
 
-Papel's covers measure Ludwig Wittgenstein's *Logisch-philosophische Abhandlung*
-(1921, German original; public domain): theme/wallpaper/tractatus.json keeps only each
-proposition's number, length and question marks, not the text.
+Papel's pictures set the opening of Miguel de Cervantes, *El ingenioso hidalgo don
+Quijote de la Mancha* (1605; public domain), from the 1905 Barcelona edition on
+Wikisource with modernised accents, and its new tab recreates the 1605 title page
+(Juan de la Cuesta, Madrid) in type, with the printer's device redrawn around the peonza.
 
 
 3. Fonts: SIL Open Font License 1.1
@@ -75,6 +76,7 @@ Vendored in assets/fonts/, each with its licence in assets/fonts/licenses/:
 - Space Grotesk, Florian Karsten
 - Doto, Óliver Lalan
 - Instrument Serif, Rodrigo Fuenzalida and Jordan Egstad
-- Space Mono, Colophon Foundry
+- Literata, TypeTogether
+- EB Garamond, Georg Duffner and Octavio Pardo
 
 RycePeonza.otf is not one of them: it is the mark (section 1).

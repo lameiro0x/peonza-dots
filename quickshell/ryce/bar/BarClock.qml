@@ -5,7 +5,8 @@ import qs as Ryce
 // Time and date at the right end. Inline in most themes, the date first in a quieter
 // ink: Grafito sets the time in its dot-matrix face at its minimum readable size, the
 // largest thing on a bar that speaks that face throughout (BarUi.dots), after an
-// uppercase date; Ola sets it in its display serif. Tinta stacks a small time over the
+// uppercase date; Ola sets it in its display serif, Papel in its display italic with
+// old-style figures, a running head's folio. Tinta stacks a small time over the
 // date in numbers, as a terminal status line does. Every line is centred on its ink
 // (BarText), so the large display numerals sit level with the smaller readouts. A click
 // drops the month under it (CalendarWindow); its ground stays lit while that is open.
@@ -15,7 +16,7 @@ Module {
     readonly property var es: Qt.locale("es_ES")
     readonly property bool stacked: BarUi.skin === "box"
     readonly property bool dots: BarUi.dots
-    readonly property bool serif: BarUi.skin === "capsule"
+    readonly property bool serif: BarUi.skin === "capsule" || BarUi.folio
     // Doto's colon is a dotted dagger; its middle dot reads as the separator.
     readonly property string time: Qt.formatTime(sys.date, dots ? "HH'·'mm" : "HH:mm")
     readonly property string date: es.toString(sys.date, "ddd d MMM").replace(/\./g, "")     // «lun 9 nov»
@@ -45,6 +46,7 @@ Module {
         font.family: clock.serif ? Ryce.Palette.fontDisplay : BarUi.face
         font.pixelSize: clock.dots ? Ryce.Palette.fontDisplayMinPx : clock.serif ? Math.round(BarUi.band * 0.48) : BarUi.textPx
         font.weight: clock.dots ? BarUi.weight : clock.serif ? Font.Normal : Font.Medium     // Doto: the readouts' Black, never its specks
+        font.italic: BarUi.folio
     }
     Item {
         visible: clock.stacked

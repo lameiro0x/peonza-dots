@@ -3,8 +3,9 @@
 The user asked for real pictures from the internet, not generated ones (2026-11-09), except
 Grafito's dot plates, which stay generated (`theme/wallpaper/scenes.py` for the main one,
 `theme/wallpaper/dots.py` for the other two), Tinta's drawing sheets and lock picture, which
-the user asked for (2026-11-12, 2026-11-14) and `theme/wallpaper/ink.py` draws, and Papel's two
-Tractatus covers, which `theme/wallpaper/paper.py` draws (2026-11-14). Each master here is
+the user asked for (2026-11-12, 2026-11-14) and `theme/wallpaper/ink.py` draws, and Papel's reading
+room and title page, which `theme/wallpaper/paper.py` draws (2026-11-19, replacing the
+Tractatus covers of 2026-11-14). Each master here is
 already cropped to 16:9 at 2560x1440 (lock pictures at 1920x1080); `scenes.py` derives every
 size, the selector and picker thumbs, the launcher panel and the lock picture from it.
 
@@ -26,8 +27,8 @@ and its alternates is the `wallpaper` block of its contract (`contracts/themes/<
 | `tinta-despiece.jpg` | Tinta | Sheet RY-PZ-002: the peonza exploded into grip, body and steel tip, balloons, parts list, the tip in half-section at 4:1 | made here: `python3 theme/wallpaper/ink.py` | the user's own mark, all rights reserved |
 | `tinta-estela.jpg` | Tinta | Sheet RY-PZ-003: the axis's trace from above as the spin decays (precession and nutation), spin and lean against time | made here: `python3 theme/wallpaper/ink.py` | the user's own mark, all rights reserved |
 | `tinta-lock.jpg` | Tinta (lock) | The peonza's half-section so close its rim runs off the screen: black body, hatched cut, pale gridded paper and the degree ring (replaces the anime eye, 2026-11-14) | made here: `python3 theme/wallpaper/ink.py` | the user's own mark, all rights reserved |
-| `papel.jpg` | Papel | The Tractatus as dots on cream paper (one per proposition, radius from its length, filled to three decimals, a pale halo behind the questions) filling the peonza's silhouette, after the Ludwig Wittgenstein Project's book covers | made here: `python3 theme/wallpaper/paper.py` from `theme/wallpaper/tractatus.json` and `~/Repos/logo-peonza/brand/mark/peonza-silhouette.svg` | the user's own mark, all rights reserved; the text is public domain |
-| `papel-lock.jpg` | Papel (lock) | The same book as a cover block with the window hyprlock writes the time in | made here: `python3 theme/wallpaper/paper.py` | public domain text, drawn here |
+| `papel.jpg` | Papel | An open book on green baize under a lamp: the opening of *Don Quijote* in Literata as ghost text (about 1.4:1), running heads in small capitals, a gilt swash initial E in EB Garamond and the peonza as a gilt fleuron | made here: `python3 theme/wallpaper/paper.py` with `~/Repos/logo-peonza/brand/mark/peonza-silhouette.svg` | the user's own mark, all rights reserved; the text is public domain |
+| `papel-lock.jpg` | Papel (lock) | A title page: a gilt double frame, the peonza as printer's device and a calm centre where hyprlock writes the hour in words | made here: `python3 theme/wallpaper/paper.py` | the user's own mark, all rights reserved |
 
 To replace one: crop the new picture to 16:9, save it here at 2560x1440 (JPEG q≈93,
 4:4:4), point `wallpaper.source` (or `lock_source`) of the theme at it and run
